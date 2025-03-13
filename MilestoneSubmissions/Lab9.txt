@@ -17,6 +17,7 @@ Calvin Wagner, Github: CalvinWagner05, email: cawa9142@colorado.edu
 Wyatt Lyda, email: wyly3647@colorado.edu, github: wyatt-lyda
 Christina Fernandez, Github: chfe8281 email: chfe8281@colorado.edu 
 Benjamin Willcutt, Github: benwillcutt, email: bewi8864@colorado.edu
+Kaitlyn Brown,
 
 4. Application Name: Coding Buddy
 
