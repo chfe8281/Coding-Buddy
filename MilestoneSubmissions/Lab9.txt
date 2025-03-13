@@ -1,0 +1,41 @@
+Group coding (paired session)
+Use external API for coding problems/test cases
+Starting code
+Different languages
+Reward system
+Tracking how many done
+Badges earned
+Add a dashboard
+Timed coding competitions
+
+Team Number: 1
+Team Name: Coding Baddies
+Team Members:
+
+Jack Toenjes Github: Ponippp Email: jato9234@colorado.edu
+Calvin Wagner, Github: CalvinWagner05, email: cawa9142@colorado.edu
+Wyatt Lyda, email: wyly3647@colorado.edu, github: wyatt-lyda
+Christina Fernandez, Github: chfe8281 email: chfe8281@colorado.edu 
+Benjamin Willcutt, Github: benwillcutt, email: bewi8864@colorado.edu
+
+4. Application Name: Coding Buddy
+
+5. Description:
+
+We want to create a website where users can log on to study CS topics in various coding languages with a friend or alone. We think it would be interesting to build an application that combines the ideas of the structures of Quizlet and Leetcode applications.
+
+There will be coding problems with starter code, problem description, and test cases. The user can choose to code in different languages. For each problem they get correct, they earn points. For these coding problems, users are able to work together in pairs to solve the problem.
+
+
+There will be multiple choice quizzes for cs concepts. Then depending on the users’ answers and score they get personalized flashcards to review what they got wrong.
+There will be flashcards for cs definitions and syntax to practice. 
+There will also be the ability for users to make their own flashcards.
+If working alone on code isn't enough, users can also practice coding with other people as our website gives an easy to use group coding environment that updates in real time.
+Our website covers different CS topics and allows users to practice coding while also learning CS conceptually. It ideally has questions for different coding languages. You can also challenge what you have learned through coding challenges that all users can compete in and receive awards for participating in. 
+
+
+6. The specific audience we are targeting is aspiring computer science students and software developers. The age group would primarily be high school and college students. The project encourages the audience to study and understand core principles of software engineering through flashcards and hands-on problems in an easy and fun way.
+
+7. For students who are struggling to learn how to code. Coding Buddy is an online tool that makes learning to code SO FUN. Unlike Quizlet or LeetCode, our product is collaborative.
+
+8. 
