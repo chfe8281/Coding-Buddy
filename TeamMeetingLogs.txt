@@ -1,1 +1,34 @@
+Week 1 Minutes (March 17, 2025):
 
+Things Done Last Week:
+-Wyatt: Login/register wireframe
+-Calvin: homepage wireframe
+-Jack: MC quiz wireframe
+-Ben: profile page wireframe
+-Christina: coding exercises wireframe, start case diagram
+-Kaitlyn: flashcards wireframe
+
+Decisions made:
+-Common goals:
+1. API reference- mock experience?
+***Coding structure and test cases
+ -Mock: have questions mocked into website, one language with a few questions
+ -Split: some look for API, some work on backup
+2. Set up initial commit (repo)
+
+Individual goals:
+-Wyatt: Look into API, coding environment setup
+-Calvin: home page UI/HTML setup
+-Jack: database schema- ER diagram, MC quizzes
+-Kaitlyn: flashcards page HTML/skeleton
+-Ben: profile/stats page: leaderboard, points, streak(?)
+-Christina: API, coding page skeleton
+
+Alternative actions/options discussed:
+-Can't find API? create two problems with 4-5 test cases, can be one language
+-Scope: Think about checking code solutions manually- ex: .cpp file
+
+Follow-up items, including agreed-on roles and responsibilities:
+-Find API or look into other possibilities
+-Follow-up on plan B (mockup) if API not possible
+-Email TA plan (either mockup or API)
