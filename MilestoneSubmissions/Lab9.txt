@@ -17,7 +17,7 @@ Calvin Wagner, Github: CalvinWagner05, email: cawa9142@colorado.edu
 Wyatt Lyda, email: wyly3647@colorado.edu, github: wyatt-lyda
 Christina Fernandez, Github: chfe8281 email: chfe8281@colorado.edu 
 Benjamin Willcutt, Github: benwillcutt, email: bewi8864@colorado.edu
-Kaitlyn Brown,
+Kaitlyn Brown, Github: TenorPanther, email: kabr3253@colorado.edu
 
 4. Application Name: Coding Buddy
 
@@ -37,10 +37,10 @@ Our website covers different CS topics and allows users to practice coding while
 
 6. The specific audience we are targeting is aspiring computer science students and software developers. The age group would primarily be high school and college students. The project encourages the audience to study and understand core principles of software engineering through flashcards and hands-on problems in an easy and fun way.
 7. For students who are struggling to learn how to code. Coding Buddy is an online tool that makes learning to code SO FUN. Unlike Quizlet or LeetCode, our product is collaborative.
-8. Repo
+8. Repo: https://github.com/chfe8281/Coding-Buddy
 9. 
 
-10. Discord
+10. We are using a Discord group chat for team communication.
 
 11. Group meeting Mondays at 2:00pm, Meeting with TA Mondays at 3:00pm
 
