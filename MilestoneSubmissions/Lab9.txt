@@ -25,7 +25,7 @@ Kaitlyn Brown, Github: TenorPanther, email: kabr3253@colorado.edu
 
 We want to create a website where users can log on to study CS topics in various coding languages with a friend or alone. We think it would be interesting to build an application that combines the ideas of the structures of Quizlet and Leetcode applications.
 
-There will be coding problems with starter code, problem description, and test cases. The user can choose to code in different languages. For each problem they get correct, they earn points. For these coding problems, users are able to work together in pairs to solve the problem.
+There will be coding problems with starter code, problem description, and test cases. The user can choose to code in different languages. For each problem they get correct, they earn points. For these coding problems, users are able to work together in pairs to solve the problem. They also have the option to time themselves by clicking a button up top to set a timer.
 
 
 There will be multiple choice quizzes for cs concepts. Then depending on the users’ answers and score they get personalized flashcards to review what they got wrong.
