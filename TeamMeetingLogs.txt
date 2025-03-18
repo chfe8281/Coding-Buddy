@@ -17,7 +17,7 @@ Decisions made:
 2. Set up initial commit (repo)
 
 Individual goals:
--Wyatt: Look into API, coding environment setup
+-Wyatt: Look into API, login/register skeleton, partials (e.g. nav)
 -Calvin: home page UI/HTML setup
 -Jack: database schema- ER diagram, MC quizzes
 -Kaitlyn: flashcards page HTML/skeleton
