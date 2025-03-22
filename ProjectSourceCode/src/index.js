@@ -53,7 +53,6 @@ db.connect()
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 
 // initialize session variables
 app.use(
@@ -189,6 +188,22 @@ const auth = (req, res, next) => {
 // *****************************************************
 // <!-- Start Server -->
 // *****************************************************
+// Route: /profile
+// Method: GET
+// Renders the profile page (with mock data for now)
+app.get('/profile', (req, res) => {
+  const userProfile = {
+    name: "FirstName LastName",
+    email: "email@example.com",
+    username: "username",
+    avatar: "https://ui-avatars.com/api/?name=F+L&background=random",
+    points: 100,
+    leaderboardPosition: 32,
+    streak: 3
+  };
+
+  res.render('pages/profile', userProfile);
+});
 
 let topic = "";
 app.get('/codingExercise', (req, res) => {

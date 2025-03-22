@@ -1,0 +1,55 @@
+<!-- src/views/pages/profile.hbs -->
+
+{{! Use the main layout }}
+{{!< layouts/main }}
+
+<div class="container mt-5">
+  <div class="row">
+    <!-- Profile Picture Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm" style="border-radius: 15px;">
+        <div class="card-body text-center">
+          <img src="{{avatar}}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; border: 5px solid #f0f0f0;">
+          <h5 class="card-title" style="font-size: 1.5rem; font-weight: bold;">{{name}}</h5>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Information Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm" style="border-radius: 15px;">
+        <div class="card-body">
+          <h5 class="card-title" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">User Information</h5>
+          <p class="card-text"><strong>Name:</strong> {{name}}</p>
+          <p class="card-text"><strong>Username:</strong> {{username}}</p>
+          <p class="card-text"><strong>Email:</strong> {{email}}</p>
+          <a href="#" class="btn btn-primary mt-3" style="width: 100%;">Edit Profile</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Points and Leaderboard Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm" style="border-radius: 15px;">
+        <div class="card-body">
+          <h5 class="card-title" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">Achievements</h5>
+          <p class="card-text">You have earned <strong style="color: #28a745;">{{points}}</strong> points from coding problems!</p>
+          <p class="card-text">This puts you in the top <strong style="color: #007bff;">{{leaderboardPosition}}%</strong> of learners!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Streak Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm" style="border-radius: 15px;">
+        <div class="card-body">
+          <h5 class="card-title" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">Daily Streak</h5>
+          <p class="card-text">You are on a <strong style="color: #ffc107;">{{streak}}</strong> day streak!</p>
+          <div class="progress mt-3" style="height: 20px; border-radius: 10px;">
+            <div class="progress-bar bg-warning" role="progressbar" style="width: {{streak}}%;" aria-valuenow="{{streak}}" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
