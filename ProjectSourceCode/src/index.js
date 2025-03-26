@@ -65,6 +65,11 @@ app.use(
   })
 );
 
+app.get('/', (req, res) => {
+  res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
+  // helpers.startCountdown();
+});
+
 
 app.listen(3000);
 console.log('Server is listening on port 3000');
