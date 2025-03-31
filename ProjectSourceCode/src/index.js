@@ -189,7 +189,6 @@ const auth = (req, res, next) => {
 // <!-- Start Server -->
 // *****************************************************
 // Route: /profile
-// Method: GET
 // Renders the profile page (with mock data for now)
 app.get('/profile', (req, res) => {
   const userProfile = {
