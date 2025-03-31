@@ -65,7 +65,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // *****************************************************
 
 // Route: /profile
-// Method: GET
 // Renders the profile page (with mock data for now)
 app.get('/profile', (req, res) => {
   const userProfile = {
@@ -79,6 +78,26 @@ app.get('/profile', (req, res) => {
   };
 
   res.render('pages/profile', userProfile);
+});
+
+// Route: /profile/edit (GET) - Show edit form
+app.get('/profile/edit', (req, res) => {
+  const userProfile = {
+    name: "FirstName LastName",
+    email: "email@example.com",
+    username: "username",
+    avatar: "https://ui-avatars.com/api/?name=F+L&background=random",
+  };
+  res.render('pages/edit-profile', userProfile);
+});
+
+// Route: /profile/edit (POST) - Handle form submission
+app.post('/profile/edit', (req, res) => {
+  // In a real app, you would save the changes to your database here
+  console.log('Profile updated with:', req.body);
+  
+  // Redirect back to profile page after saving
+  res.redirect('/profile');
 });
 
 // *****************************************************
