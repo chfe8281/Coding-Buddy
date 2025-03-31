@@ -82,7 +82,74 @@ app.get('/register', (req, res) => {
 app.get('/login', (req,res)=>{
     res.render('pages/login')
 });
+// Route: /register
+// Method: POST
+// route for inserting hashed password into users table
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
 
+  try {
+      console.log('Received registration request:', { username });
+      const userExists = await db.any('SELECT * FROM users WHERE username = $1', [username]);
+      console.log('User exists check result:', userExists);
+
+      if (userExists.length > 0) {
+          console.log('Username already taken.');
+          return res.render('pages/register', { message: 'Username already taken. Try a different one.' });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      console.log('Hashed password:', hashedPassword);
+
+      await db.none(
+          'INSERT INTO users (username, password) VALUES ($1, $2)',
+          [username, hashedPassword]
+      );
+
+      console.log('User registered successfully');
+      return res.redirect('/login');
+
+  } catch (error) {
+      console.error('Registration error:', error);
+      res.status(500).send(`Internal Server Error: ${error.message}`);
+  }
+});
+// Route: /login
+// Method: POST
+///login - Authenticate user
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  console.log('Login attempt:', { username });
+
+  try {
+      const result = await db.query('SELECT * FROM users WHERE username = $1', [username]);
+      console.log('Query result:', result);
+
+      if (!result || result.length === 0) {
+          console.log('User not found in the database.');
+          return res.render('pages/login', { message: 'User not found. Please register first.' });
+      }
+
+      const user = result[0]; 
+      console.log('Retrieved user:', username);
+      const match = await bcrypt.compare(password, user.password);
+
+      if (!match) {
+          console.log('Incorrect password.');
+          return res.render('pages/login', { message: 'Incorrect username or password.' });
+      }
+
+      req.session.user = user;
+      req.session.save(() => {
+          console.log('User authenticated, redirecting to /discover');
+          res.redirect('/discover');
+      });
+
+  } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).send(`Internal Server Error: ${error.message}`);
+  }
+});
 // *****************************************************
 // <!-- Start Server -->
 // *****************************************************
