@@ -65,6 +65,56 @@ app.use(
   })
 );
 
+app.get('/home', (req, res) => {
+  res.render('pages/homePage');
+});
+
 
 app.listen(3000);
 console.log('Server is listening on port 3000');
+
+// *****************************************************
+// <!-- Home Page JS -->
+// *****************************************************
+
+    let currentIndex = 0;
+    const images = document.querySelectorAll('.carousel img');
+    const totalImages = images.length;
+
+    function showImage(index) {
+      images.forEach((img, i) => {
+        img.classList.toggle('active', i === index);
+      });
+    }
+
+    function nextImage() {
+      currentIndex = (currentIndex + 1) % totalImages;
+      showImage(currentIndex);
+    }
+
+    function prevImage() {
+      currentIndex = (currentIndex - 1 + totalImages) % totalImages;
+      showImage(currentIndex);
+    }
+
+    // Function to reset the timer
+    function resetTimer() {
+      clearInterval(timer);
+      timer = setInterval(nextImage, 5000);
+    }
+
+    document.querySelector('.carousel a.next').addEventListener('click', function(e) {
+      e.preventDefault();
+      nextImage();
+      resetTimer();
+    });
+
+    document.querySelector('.carousel a.prev').addEventListener('click', function(e) {
+      e.preventDefault();
+      prevImage();
+      resetTimer();
+    });
+
+    // Initialize timer to change images every 5 seconds
+    let timer = setInterval(nextImage, 5000);
+    showImage(currentIndex);

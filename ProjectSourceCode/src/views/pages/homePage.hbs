@@ -78,7 +78,7 @@
     }
     /* Main content background under the header */
     .main-content {
-      background-color: lightblue;
+      background-color: rgb(185, 210, 218);
       padding: 20px 0;
     }
     /* Slogan styling (now matching the container width) */
@@ -120,7 +120,7 @@
       align-items: center;
       gap: 10px;
     }
-    .divider-vertical {
+    .divider {
       width: 1px;
       background-color: #000;
       height: 80%; /* Adjust height as needed */
@@ -165,7 +165,7 @@
           <h2><i class="bi bi-flag"></i> Mission</h2>
           <p>Coding Buddy is an online tool targeted towards up and coming computer science students to help them learn and improve their knowledge on a vast majority of computer science topics. We believe that tailoring learning to the individual is the most effective method to achieve mastery of a subject. That is why learning on Coding Buddy takes into account your own personal pre-requisite knowledge.</p>
         </div>
-        <div class="divider-vertical"></div>
+        <div class="divider"></div>
         <div class="image-box">
           <img src="images/img1.webp" alt="Row 1 Image">
         </div>
@@ -177,7 +177,7 @@
           <p>Coding Buddy's learning algorithm is targeted to primarily focus on topics and concepts that you personally struggle with. This is through our MC test system which identifies which question you get incorrect and then tailors practice questions and learning flashcards to your needs.</p>
           <p>To get started, navigate over to the MC Test tab and complete the test. After you finish, your score as well as the questions you answered correctly and incorrectly will be recorded. It will then give you feedback on what topics in particular you should focus more on. You can then navigate either to the flashcards or coding questions tab to practice the concepts you got incorrect. These questions will be tailored specifically to the outcome of your test and once you feel confident, you can retake the test to solidify your mastery of the topic.</p>
         </div>
-        <div class="divider-vertical"></div>
+        <div class="divider"></div>
         <div class="image-box">
           <img src="images/img2.jpg" alt="Row 2 Image">
         </div>
@@ -188,7 +188,7 @@
           <h2><i class="bi bi-star"></i> To-Do</h2>
           <p>Possibly a section where is suggests what to do next based on what you have achieved so far</p>
         </div>
-        <div class="divider-vertical"></div>
+        <div class="divider"></div>
         <div class="image-box">
           <img src="/images/row3.jpg" alt="Row 3 Image">
         </div>
@@ -199,7 +199,7 @@
           <h2><i class="bi bi-lightning-charge"></i> Row 4 Title</h2>
           <p>Undecided</p>
         </div>
-        <div class="divider-vertical"></div>
+        <div class="divider"></div>
         <div class="image-box">
           <img src="/images/row4.jpg" alt="Row 4 Image">
         </div>
@@ -208,49 +208,6 @@
   </div>
 
   <!-- JavaScript for Carousel Functionality -->
-  <script>
-    let currentIndex = 0;
-    const images = document.querySelectorAll('.carousel img');
-    const totalImages = images.length;
-
-    function showImage(index) {
-      images.forEach((img, i) => {
-        img.classList.toggle('active', i === index);
-      });
-    }
-
-    function nextImage() {
-      currentIndex = (currentIndex + 1) % totalImages;
-      showImage(currentIndex);
-    }
-
-    function prevImage() {
-      currentIndex = (currentIndex - 1 + totalImages) % totalImages;
-      showImage(currentIndex);
-    }
-
-    // Function to reset the timer
-    function resetTimer() {
-      clearInterval(timer);
-      timer = setInterval(nextImage, 5000);
-    }
-
-    document.querySelector('.carousel a.next').addEventListener('click', function(e) {
-      e.preventDefault();
-      nextImage();
-      resetTimer();
-    });
-
-    document.querySelector('.carousel a.prev').addEventListener('click', function(e) {
-      e.preventDefault();
-      prevImage();
-      resetTimer();
-    });
-
-    // Initialize timer to change images every 5 seconds
-    let timer = setInterval(nextImage, 5000);
-    showImage(currentIndex);
-  </script>
-  <script src="/js/homePage.js"></script>
+  <script src="Coding-Buddy/ProjectSourceCode/src/index.js"></script>
 </body>
 </html>
