@@ -12,6 +12,7 @@ const bodyParser = require('body-parser');
 const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
 const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
+const qs = require('qs');
 const e = require('express');
 
 // *****************************************************
@@ -65,9 +66,41 @@ app.use(
   })
 );
 
-app.get('/', (req, res) => {
+app.get('/codingExercise', (req, res) => {
   res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
+});
+
+app.post('/codingExercise', (req, res) => {
+  var input = req.body.code;
+  console.log(input);
+  var data = qs.stringify({
+    'language': "c++",   // Language: C++
+    'source': input,
+    'stdin': '',   // No input required
+    'stdout': 'true',  // Expect stdout in the response
+    'stderr': 'true'   // Expect stderr in the response
+  });
+
+  var config = {
+    method: 'post',
+    url: 'https://emkc.org/api/v1/piston/execute',  // Piston API endpoint
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    data: data
+  };
+
+  axios(config)
+    .then(function (response) {
+      console.log('Output:', response.data);
+      /*res.render('pages/codingExercise.hbs'), {
+        output: response.data.output
+      }*/
+    })
+    .catch(function (error) {
+      console.log('Error:', error);
+    });
 });
 
 
