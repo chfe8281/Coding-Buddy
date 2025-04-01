@@ -1,23 +1,23 @@
 const quizData = [
     {
-        question: "1300 Question Here",
-        options: ["A", "B", "C", "D"],
+        question: "What is the output of the following code? API CALL HERE",
+        options: ["A) 6", "B) 5", "C) Compilation Error", "D) Undefined Behavior"],
         correct: 2
     },
     {
-        question: "2270 Question Here",
-        options: ["A", "B", "C", "D"],
-        correct: 1
-    },
-    {
-        question: "2400 Question Here",
-        options: ["A", "B", "C", "D"],
+        question: "What will be the output of the following statement? API TO GET IN PROPER FORMATTING: cout << 5 / 2;",
+        options: ["A) 2.5", "B) 2", "C) 2.0", "D) Compilation Error"],
         correct: 2
     },
     {
-        question: "3104 Question Here",
-        options: ["A", "B", "C", "D"],
+        question: "Which loop is guaranteed to execute at least once?",
+        options: ["A) for loop", "B) while loop", "C) do-while loop", "D) All loops execute at least once"],
         correct: 3
+    },
+    {
+        question: "What is the correct way to dynamically allocate memory for an integer in C++?",
+        options: ["A) int *ptr = malloc(sizeof(int));", "B) int *ptr = new int;", "C) int *ptr = (int*)malloc(sizeof(int));", "D) int ptr = new int;"],
+        correct: 2
     },
     {
         question: "More Questions Here",
