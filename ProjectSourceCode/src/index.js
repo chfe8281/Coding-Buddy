@@ -66,7 +66,7 @@ app.use(
 );
 
 
-app.get('/', (req, res) => {
+app.get('/codingExercise', (req, res) => {
   res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
 });

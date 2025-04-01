@@ -1,6 +1,6 @@
-module.exports = {
+
             // Function to start the countdown
-    startCountdown: function(){
+function startCountdown(){
         let countdownTime = 1800;
         const timerElement = document.getElementById('timer');
         timerElement.style.backgroundColor = 'rgb(214, 246, 214)';
@@ -24,8 +24,7 @@ module.exports = {
                 timerElement.textContent = "Time's up!";
             }
         }, 1000);
-    }
+}
 
-};
         // Start the countdown when the page loads
 // window.onload = startCountdown;        
