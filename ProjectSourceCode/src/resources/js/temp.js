@@ -1,27 +1,27 @@
 const quizData = [
     {
-        question: "What is the capital of France?",
-        options: ["London", "Berlin", "Paris", "Madrid"],
+        question: "1300 Question Here",
+        options: ["A", "B", "C", "D"],
         correct: 2
     },
     {
-        question: "Which planet is known as the Red Planet?",
-        options: ["Venus", "Mars", "Jupiter", "Saturn"],
+        question: "2270 Question Here",
+        options: ["A", "B", "C", "D"],
         correct: 1
     },
     {
-        question: "Who painted the Mona Lisa?",
-        options: ["Vincent van Gogh", "Pablo Picasso", "Leonardo da Vinci", "Michelangelo"],
+        question: "2400 Question Here",
+        options: ["A", "B", "C", "D"],
         correct: 2
     },
     {
-        question: "What is the largest ocean on Earth?",
-        options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+        question: "3104 Question Here",
+        options: ["A", "B", "C", "D"],
         correct: 3
     },
     {
-        question: "Which element has the chemical symbol 'O'?",
-        options: ["Gold", "Silver", "Oxygen", "Iron"],
+        question: "More Questions Here",
+        options: ["A", "B", "C", "D"],
         correct: 2
     }
 ];
