@@ -14,6 +14,7 @@ const bcrypt = require('bcryptjs'); //  To hash passwords
 const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
 const qs = require('qs');
 const e = require('express');
+const { mainModule } = require('process');
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -71,37 +72,107 @@ app.get('/codingExercise', (req, res) => {
   // helpers.startCountdown();
 });
 
-app.post('/codingExercise', (req, res) => {
-  var input = req.body.code;
-  console.log(input);
-  var data = qs.stringify({
-    'language': "c++",   // Language: C++
-    'source': input,
-    'stdin': '',   // No input required
-    'stdout': 'true',  // Expect stdout in the response
-    'stderr': 'true'   // Expect stderr in the response
-  });
+app.post('/codingExercise', async(req, res) => {
+    let input = req.body.code;
+    let input_1 = "";
+    let output_1 = "";
+    var getQuestion = `SELECT input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
+    try {
+      let results = await db.one(getQuestion);
+      input_1 = results.input_1;
+      output_1 = results.output_1;
+      console.log("INPUT1", input_1);
+      console.log(results);
+      
+    } catch (err) {
+      res.redirect('/codingExercise')
+    }
+    const axios = require('axios');
+    let data = JSON.stringify({
+      "language": "python",
+      "version": "3.10.0",
+      "files": [
+        {
+          "name": "my_cool_code.js",
+          "content": `${input}\n${input_1}`
+        }
+      ],
+      "stdin": "",
+      "args": [
+        "1",
+        "2",
+        "3"
+      ],
+      "compile_timeout": 10000,
+      "run_timeout": 3000,
+      "compile_cpu_time": 10000,
+      "run_cpu_time": 3000,
+      "compile_memory_limit": -1,
+      "run_memory_limit": -1
+    });
+
+    console.log("Input", data);
+
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'https://emkc.org/api/v2/piston/execute',
+      headers: { 
+        'Content-Type': 'application/json', 
+        'Cookie': 'engineerman.sid=s%3Akvnpn0FXmlPNrj5oQAzFdWL3_PfixMdO.6tPjcuIScWntIC6%2BYY2vnbqfu5UeM664ikYYImkm8Qc'
+      },
+      data : data
+    };
+
+    axios.request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data.run.output));
+      let output = JSON.stringify(response.data.run.output);
+      let message = "no";
+      if (output_1 == output)
+      {
+        message = "yes";
+      }
+      console.log(output);
+      res.render('pages/codingExercise.hbs', {
+        response: message
+      })
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+});
+
+/*app.post('/codingExercise', (req, res) => {
+  let input = req.body.code;
+  console.log("input", input);
+  var data = {
+    "lang": "CPP17",
+    "source": input,
+  };
 
   var config = {
     method: 'post',
-    url: 'https://emkc.org/api/v1/piston/execute',  // Piston API endpoint
+    url: 'https://api.hackerearth.com/v4/partner/code-evaluation/submissions/',  // Piston API endpoint
     headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Client-Secret': '4b9c1323874d2a652bd28c71b33dd6f997a8914d'
     },
     data: data
   };
-
+  console.log("data1", data);
   axios(config)
     .then(function (response) {
-      console.log('Output:', response.data);
-      /*res.render('pages/codingExercise.hbs'), {
+      console.log('Output:', response);
+      res.render('pages/codingExercise.hbs'), {
         output: response.data.output
-      }*/
+      }
     })
     .catch(function (error) {
       console.log('Error:', error);
     });
-});
+});*/
 
 
 app.listen(3000);
