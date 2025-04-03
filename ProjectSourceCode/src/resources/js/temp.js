@@ -1,3 +1,4 @@
+<
 const quizData = [
     {
         question: "What is the output of the following code? API CALL HERE",
@@ -123,3 +124,4 @@ nextBtn.addEventListener('click', () => {
 });
 
 loadQuestion();
+
