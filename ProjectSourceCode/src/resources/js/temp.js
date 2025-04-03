@@ -89,7 +89,7 @@ app.get('/login', (req,res)=>{
 // Method: POST
 // Route for inserting hashed password and email into users table
 app.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, name, password } = req.body;
 
   try {
       console.log('Received registration request:', { username, email });
@@ -105,8 +105,8 @@ app.post('/register', async (req, res) => {
       console.log('Hashed password:', hashedPassword);
 
       await db.none(
-          'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
-          [username, email, hashedPassword]
+          'INSERT INTO users (username, email, name, password) VALUES ($1, $2, $3, $4)',
+          [username, email, name, hashedPassword]
       );
 
       console.log('User registered successfully');
