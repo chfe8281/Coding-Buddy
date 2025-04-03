@@ -9,10 +9,8 @@ const Handlebars = require('handlebars');
 const path = require('path');
 const pgp = require('pg-promise')(); // To connect to the Postgres DB from the node server
 const bodyParser = require('body-parser');
-const session = require('express-session'); // To set the session object. To store or access session data, use the `req.session`, which is (generally) serialized as JSON by the store.
-const bcrypt = require('bcryptjs'); //  To hash passwords
-const axios = require('axios'); // To make HTTP requests from our server. We'll learn more about it in Part C.
-const e = require('express');
+const session = require('express-session'); // To set the session object
+const bcrypt = require('bcryptjs'); // To hash passwords
 
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
@@ -45,3 +43,130 @@ db.connect()
   .catch(error => {
     console.log('ERROR:', error.message || error);
   });
+
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
+
+// initialize session variables
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
+  })
+);
+
+// allow access to public/images/default-event
+app.use(express.static(path.join(__dirname, 'public')));
+
+// *****************************************************
+// <!-- API Routes -->
+// *****************************************************
+
+// Route: /
+// Method: GET
+// take user to login page by default
+app.get('/', (req, res) => {
+    res.redirect('/login');
+  });
+// Route: /register
+// Method: GET
+// renders the register page
+app.get('/register', (req, res) => {
+    res.render('pages/register'); 
+});
+// Route: /login
+// Method: GET
+// renders the login page
+app.get('/login', (req,res)=>{
+    res.render('pages/login')
+});
+// Route: /register
+// Method: POST
+// route for inserting hashed password into users table
+// Route: /register
+// Method: POST
+// Route for inserting hashed password and email into users table
+app.post('/register', async (req, res) => {
+  const { username, email, name, password } = req.body;
+
+  try {
+      console.log('Received registration request:', { username, email });
+      const userExists = await db.any('SELECT * FROM users WHERE username = $1 OR email = $2', [username, email]);
+      console.log('User exists check result:', userExists);
+
+      if (userExists.length > 0) {
+          console.log('Username or Email already taken.');
+          return res.render('pages/register', { message: 'Username or Email already taken. Try a different one.' });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      console.log('Hashed password:', hashedPassword);
+
+      await db.none(
+          'INSERT INTO users (username, email, name, password) VALUES ($1, $2, $3, $4)',
+          [username, email, name, hashedPassword]
+      );
+
+      console.log('User registered successfully');
+      return res.redirect('/login');
+
+  } catch (error) {
+      console.error('Registration error:', error);
+      res.status(500).send(`Internal Server Error: ${error.message}`);
+  }
+});
+
+// Route: /login
+// Method: POST
+///login - Authenticate user
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  console.log('Login attempt:', { username });
+
+  try {
+      const result = await db.query('SELECT * FROM users WHERE username = $1', [username]);
+      console.log('Query result:', result);
+
+      if (!result || result.length === 0) {
+          console.log('User not found in the database.');
+          return res.render('pages/login', { message: 'User not found. Please register first.' });
+      }
+
+      const user = result[0]; 
+      console.log('Retrieved user:', username);
+      const match = await bcrypt.compare(password, user.password);
+
+      if (!match) {
+          console.log('Incorrect password.');
+          return res.render('pages/login', { message: 'Incorrect username or password.' });
+      }
+
+      req.session.user = user;
+      req.session.save(() => {
+          console.log('User authenticated, redirecting to /discover');
+          res.redirect('/discover');
+      });
+
+  } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).send(`Internal Server Error: ${error.message}`);
+  }
+});
+// Authentication Middleware?
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+      console.log('User not authenticated. Redirecting to login...');
+      return res.redirect('/login');
+  }
+  next();
+};
+// *****************************************************
+// <!-- Start Server -->
+// *****************************************************
+
+// Starting the server and keeping the connection open to listen for more requests
+app.listen(3000, () => {
+  console.log('Server is listening on port 3000');
+});
