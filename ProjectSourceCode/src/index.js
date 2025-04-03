@@ -407,3 +407,11 @@ app.post('/codingExercise', async(req, res) => {
 
 app.listen(3000);
 console.log('Server is listening on port 3000');
+
+// *****************************************************
+// <!-- Multiple Choice Question API Routes -->
+// *****************************************************
+
+app.get('/mcq', (req, res) => {
+    res.render('pages/mcq'); 
+});
