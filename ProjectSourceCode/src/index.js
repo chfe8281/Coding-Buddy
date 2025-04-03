@@ -224,20 +224,12 @@ app.get('/codingExercise', (req, res) => {
 app.post('/codingExercise', async(req, res) => {
   let input = req.body.code;
   let input_1 = "";
-  let input_2 = "";
-  let input_3 = "";
   let output_1 = "";
-  let output_2 = "";
-  let output_3 = "";
   var getQuestion = `SELECT input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
   try {
     let results = await db.one(getQuestion);
     input_1 = results.input_1;
-    input_2 = results.input_2;
-    input_3 = results.input_3;
     output_1 = results.output_1;
-    output_2 = results.output_2;
-    output_3 = results.output_3;
     console.log("INPUT1", input_1);
     console.log(results);
       
