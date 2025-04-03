@@ -64,6 +64,8 @@ app.use(
   })
 );
 
+app.use(express.json()); // For parsing application/json
+app.use(express.urlencoded({ extended: true })); // For parsing form data
 
 // allow access to public/images/default-event
 app.use(express.static(path.join(__dirname, 'public')));
@@ -105,8 +107,15 @@ app.post('/register', async (req, res) => {
       console.log('User exists check result:', userExists);
 
       if (userExists.length > 0) {
-          console.log('Username or Email already taken.');
-          return res.render('pages/register', { message: 'Username or Email already taken. Try a different one.' });
+        console.log('Username or Email already taken.');
+        if (req.accepts('html')) {
+            return res.status(400).render('pages/register', { 
+                message: 'Username or Email already taken. Try a different one.' 
+            });
+        }
+        return res.status(400).json({ 
+            message: 'Username or Email already taken. Try a different one.' 
+        });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -404,6 +413,10 @@ app.post('/codingExercise', async(req, res) => {
   });
 }); 
 
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
 
-app.listen(3000);
+
+module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
