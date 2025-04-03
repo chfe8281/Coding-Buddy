@@ -70,6 +70,56 @@ app.get('/', (req, res) => {
   res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
 });
+//functions to fetch questions in the database and call the api route
+document.addEventListener("DOMContentLoaded", () => {
+    const buttons = document.querySelectorAll(".type-buttons button");
+    let selectedTopic = "";
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            selectedTopic = button.textContent;
+            fetchQuestion(selectedTopic);
+        });
+    });
+
+    function fetchQuestion(topic) {
+        fetch(`/get-question?topic=${encodeURIComponent(topic)}`)
+            .then(response => response.json())
+            .then(data => {
+                displayQuestion(data);
+            })
+            .catch(error => console.error("Error fetching question:", error));
+    }
+
+    function displayQuestion(question) {
+        const questionContainer = document.getElementById("question-container");
+        if (questionContainer) {
+            questionContainer.innerHTML = `<h3>${question.name}</h3><p>${question.starter_code || question.mcq_text}</p>`;
+        }
+    }
+});
+//get route fetching a random coding question by topic
+app.get("/get-question", async (req, res) => {
+  const topic = req.query.topic;
+
+  if (!topic) {
+    return res.status(400).json({ error: "Topic is required." });
+  }
+
+  try {
+    const query = `SELECT * FROM coding_questions WHERE topic = $1 ORDER BY RANDOM() LIMIT 1`;
+    const question = await db.oneOrNone(query, [topic]); // 'oneOrNone' returns a single row or null
+
+    if (question) {
+      res.json(question); // Send the question data as JSON
+    } else {
+      res.status(404).json({ error: "No questions found for this topic." });
+    }
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});
 
 app.listen(3000);
 console.log('Server is listening on port 3000');
