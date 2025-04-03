@@ -207,7 +207,50 @@
     </div>
   </div>
 
-  <!-- JavaScript for Carousel Functionality -->
-  <script src="Coding-Buddy/ProjectSourceCode/src/index.js"></script>
-</body>
+    <!-- JavaScript for Carousel Functionality -->
+   <script>
+  let currentIndex = 0;
+  const images = document.querySelectorAll('.carousel img');
+  const totalImages = images.length;
+  let timer; // Declare timer here
+
+  function showImage(index) {
+    images.forEach((img, i) => {
+      img.classList.toggle('active', i === index);
+    });
+  }
+
+  function nextImage() {
+    currentIndex = (currentIndex + 1) % totalImages;
+    showImage(currentIndex);
+  }
+
+  function prevImage() {
+    currentIndex = (currentIndex - 1 + totalImages) % totalImages;
+    showImage(currentIndex);
+  }
+
+  // Function to reset the timer
+  function resetTimer() {
+    clearInterval(timer);
+    timer = setInterval(nextImage, 5000);
+  }
+
+  document.querySelector('.carousel a.next').addEventListener('click', function(e) {
+    e.preventDefault();
+    nextImage();
+    resetTimer();
+  });
+
+  document.querySelector('.carousel a.prev').addEventListener('click', function(e) {
+    e.preventDefault();
+    prevImage();
+    resetTimer();
+  });
+
+  // Initialize timer to change images every 5 seconds
+  timer = setInterval(nextImage, 5000);
+  showImage(currentIndex);
+</script>
+  </body>
 </html>
