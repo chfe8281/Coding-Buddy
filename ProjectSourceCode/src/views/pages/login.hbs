@@ -1,0 +1,30 @@
+<div class="container mt-5">
+    <h2 class="text-center">LOGIN</h2>
+    <form action="/login" method="POST">
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <div class="input-group">
+                <span class="input-group-text">&#128100;</span>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <div class="input-group">
+                <span class="input-group-text">&#128274;</span>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+        </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+            <label class="form-check-label" for="rememberMe">Remember me</label>
+        </div>
+        <div class="mb-3">
+            <a href="/forgot-password">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">LOGIN</button>
+        <div class="text-center mt-3">
+            <p>Don't have an account? <a href="/register">Register</a></p>
+        </div>
+    </form>
+</div>
