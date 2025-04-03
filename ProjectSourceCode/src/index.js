@@ -97,11 +97,19 @@ app.get('/login', (req,res)=>{
 // Method: POST
 // Route for inserting hashed password and email into users table
 app.post('/register', async (req, res) => {
-  const { username, email, name, password } = req.body;
+  console.log('Recieved Body', req.body);
+  // const { username, email, name, password } = req.body;
+  const username = req.body.username;
+  const email = req.body.email;
+  const name = req.body.name;
+  const password = req.body.password;
+
+  console.log(username);
 
   try {
       console.log('Received registration request:', { username, email });
-      const userExists = await db.any('SELECT * FROM users WHERE username = $1 OR email = $2', [username, email]);
+      const userExists = await db.any(`SELECT * FROM users WHERE username = '${username}' OR email = '${email}'`);
+        // 1 OR email = $2', [username, email]);
       console.log('User exists check result:', userExists);
 
       if (userExists.length > 0) {
@@ -112,13 +120,13 @@ app.post('/register', async (req, res) => {
       const hashedPassword = await bcrypt.hash(password, 10);
       console.log('Hashed password:', hashedPassword);
 
-      await db.none(
-          'INSERT INTO users (username, email, name, password) VALUES ($1, $2, $3, $4)',
-          [username, email, name, hashedPassword]
+      await db.any(
+          `INSERT INTO users (username, email, name, password) VALUES ('${username}', '${email}', '${name}', '${hashedPassword}')`
+          // [username, email, name, hashedPassword]
       );
 
       console.log('User registered successfully');
-      return res.redirect('/login');
+      return res.redirect('/login', {message: 'Yes'});
 
   } catch (error) {
       console.error('Registration error:', error);
@@ -405,5 +413,5 @@ app.post('/codingExercise', async(req, res) => {
 }); 
 
 
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
