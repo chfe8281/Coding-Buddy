@@ -47,6 +47,7 @@ db.connect()
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
+app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 
 // initialize session variables
 app.use(
@@ -56,6 +57,7 @@ app.use(
     resave: false,
   })
 );
+
 
 // allow access to public/images/default-event
 app.use(express.static(path.join(__dirname, 'public')));
@@ -167,6 +169,12 @@ const auth = (req, res, next) => {
 // *****************************************************
 
 // Starting the server and keeping the connection open to listen for more requests
-app.listen(3000, () => {
-  console.log('Server is listening on port 3000');
-});
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+
+
+app.listen(3000);
+console.log('Server is listening on port 3000');
