@@ -36,12 +36,12 @@ CREATE TABLE IF NOT EXISTS coding_questions (
   name VARCHAR(50) NOT NULL,
   -- Increase as needed
   topic VARCHAR(20),
-  input_1 VARCHAR(500),
-  -- input_2 VARCHAR(40),
-  -- input_3 VARCHAR(40),
-  output_1 VARCHAR(50)
-  -- output_2 VARCHAR(10),
-  -- output_3 VARCHAR(10),
+  input_1 VARCHAR(1000),
+  -- input_2 VARCHAR(500),
+  -- input_3 VARCHAR(500),
+  output_1 VARCHAR(500)
+  -- output_2 VARCHAR(50),
+  -- output_3 VARCHAR(50)
   -- Difficult scale 1-5
   -- difficulty INT CONSTRAINT limited_values CHECK (difficulty > 0 AND difficulty < 6),
   -- deck_id INT,
