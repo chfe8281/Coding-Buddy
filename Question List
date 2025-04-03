@@ -1,0 +1,34 @@
+1300 Questions:
+
+What is the output of the following code?
+int x = 5; 
+cout << x++;
+A) 6
+B) 5
+C) Compilation Error
+D) Undefined Behavior
+Answer: B
+
+What will be the output of the following statement?
+cout << 5 / 2;
+A) 2.5
+B) 2
+C) 2.0
+D) Compilation Error
+Answer: B
+
+Which loop is guaranteed to execute at least once?
+A) for loop
+B) while loop
+C) do-while loop
+D) All loops execute at least once
+Answer: C
+
+What is the correct way to dynamically allocate memory for an integer in C++?
+A) int *ptr = malloc(sizeof(int));
+B) int *ptr = new int;
+C) int *ptr = (int*)malloc(sizeof(int));
+D) int ptr = new int;
+Answer: B
+
+2270 Questions:

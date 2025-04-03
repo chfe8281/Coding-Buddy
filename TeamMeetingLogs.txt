@@ -32,3 +32,24 @@ Follow-up items, including agreed-on roles and responsibilities:
 -Find API or look into other possibilities
 -Follow-up on plan B (mockup) if API not possible
 -Email TA plan (either mockup or API)
+
+Week 2 Minutes (March 31, 2025)
+Main takeaways:
+-Database is really important, let's not make any more code without the database complete
+-no track record for users and record the progress with the database supporting that, when a code is failing or succeeding
+-in profile page you should be able to see the progress complete on the website
+Things done last week:
+-Wyatt: Write login and register HTML, created templating for the project, partials, and started js get and post routes for login and register
+-Calvin: worked on the homepage for the website, created a base layout for the page, added api get routes for the home page
+-Ben: worked on the profile page, general outline of the page, added generic points and ranks for profiles, added a general outline (HTML) of an edit profile page.
+-Christina: set up docker, made coding exercise general page outline, made a timer for coding exercise, made google doc for practice questions
+-Jack: MC quiz ER diagram, started to work on HTML and js for MC quiz page
+-Kaitlyn: Made HTML for overview page for flashcards, .json using handlebars 
+
+Individual goals for next week:
+-Wyatt: finish out js apis for login and register, flesh out the ER diagram for the database, then help christina with buttons on the coding exercise page.
+-Calvin: finalize the home page, to do section of homepage, help write coding questions for coding practice, ask around for help.
+-Ben: connect the profile page to the database and have it be able to update the database, adding POST routes for profile page, ask around for help.
+-Christina: - session.save to save incase a page is refreshed, only if you want to. get axios call get and post for the input and connecting codex to the coding exercise page, fix js for the timer.
+-Jack: finish connecting ER diagram, fix api routes, finish implementing the MC quiz page, create MC quiz questions.
+-Kaitlyn: create the database

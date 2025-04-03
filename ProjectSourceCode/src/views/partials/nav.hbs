@@ -1,0 +1,53 @@
+<header></header>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+      <a class="navbar-brand" href="/"></a>
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+            {{#if email}} <!-- Do we have an email variable to keep track of if logged in?-->
+                <a class="nav-link" href="/">Home</a>
+            {{else}}
+                <a class="nav-link" href="/login">Home</a>
+            {{/if}}
+        </li>
+
+        </li>
+        <li class="nav-item">
+          {{#if email}}
+            <a class="nav-link" href='/quiz'>Quiz</a>
+          {{else}}
+            <a class="nav-link" href='/login'>Quiz</a>
+          {{/if}}
+        </li>
+        <li class="nav-item">
+          {{#if email}}
+            <a class="nav-link" href='/coding'>Coding Practice</a>
+          {{else}}
+            <a class="nav-link" href='/coding'>Coding Practice</a>
+          {{/if}}
+        </li>
+        <li class="nav-item">
+          {{#if email}}
+            <a class="nav-link" href='/profile'>Profile</a>
+          {{else}}
+            <a class="nav-link" href='/login'>Profile</a>
+          {{/if}}
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href='/logout'>Log out</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="navbar-collapse collapse order-3 dual-collapse2">
+      <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+              <a class="nav-link" href="#">
+              <!-- TODO: Add the email id which is passed using: {{ variable_name }}. This will display the email id on the top right corner of the page -->
+              {{email}}
+              </a>
+          </li>
+      </ul>
+    </div>
+  </nav>
+</header>
