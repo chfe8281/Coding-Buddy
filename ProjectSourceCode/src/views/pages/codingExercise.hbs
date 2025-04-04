@@ -1,15 +1,25 @@
 {{>nav}}
-<div class = "container">
-    <div class = "column">
-        <p>Description goes here...</p>
+<h1>Coding Exercises:</h1>
+
+<div class = "type-buttons">
+    <button>Introduction to CS</button>
+    <button>Data Structures</button>
+    <button>Computer Systems</button>
+    <button>Algorithms</button>
+
+    <button id = "timer" type = "submit" onclick = "startCountdown()" formmethod = "post" formaction = "/codingExercise">Start Timer</button>
+</div>
+<div class = "grid-container">
+    <div class = "grid-item">
+        <p>Description</p>
     </div>
-    <div class = "column">
-        <p>{{response}}</p>
+    <div class = "grid-item">
         <div class = "code-textbox">
             <form method="post" action="/codingExercise" id = "codingExercise">
                 <textarea id = "code" name = "code" cols = "75" rows = "25" placeholder = "Start Coding Here..."></textarea><br />
                 <input type="submit" id = "submit-button" name = "submit-button" value = "Submit"/>
             </form>
         </div>
+        {{>passed}}
     </div>
 </div>
