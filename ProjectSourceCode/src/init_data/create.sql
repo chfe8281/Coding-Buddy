@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(50) NOT NULL,
   rank INT,
   last_login DATE,
-  streak INT,
+  streak INT DEFAULT 0,
   name VARCHAR(100),
-  points INT,
+  points INT DEFAULT 0,
   avatar_url VARCHAR(200)
 );
 
