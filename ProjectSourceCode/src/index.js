@@ -255,36 +255,10 @@ app.post('/login', async (req, res) => {
 });
 
 let current_user = "";
-const auth = (req, res, next) => {
-  current_user = req.session.user;
-  if (!req.session.user) {
-      console.log('User not authenticated. Redirecting to login...');
-      return res.redirect('/login');
-  }
-  next();
-};
 
 // *****************************************************
 // <!-- Start Server -->
 // *****************************************************
-
-
-
-// Route: /profile
-// Renders the profile page (with mock data for now)
-app.get('/profile', (req, res) => {
-  const userProfile = {
-    name: "FirstName LastName",
-    email: "email@example.com",
-    username: "username",
-    avatar: "https://ui-avatars.com/api/?name=F+L&background=random",
-    points: 100,
-    leaderboardPosition: 32,
-    streak: 3
-  };
-
-  res.render('pages/profile', userProfile);
-});
 
 const topic = "";
 const question_id = "";
