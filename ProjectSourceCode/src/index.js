@@ -198,9 +198,26 @@ app.get('/profile', (req, res) => {
   res.render('pages/profile', userProfile);
 });
 
-let topic = "";
-app.get('/coding', (req, res) => {
-  res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
+const topic = "";
+const question_id = "";
+// let question_id = "";
+app.get('/coding', async(req, res) => {
+  let description = "";
+  let question_id = "";
+  var getQuestion = `SELECT question_id, description FROM coding_questions WHERE topic = '1300';`;
+  try {
+    let results = await db.one(getQuestion);
+    question_id = results.question_id;
+    description = results.description;
+    console.log("description", description);
+    console.log(results);
+    res.render('pages/codingExercise.hbs',{question_descript: description});
+      
+  } catch (err) {
+    console.log("enter error");
+    res.render('pages/codingExercise.hbs', {question_descript: ""})
+  }
+  //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
 });
 
@@ -210,7 +227,7 @@ app.post('/coding', auth, async(req, res) => {
   let input_1 = "";
   let output_1 = "";
   let question_id = "";
-  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE topic = '2270';`;
+  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
   try {
     let results = await db.one(getQuestion);
     question_id = results.question_id;

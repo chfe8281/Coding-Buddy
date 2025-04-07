@@ -1,7 +1,22 @@
 INSERT INTO 
-coding_questions(name, topic, input_1, output_1) 
+coding_questions(name, topic, description, input_1, output_1) 
 VALUES('Largest Element', 
 '1300', 
+'Purpose:
+The purpose of the findLargestElement function is to identify and return the largest element from a given array of integers.
+Parameters:
+arr (int[]): A pointer to the first element of the integer array.
+size (int): The size of the array.
+Returns:
+The function returns an integer representing the largest element found in the array.
+Behavior:
+The function iterates through the array from the first to the last element.
+It keeps track of the largest element encountered during the iteration.
+Once the entire array is traversed, the largest element is returned.
+Edge Cases:
+If the array is empty (i.e., size is zero), the function should ideally return a default value or handle this case with error handling.
+If all elements are equal, the function will return that element as the largest.
+Negative numbers are handled as well, and the function will return the largest negative number if its the greatest element in the array.',
 'int main() {
     int arr[] = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5};  // Example array
     int size = sizeof(arr) / sizeof(arr[0]);  // Calculate the size of the array
@@ -24,7 +39,7 @@ VALUES('Largest Element',
 }', 
 '"The largest element in the array is: 9\nThe largest element in the second array is: -1\nThe largest element in the third array is: 20\n"'), 
 ('Array Doubling', 
-'2270', 
+'2270','Description', 
 'int main() {
     // Test case 1: Initial array with size 3
     int size1 = 3;

@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS coding_questions (
   question_id SERIAL PRIMARY KEY NOT NULL,
   name VARCHAR(50) NOT NULL,
   -- Increase as needed
-  starter_code VARCHAR(5000),
+  description VARCHAR(5000),
   topic VARCHAR(20),
   input_1 VARCHAR(5000),
   input_2 VARCHAR(5000),
@@ -44,9 +44,9 @@ CREATE TABLE IF NOT EXISTS coding_questions (
   output_2 VARCHAR(5000),
   output_3 VARCHAR(5000),
   -- Difficult scale 1-5
-  difficulty INT CONSTRAINT limited_values CHECK (difficulty > 0 AND difficulty < 6),
-  deck_id INT,
-  FOREIGN KEY (deck_id) REFERENCES decks (deck_id) ON DELETE CASCADE
+  difficulty INT CONSTRAINT limited_values CHECK (difficulty > 0 AND difficulty < 6)
+  -- deck_id INT,
+  -- FOREIGN KEY (deck_id) REFERENCES decks (deck_id) ON DELETE CASCADE
 );
 
 -- DROP TABLE IF EXISTS mc_questions CASCADE;
