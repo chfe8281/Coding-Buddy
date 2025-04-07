@@ -1,6 +1,3 @@
-{{! Use the main layout }}
-{{!< layouts/main }}
-
 <div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-md-8">
@@ -9,13 +6,13 @@
           <h3 class="mb-0">Edit Profile</h3>
         </div>
         <div class="card-body">
+          {{#if message}}
+            <div class="alert alert-danger">{{message}}</div>
+          {{/if}}
           <form action="/profile/edit" method="POST">
-            <!-- Profile Picture Upload (placeholder) -->
+            <!-- Profile Picture -->
             <div class="form-group text-center mb-4">
               <img src="{{avatar}}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; border: 5px solid #f0f0f0;">
-              <div>
-                <button type="button" class="btn btn-outline-primary btn-sm">Change Photo</button>
-              </div>
             </div>
 
             <!-- Name Field -->
