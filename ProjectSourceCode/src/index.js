@@ -171,13 +171,16 @@ app.post('/login', async (req, res) => {
   }
 });
 // Authentication Middleware?
+let current_user = "";
 const auth = (req, res, next) => {
+  current_user = req.session.user;
   if (!req.session.user) {
       console.log('User not authenticated. Redirecting to login...');
       return res.redirect('/login');
   }
   next();
 };
+
 
 // Route: /profile
 // Renders the profile page (with mock data for now)
@@ -201,8 +204,9 @@ app.get('/coding', (req, res) => {
   // helpers.startCountdown();
 });
 
-app.post('/coding', async(req, res) => {
+app.post('/coding', auth, async(req, res) => {
   let input = req.body.code;
+  let user_id = req.session.user.user_id;
   let input_1 = "";
   let output_1 = "";
   let question_id = "";
@@ -229,11 +233,7 @@ app.post('/coding', async(req, res) => {
         }
       ],
       "stdin": "",
-      "args": [
-        "1",
-        "2",
-        "3"
-      ],
+      "args": [""],
       "compile_timeout": 10000,
       "run_timeout": 3000,
       "compile_cpu_time": 10000,
@@ -252,11 +252,11 @@ app.post('/coding', async(req, res) => {
     },
     data: data
   };
-  console.log("data1", data);
+  // console.log("data1", data);
   let passed_1 = false;
   let passed = "Compile error!";
   axios.request(config)
-  .then((response) => {
+  .then(async (response) => {
     console.log(JSON.stringify(response.data.run.output));
     let output = JSON.stringify(response.data.run.output);
     passed = `Incorrect\n Output:${output}\n Expected:${output_1}`;
@@ -264,6 +264,14 @@ app.post('/coding', async(req, res) => {
     {
       passed_1 = true;
       passed = "Success!";
+      console.log("Userid", user_id);
+      let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id) VALUES(${user_id}, ${question_id}) RETURNING user_id;`;
+      
+        console.log("inside");
+        let ret = await db.one(insertUser);
+        console.log(ret)
+        // res.redirect('/coding')
+      
     }
     console.log("DBAnswer", output_1);
     res.render('pages/codingExercise.hbs', {
