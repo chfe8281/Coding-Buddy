@@ -53,7 +53,6 @@ db.connect()
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 
 // initialize session variables
 app.use(
@@ -81,6 +80,13 @@ app.use('/img', express.static(path.join(__dirname, '../img')));
 
 // Serve resources (like CSS) from the resources folder inside src
 app.use('/resources', express.static(path.join(__dirname, 'resources')));
+
+// Starting the server and keeping the connection open to listen for more requests
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 
 // *****************************************************
 // <!-- API Routes -->
@@ -153,7 +159,7 @@ app.get('/login', (req,res)=>{
 // Method: POST
 // Route for inserting hashed password and email into users table
 app.post('/register', async (req, res) => {
-  const { username, email, name, password } = req.body;
+  const { username, email, password } = req.body;
 
   try {
       console.log('Received registration request:', { username, email });
@@ -161,23 +167,16 @@ app.post('/register', async (req, res) => {
       console.log('User exists check result:', userExists);
 
       if (userExists.length > 0) {
-        console.log('Username or Email already taken.');
-        if (req.accepts('html')) {
-            return res.status(400).render('pages/register', { 
-                message: 'Username or Email already taken. Try a different one.' 
-            });
-        }
-        return res.status(400).json({ 
-            message: 'Username or Email already taken. Try a different one.' 
-        });
+          console.log('Username or Email already taken.');
+          return res.render('pages/register', { message: 'Username or Email already taken. Try a different one.' });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       console.log('Hashed password:', hashedPassword);
 
       await db.none(
-          'INSERT INTO users (username, email, name, password) VALUES ($1, $2, $3, $4)',
-          [username, email, name, hashedPassword]
+          'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
+          [username, email, hashedPassword]
       );
 
       console.log('User registered successfully');
@@ -222,6 +221,7 @@ app.post('/login', async (req, res) => {
       req.session.user = user;
       req.session.save(() => {
           console.log('User authenticated, redirecting to /home');
+
           res.redirect('/home');
       });
 
@@ -231,7 +231,9 @@ app.post('/login', async (req, res) => {
   }
 });
 // Authentication Middleware?
+let current_user = "";
 const auth = (req, res, next) => {
+  current_user = req.session.user;
   if (!req.session.user) {
       console.log('User not authenticated. Redirecting to login...');
       return res.redirect('/login');
@@ -243,32 +245,64 @@ const auth = (req, res, next) => {
 // <!-- Start Server -->
 // *****************************************************
 
-// Starting the server and keeping the connection open to listen for more requests
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
 
-app.get('/codingExercise', (req, res) => {
-  res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
+
+// Route: /profile
+// Renders the profile page (with mock data for now)
+app.get('/profile', (req, res) => {
+  const userProfile = {
+    name: "FirstName LastName",
+    email: "email@example.com",
+    username: "username",
+    avatar: "https://ui-avatars.com/api/?name=F+L&background=random",
+    points: 100,
+    leaderboardPosition: 32,
+    streak: 3
+  };
+
+  res.render('pages/profile', userProfile);
+});
+
+const topic = "";
+const question_id = "";
+// let question_id = "";
+app.get('/coding', async(req, res) => {
+  let description = "";
+  let question_id = "";
+  var getQuestion = `SELECT question_id, description FROM coding_questions WHERE topic = '1300';`;
+  try {
+    let results = await db.one(getQuestion);
+    question_id = results.question_id;
+    description = results.description;
+    console.log("description", description);
+    console.log(results);
+    res.render('pages/codingExercise.hbs',{question_descript: description});
+      
+  } catch (err) {
+    console.log("enter error");
+    res.render('pages/codingExercise.hbs', {question_descript: ""})
+  }
+  //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
 });
 
-app.post('/codingExercise', async(req, res) => {
+app.post('/coding', auth, async(req, res) => {
   let input = req.body.code;
+  let user_id = req.session.user.user_id;
   let input_1 = "";
   let output_1 = "";
-  var getQuestion = `SELECT input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
+  let question_id = "";
+  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
   try {
     let results = await db.one(getQuestion);
+    question_id = results.question_id;
     input_1 = results.input_1;
     output_1 = results.output_1;
     console.log("INPUT1", input_1);
     console.log(results);
       
   } catch (err) {
-    res.redirect('/codingExercise')
+    res.redirect('/coding')
   }
   const axios = require('axios');
   let data = JSON.stringify({
@@ -281,11 +315,7 @@ app.post('/codingExercise', async(req, res) => {
         }
       ],
       "stdin": "",
-      "args": [
-        "1",
-        "2",
-        "3"
-      ],
+      "args": [""],
       "compile_timeout": 10000,
       "run_timeout": 3000,
       "compile_cpu_time": 10000,
@@ -304,23 +334,39 @@ app.post('/codingExercise', async(req, res) => {
     },
     data: data
   };
-  console.log("data1", data);
-  let passed_1 = "no";
+  // console.log("data1", data);
+  let passed_1 = false;
+  let passed = "Compile error!";
   axios.request(config)
-  .then((response) => {
+  .then(async (response) => {
     console.log(JSON.stringify(response.data.run.output));
     let output = JSON.stringify(response.data.run.output);
+    passed = `Incorrect\n Output:${output}\n Expected:${output_1}`;
     if (output_1 == output)
     {
-      passed_1 = "yes";
+      passed_1 = true;
+      passed = "Success!";
+      console.log("Userid", user_id);
+      let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id) VALUES(${user_id}, ${question_id}) RETURNING user_id;`;
+      
+        console.log("inside");
+        let ret = await db.one(insertUser);
+        console.log(ret)
+        // res.redirect('/coding')
+      
     }
     console.log("DBAnswer", output_1);
     res.render('pages/codingExercise.hbs', {
-      response: passed_1
+      passed: passed,
+      error: !passed_1
     })
   })
   .catch((error) => {
     console.log(error);
+    res.render('pages/codingExercise.hbs', {
+      passed: passed,
+      error: true
+    })
   });
 }); 
 
