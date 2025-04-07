@@ -58,11 +58,26 @@ app.use(bodyParser.json()); // specify the usage of JSON for parsing request bod
 // initialize session variables
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
+    secret: process.env.SESSION_SECRET || 'fallback-secret',
     resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // Set to true if using HTTPS in production
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'strict'
+    }
   })
 );
+
+app.use((req, res, next) => {
+  res.locals.user = req.session.user; // Makes user available in all templates
+  next();
+});
+
+
+app.use(express.json()); // For parsing application/json
+app.use(express.urlencoded({ extended: true })); // For parsing form data
 
 // Flash message middleware
 app.use((req, res, next) => {
@@ -70,9 +85,6 @@ app.use((req, res, next) => {
   delete req.session.message;
   next();
 });
-
-app.use(express.json()); // For parsing application/json
-app.use(express.urlencoded({ extended: true })); // For parsing form data
 
 // allow access to public/images/default-event
 app.use(express.static(path.join(__dirname, 'public')));
@@ -85,6 +97,15 @@ app.use('/resources', express.static(path.join(__dirname, 'resources')));
 // *****************************************************
 // <!-- API Routes -->
 // *****************************************************
+
+// Authentication Middleware?
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+      console.log('User not authenticated. Redirecting to login...');
+      return res.redirect('/login');
+  }
+  next();
+};
 
 // Route: /
 // Method: GET
@@ -103,8 +124,11 @@ app.get('/register', (req, res) => {
 // Route: /home
 // Method: GET
 // renders the register page
-app.get('/home', async (req, res) => {
-  //const userId = req.session.user.user_id;
+app.get('/home', auth, async (req, res) => {
+
+  console.log('Session data:', req.session);
+
+  const userId = req.session.user.user_id;
 
   try {
     const totalMC = await db.one('SELECT count(*) AS count FROM mc_questions');
@@ -222,7 +246,7 @@ app.post('/login', async (req, res) => {
       req.session.user = user;
       req.session.save(() => {
           console.log('User authenticated, redirecting to /home');
-          res.redirect('/home');
+          res.redirect('/profile');
       });
 
   } catch (error) {
@@ -230,14 +254,7 @@ app.post('/login', async (req, res) => {
       res.status(500).send(`Internal Server Error: ${error.message}`);
   }
 });
-// Authentication Middleware?
-const auth = (req, res, next) => {
-  if (!req.session.user) {
-      console.log('User not authenticated. Redirecting to login...');
-      return res.redirect('/login');
-  }
-  next();
-};
+
 
 // *****************************************************
 // <!-- Start Server -->
@@ -329,6 +346,7 @@ app.get('/welcome', (req, res) => {
 });
 
 app.get('/profile', auth, async (req, res) => {
+  console.log('Session data:', req.session);
   try {
     const user = req.session.user;
     if (!user) return res.redirect('/login');
@@ -461,7 +479,6 @@ app.post('/profile/edit', auth, async (req, res) => {
     };
 
     return res.redirect('/profile');
-    res.redirect('/profile');
   } catch (error) {
     console.error('Update profile error:', error);
     res.status(500).send('Error updating profile');
