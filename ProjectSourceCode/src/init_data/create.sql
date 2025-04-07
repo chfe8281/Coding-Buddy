@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(50) NOT NULL,
   rank INT,
   last_login DATE,
-  streak INT,
+  streak INT DEFAULT 0,
   name VARCHAR(100),
-  points INT,
+  points INT DEFAULT 0,
   avatar_url VARCHAR(200)
 );
 
@@ -108,7 +108,8 @@ CREATE TABLE IF NOT EXISTS users_to_mc_questions (
 
 -- Create an admin user to assign default decks to
 INSERT INTO users (username, password, email)
-  VALUES ('admin', 'password987', 'admin42@colorado.edu');
+  VALUES ('admin', '$2a$10$UDl9WT1/9C68T5xvP/cldus/rUcFC8wkXc435KBrBQmJGiuoeTcIO', 'admin42@colorado.edu');
+  -- hashed password is "password987"
 
 -- Default flashcard decks
 INSERT INTO decks (name, count, creator_id)

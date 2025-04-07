@@ -36,8 +36,7 @@ Negative numbers are handled as well, and the function will return the largest n
 
 
     return 0;
-}', 
-'"The largest element in the array is: 9\nThe largest element in the second array is: -1\nThe largest element in the third array is: 20\n"'), 
+}', '"The largest element in the array is: 9\nThe largest element in the second array is: -1\nThe largest element in the third array is: 20\n"'), 
 ('Array Doubling', 
 '2270','Description', 
 'int main() {
@@ -99,3 +98,9 @@ Negative numbers are handled as well, and the function will return the largest n
     return 0;
 }', 
 '"Original array 1: 1 2 3 \nDoubled array 1: 1 2 3 0 0 0 \nNew size 1: 6\nOriginal array 2: 1 2 3 4 5 \nDoubled array 2: 1 2 3 4 5 0 0 0 0 0 \nNew size 2: 10\nOriginal array 3 (size 0): No elements\nDoubled array 3 (size 0): \nNew size 3: 0\n"');
+
+-- test for completed questions calculation
+INSERT INTO
+users_to_coding_questions(user_id, question_id)
+VALUES(1,1);
+

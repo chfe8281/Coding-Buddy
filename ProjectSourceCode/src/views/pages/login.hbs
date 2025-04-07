@@ -1,5 +1,8 @@
 <div class="container mt-5">
     <h2 class="text-center">LOGIN</h2>
+    {{#if message}}
+        <div class="alert alert-danger">{{message}}</div>
+    {{/if}}
     <form action="/login" method="POST">
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>

@@ -57,3 +57,30 @@ describe('Testing Add User API', () => {
           });
       });
 });
+
+describe('Testing Login API', () => {
+  it('positive : /login', done => {
+      chai
+      .request(server)
+      .post('/login')
+      .send({username: 'testuser', password: 'pwd123'})
+      .end((err, res) => {
+          res.should.have.status(200);
+          res.should.redirectTo(/^.*127\.0\.0\.1.*\/profile$/); // should redirect to /profile for now but home later
+          done();
+      });
+  });
+
+  it('Negative : /login. Checking invalid name', done => {
+      chai
+        .request(server)
+        .post('/login')
+        .set('Accept', 'application/json') // Explicitly request JSON
+        .send({username: 'fakeuser', password: 'pwd123'})
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.body.message).to.equals('User not found in the database.');
+          done();
+        });
+    });
+});
