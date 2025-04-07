@@ -87,21 +87,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
     res.redirect('/login');
   });
+
 // Route: /register
 // Method: GET
 // renders the register page
 app.get('/register', (req, res) => {
     res.render('pages/register'); 
 });
+
 // Route: /login
 // Method: GET
 // renders the login page
 app.get('/login', (req,res)=>{
     res.render('pages/login')
 });
-// Route: /register
-// Method: POST
-// route for inserting hashed password into users table
+
 // Route: /register
 // Method: POST
 // Route for inserting hashed password and email into users table
@@ -154,8 +154,13 @@ app.post('/login', async (req, res) => {
       console.log('Query result:', result);
 
       if (!result || result.length === 0) {
+        if (req.accepts('html')) {
           console.log('User not found in the database.');
           return res.render('pages/login', { message: 'User not found. Please register first.' });
+      }
+        return res.status(400).json({ 
+          message: 'User not found in the database.' 
+        });
       }
 
       const user = result[0]; 
