@@ -17,6 +17,7 @@ const qs = require('qs');
 const e = require('express');
 const { mainModule } = require('process');
 
+
 // *****************************************************
 // <!-- Section 2 : Connect to DB -->
 // *****************************************************
@@ -72,8 +73,6 @@ app.use((req, res, next) => {
 
 app.use(express.json()); // For parsing application/json
 app.use(express.urlencoded({ extended: true })); // For parsing form data
-app.use(express.json()); // For parsing application/json
-app.use(express.urlencoded({ extended: true })); // For parsing form data
 
 // allow access to public/images/default-event
 app.use(express.static(path.join(__dirname, 'public')));
@@ -109,8 +108,6 @@ app.get('/login', (req,res)=>{
 app.post('/register', async (req, res) => {
   const { username, email, name, password } = req.body;
 
-  const { username, email, name, password } = req.body;
-
   try {
       console.log('Received registration request:', { username, email });
       const userExists = await db.any('SELECT * FROM users WHERE username = $1 OR email = $2', [username, email]);
@@ -126,17 +123,6 @@ app.post('/register', async (req, res) => {
         return res.status(400).json({ 
             message: 'Username or Email already taken. Try a different one.' 
         });
-
-        console.log('Username or Email already taken.');
-        if (req.accepts('html')) {
-            return res.status(400).render('pages/register', { 
-                message: 'Username or Email already taken. Try a different one.' 
-            });
-        }
-        return res.status(400).json({ 
-            message: 'Username or Email already taken. Try a different one.' 
-        });
-
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -185,8 +171,6 @@ app.post('/login', async (req, res) => {
       req.session.save(() => {
           console.log('User authenticated, redirecting to /home');
           res.redirect('/profile'); //temp redirect to profile for now
-          console.log('User authenticated, redirecting to /discover');
-          res.redirect('/discover');
       });
 
   } catch (error) {
@@ -217,155 +201,6 @@ app.get('/codingExercise', (req, res) => {
   res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
 });
-
-/*app.post('/codingExercise', async(req, res) => {
-    let input = req.body.code;
-    let input_1 = "";
-    let output_1 = "";
-    var getQuestion = `SELECT input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
-    try {
-      let results = await db.one(getQuestion);
-      input_1 = results.input_1;
-      output_1 = results.output_1;
-      console.log("INPUT1", input_1);
-      console.log(results);
-      
-    } catch (err) {
-      res.redirect('/codingExercise')
-    }
-    const axios = require('axios');
-    let data = JSON.stringify({
-      "language": "python",
-      "version": "3.10.0",
-      "files": [
-        {
-          "name": "my_cool_code.js",
-          "content": `${input}\n${input_1}`
-        }
-      ],
-      "stdin": "",
-      "args": [
-        "1",
-        "2",
-        "3"
-      ],
-      "compile_timeout": 10000,
-      "run_timeout": 3000,
-      "compile_cpu_time": 10000,
-      "run_cpu_time": 3000,
-      "compile_memory_limit": -1,
-      "run_memory_limit": -1
-    });
-
-    console.log("Input", data);
-
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: 'https://emkc.org/api/v2/piston/execute',
-      headers: { 
-        'Content-Type': 'application/json', 
-        'Cookie': 'engineerman.sid=s%3Akvnpn0FXmlPNrj5oQAzFdWL3_PfixMdO.6tPjcuIScWntIC6%2BYY2vnbqfu5UeM664ikYYImkm8Qc'
-      },
-      data : data
-    };
-
-    axios.request(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data.run.output));
-      let output = JSON.stringify(response.data.run.output);
-      let message = "no";
-      if (output_1 == output)
-      {
-        message = "yes";
-      }
-      console.log(output);
-      res.render('pages/codingExercise.hbs', {
-        response: message
-      })
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-
-});*/
-
-/* app.post('/codingExercise', async(req, res) => {
-  let input = req.body.code;
-  let input_1 = "";
-  let input_2 = "";
-  let input_3 = "";
-  let output_1 = "";
-  let output_2 = "";
-  let output_3 = "";
-  var getQuestion = `SELECT input_1, output_1, input_2, output_2, input_3, output_3 FROM coding_questions WHERE topic = '1300';`;
-  try {
-    let results = await db.one(getQuestion);
-    input_1 = results.input_1;
-    input_2 = results.input_2;
-    input_3 = results.input_3;
-    output_1 = results.output_1;
-    output_2 = results.output_2;
-    output_3 = results.output_3;
-    console.log("INPUT1", input_1);
-    console.log(results);
-      
-  } catch (err) {
-    res.redirect('/codingExercise')
-  }
-  const axios = require('axios');
-  let data = JSON.stringify({
-    "language": "cpp",
-      "version": "10.2.0",
-      "files": [
-        {
-          "name": "my_cool_code.js",
-          "content": `${input}\n${input_1}`
-        }
-      ],
-      "stdin": "",
-      "args": [
-        "1",
-        "2",
-        "3"
-      ],
-      "compile_timeout": 10000,
-      "run_timeout": 3000,
-      "compile_cpu_time": 10000,
-      "run_cpu_time": 3000,
-      "compile_memory_limit": -1,
-      "run_memory_limit": -1
-  });
-
-  let config = {
-    method: 'post',
-    maxBodyLength: Infinity,
-    url: 'https://emkc.org/api/v2/piston/execute',
-    headers: {
-        'Content-Type': 'application/json', 
-        'Cookie': 'engineerman.sid=s%3Akvnpn0FXmlPNrj5oQAzFdWL3_PfixMdO.6tPjcuIScWntIC6%2BYY2vnbqfu5UeM664ikYYImkm8Qc'
-    },
-    data: data
-  };
-  console.log("data1", data);
-  axios.request(config)
-  .then((response) => {
-    console.log(JSON.stringify(response.data.run.output));
-    let output = JSON.stringify(response.data.run.output);
-    let message = "no";
-    if (output_1 == output)
-    {
-      message = "yes";
-    }
-    console.log(output);
-    res.render('pages/codingExercise.hbs', {
-      response: message
-    })
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-}); */
 
 app.post('/codingExercise', async(req, res) => {
   let input = req.body.code;
@@ -440,6 +275,205 @@ app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
 
+app.get('/profile', auth, async (req, res) => {
+  try {
+    const user = req.session.user;
+    if (!user) return res.redirect('/login');
+
+    const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [user.user_id]);
+    
+    res.render('pages/profile', {
+      name: userData.name,
+      email: userData.email,
+      username: userData.username,
+      avatar: userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'U')}&background=random`,
+      points: userData.points || 0,
+      leaderboardPosition: await calculateLeaderboardPosition(userData.user_id),
+      streak: userData.streak || 0
+      // Message is automatically available via res.locals
+    });
+  } catch (error) {
+    console.error('Profile error:', error);
+    res.status(500).send('Error loading profile');
+  }
+});
+
+async function calculateLeaderboardPosition(userId) {
+  try {
+    // 1. Get total count of users with points > 0
+    const countResult = await db.one('SELECT COUNT(*)::int FROM users WHERE points > 0');
+    const userCount = countResult.count;
+    
+    // If no users have points, return 100 (top position) instead of 0
+    if (userCount === 0) {
+      return 100;
+    }
+
+    // 2. Get current user's points (default to 0 if null)
+    const userResult = await db.one(
+      'SELECT COALESCE(points, 0) AS points FROM users WHERE user_id = $1', 
+      [userId]
+    );
+    const userPoints = userResult.points;
+
+    // 3. Count users with higher scores
+    const betterUsers = await db.one(
+      'SELECT COUNT(*)::int FROM users WHERE points > $1',
+      [userPoints]
+    );
+    const betterCount = betterUsers.count;
+
+    // 4. Calculate position (0 = best, 100 = worst)
+    const positionPercentile = Math.round((betterCount / userCount) * 100);
+    
+    // Return inverted percentile (100 - position) so higher is better
+    return 100 - positionPercentile;
+    
+  } catch (error) {
+    console.error('Error calculating leaderboard position:', error);
+    return 50; // Default middle position if errors occur
+  }
+}
+
+// Route: /profile/edit (GET) - Show edit form
+app.get('/profile/edit', auth, async (req, res) => {
+  try {
+    const user = req.session.user;
+    if (!user) {
+      return res.redirect('/login');
+    }
+
+    const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [user.user_id]);
+
+    res.render('pages/edit-profile', {
+      name: userData.name,
+      username: userData.username,
+      email: userData.email,
+      avatar: userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'U')}&background=random`
+    });
+  } catch (error) {
+    console.error('Edit profile error:', error);
+    res.status(500).send('Error loading edit profile');
+  }
+});
+
+// Route: /profile/edit (POST) - Handle form submission
+app.post('/profile/edit', auth, async (req, res) => {
+  try {
+    const { name, username, email } = req.body;
+    const userId = req.session.user.user_id;
+
+    // Check if username or email already exists (excluding current user)
+    const exists = await db.any(
+      `SELECT * FROM users 
+       WHERE (username = $1 OR email = $2) 
+       AND user_id != $3`,
+      [username, email, userId]
+    );
+
+    if (exists.length > 0) {
+      const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [userId]);
+      return res.render('pages/edit-profile', {
+        name: userData.name,
+        username: userData.username,
+        email: userData.email,
+        avatar: userData.avatar_url,
+        message: 'Username or email already taken'
+      });
+    }
+
+    // Update user in database
+    await db.none(
+      `UPDATE users 
+       SET name = $1, username = $2, email = $3 
+       WHERE user_id = $4`,
+      [name, username, email, userId]
+    );
+
+    // Update session with new data
+    req.session.user = {
+      ...req.session.user,
+      name,
+      username,
+      email
+    };
+    req.session.save();
+
+    // Set flash message and redirect
+    req.session.message = {
+      type: 'success',
+      text: 'Profile Updated Successfully'
+    };
+
+    return res.redirect('/profile');
+    res.redirect('/profile');
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).send('Error updating profile');
+  }
+});
+
+// Route: /profile/change-password (GET)
+app.get('/profile/change-password', auth, async (req, res) => {
+  try {
+    res.render('pages/change-password');
+  } catch (error) {
+    console.error('Password change error:', error);
+    res.status(500).send('Error loading password change page');
+  }
+});
+
+app.post('/profile/change-password', auth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const userId = req.session.user.user_id;
+
+    // Validation
+    if (newPassword !== confirmPassword) {
+      return res.render('pages/change-password', {
+        message: { type: 'danger', text: 'New passwords do not match' }
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.render('pages/change-password', {
+        message: { type: 'danger', text: 'Password must be at least 8 characters' }
+      });
+    }
+
+    // Verify current password
+    const user = await db.one('SELECT * FROM users WHERE user_id = $1', [userId]);
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    
+    if (!isMatch) {
+      return res.render('pages/change-password', {
+        message: { type: 'danger', text: 'Current password is incorrect' }
+      });
+    }
+
+    // Update password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await db.none(
+      'UPDATE users SET password = $1 WHERE user_id = $2',
+      [hashedPassword, userId]
+    );
+
+    // Set flash message and redirect
+    req.session.message = {
+      type: 'success',
+      text: 'Password Changed Successfully'
+    };
+    return res.redirect('/profile');
+    
+  } catch (error) {
+    console.error('Password change error:', error);
+    req.session.message = {
+      type: 'danger',
+      text: 'Error changing password'
+    };
+    return res.redirect('/profile/change-password');
+  }
+});
 
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
