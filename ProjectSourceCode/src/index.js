@@ -286,6 +286,7 @@ app.get('/profile', auth, async (req, res) => {
     if (!user) return res.redirect('/login');
 
     const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [user.user_id]);
+    const cqp = await calculateCompletionPercentage(userData.username);
     
     res.render('pages/profile', {
       name: userData.name,
@@ -294,7 +295,8 @@ app.get('/profile', auth, async (req, res) => {
       avatar: userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'U')}&background=random`,
       points: userData.points || 0,
       leaderboardPosition: await calculateLeaderboardPosition(userData.user_id),
-      streak: userData.streak || 0
+      streak: userData.streak || 0,
+      codingQuestionsPercent: cqp
       // Message is automatically available via res.locals
     });
   } catch (error) {
@@ -479,6 +481,38 @@ app.post('/profile/change-password', auth, async (req, res) => {
     return res.redirect('/profile/change-password');
   }
 });
+
+async function calculateCompletionPercentage(username) {
+  try {
+    // Get total number of coding questions
+    const totalQuestions = await db.one(
+      'SELECT COUNT(*) as count FROM coding_questions'
+    );
+    console.log(totalQuestions);
+    
+    // Get user id
+    const user = await db.one(`SELECT user_id FROM users WHERE username = $1`, [username]);
+    const userID = user.user_id; // Extract ID
+
+    // Get number of questions completed by user
+    const completedQuestions = await db.one(
+      'SELECT COUNT(*) as count FROM users_to_coding_questions WHERE user_id = $1',
+      [userID] // Now passing just the integer
+    );
+    
+    // Calculate percentage
+    if (totalQuestions.count === 0) {
+      return 0; // Avoid division by zero if no questions exist
+    }
+    
+    const percentage = (completedQuestions.count / totalQuestions.count) * 100;
+    return Math.round(percentage * 100) / 100; // Round to 2 decimal places
+    
+  } catch (error) {
+    console.error('Error calculating completion percentage:', error);
+    return 0; // Return 0 if there's an error
+  }
+}
 
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
