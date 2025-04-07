@@ -23,3 +23,8 @@ VALUES('Largest Element',
     return 0;
 }', 
 '"The largest element in the array is: 9\nThe largest element in the second array is: -1\nThe largest element in the third array is: 20\n"');
+
+-- test for completed questions calculation
+INSERT INTO
+users_to_coding_questions(user_id, question_id)
+VALUES(1,1);
