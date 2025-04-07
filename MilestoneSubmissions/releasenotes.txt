@@ -1,0 +1,23 @@
+Week 1 (March 17, 2025):
+-Wyatt: Login/register wireframe
+-Calvin: homepage wireframe
+-Jack: MC quiz wireframe
+-Ben: profile page wireframe
+-Christina: coding exercises wireframe, start case diagram
+-Kaitlyn: flashcards wireframe
+
+Week 2 (March 31, 2025):
+-Wyatt: Write login and register HTML, created templating for the project, partials, and started js get and post routes for login and register
+-Calvin: worked on the homepage for the website, created a base layout for the page, added api get routes for the home page
+-Ben: worked on the profile page, general outline of the page, added generic points and ranks for profiles, added a general outline (HTML) of an edit profile page.
+-Christina: set up docker, made coding exercise general page outline, made a timer for coding exercise, made google doc for practice questions
+-Jack: MC quiz ER diagram, started to work on HTML and js for MC quiz page
+-Kaitlyn: Made HTML for overview page for flashcards, .json using handlebars 
+
+Week 3 (April 7, 2025):
+-Wyatt: finished out js apis for login and register, flesh out the ER diagram for the database, then helped christina with buttons on the coding exercise page.
+-Calvin: finalized the home page, to do section of homepage, created functionality to track the number of coding questions a user has completed ...
+-Ben: connected the profile page to the database and have it be able to update the database, adding POST routes for profile page, ask around for help.
+-Christina: get axios call get and post for the input and connecting codex to the coding exercise page, fix js for the timer.
+-Jack: fixed api routes, progress implementing the MC quiz page, created MC quiz questions.
+-Kaitlyn: created the database, connected the flashcards route so it pulls data from the database.
