@@ -3,7 +3,7 @@
 </div>
 
 {{!-- Input json array of user's flashcards objects --}}
-{{#each group}}
+{{#each decks}}
 <div class="container">
   <div class="row">
     <h2>{{name}}</h2>
@@ -15,10 +15,10 @@
             <div class="card flashcard">
                 <div class="card-body">
                     {{!-- Switch between card sides --}}
-                    {{#if show_front}}
-                        <h1>{{front}}</h1>
+                    {{#if show_back}}
+                        <h1>{{back}}</h1>
                     {{else}}
-                        <p>{{back}}</p>
+                        <p>{{front}}</p>
                     {{/if}}
                 </div>
             </div>

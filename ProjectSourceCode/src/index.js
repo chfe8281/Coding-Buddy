@@ -405,11 +405,33 @@ app.post('/codingExercise', async(req, res) => {
 }); 
 
 app.get('/flashcards', (req, res) =>{
-  let name = "Card Group"
-  let show_front = true
-  let front = "This is the term"
-  let back = "This is the explanation"
-  res.render('pages/flashcards', {name, show_front, front, back});
+  // let name = "Card Group"
+  // let show_front = true
+  // let front = "This is the term"
+  // let back = "This is the explanation"
+  // res.render('pages/flashcards', {name, show_front, front, back});
+
+  db.any(`SELECT decks.name, cards.front, cards.back FROM users
+    INNER JOIN users_to_decks
+      ON users.user_id = users_to_decks.user_id
+    INNER JOIN decks
+      ON users_to_decks.deck_id = decks.deck_id
+    INNER JOIN decks_to_cards
+      ON decks_to_cards.deck_id = decks.deck_id
+    INNER JOIN cards
+      ON cards.card_id = decks_to_cards.card_id
+    WHERE users.user_id = $1;`, [req.session.user.user_id])
+  .then(decks => {
+    console.log(decks)
+    res.render('pages/flashcards', {decks});
+  })
+  .catch(err => {
+    res.render('pages/flashcards', {
+      decks: [],
+      error: true,
+      message: err.message,
+    });
+  });
 })
 
 
