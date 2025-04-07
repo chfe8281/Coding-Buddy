@@ -70,6 +70,13 @@ app.use(express.urlencoded({ extended: true })); // For parsing form data
 // allow access to public/images/default-event
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Starting the server and keeping the connection open to listen for more requests
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+
 // *****************************************************
 // <!-- API Routes -->
 // *****************************************************
@@ -183,13 +190,7 @@ const auth = (req, res, next) => {
 // <!-- Start Server -->
 // *****************************************************
 
-// Starting the server and keeping the connection open to listen for more requests
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
-
+let topic = "";
 app.get('/codingExercise', (req, res) => {
   res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
@@ -199,7 +200,7 @@ app.post('/codingExercise', async(req, res) => {
   let input = req.body.code;
   let input_1 = "";
   let output_1 = "";
-  var getQuestion = `SELECT input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
+  var getQuestion = `SELECT input_1, output_1 FROM coding_questions WHERE topic = '2270';`;
   try {
     let results = await db.one(getQuestion);
     input_1 = results.input_1;
@@ -251,7 +252,7 @@ app.post('/codingExercise', async(req, res) => {
   .then((response) => {
     console.log(JSON.stringify(response.data.run.output));
     let output = JSON.stringify(response.data.run.output);
-    passed = "Incorrect" + '\n' + "Output: " + output_1 + "\n Expected: " + output;
+    passed = `Incorrect\n Output:${output}\n Expected:${output_1}`;
     if (output_1 == output)
     {
       passed_1 = true;

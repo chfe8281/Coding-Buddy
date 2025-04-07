@@ -22,4 +22,65 @@ VALUES('Largest Element',
 
     return 0;
 }', 
-'"The largest element in the array is: 9\nThe largest element in the second array is: -1\nThe largest element in the third array is: 20\n"');
+'"The largest element in the array is: 9\nThe largest element in the second array is: -1\nThe largest element in the third array is: 20\n"'), 
+('Array Doubling', 
+'2270', 
+'int main() {
+    // Test case 1: Initial array with size 3
+    int size1 = 3;
+    int *arr1 = new int[size1]{1, 2, 3};
+    cout << "Original array 1: ";
+    for (int i = 0; i < size1; ++i) {
+        cout << arr1[i] << " ";
+    }
+    cout << endl;
+
+    // Doubling the array
+    arrDouble(arr1, size1);
+    cout << "Doubled array 1: ";
+    for (int i = 0; i < size1; ++i) {
+        cout << arr1[i] << " ";
+    }
+    cout << endl;
+    cout << "New size 1: " << size1 << endl;
+
+    // Test case 2: Initial array with size 5
+    int size2 = 5;
+    int *arr2 = new int[size2]{1, 2, 3, 4, 5};
+    cout << "Original array 2: ";
+    for (int i = 0; i < size2; ++i) {
+        cout << arr2[i] << " ";
+    }
+    cout << endl;
+
+    // Doubling the array
+    arrDouble(arr2, size2);
+    cout << "Doubled array 2: ";
+    for (int i = 0; i < size2; ++i) {
+        cout << arr2[i] << " ";
+    }
+    cout << endl;
+    cout << "New size 2: " << size2 << endl;
+
+    // Test case 3: Initial array with size 0 (empty array)
+    int size3 = 0;
+    int *arr3 = nullptr;  // Empty array
+    cout << "Original array 3 (size 0): No elements" << endl;
+
+    // Doubling the array
+    arrDouble(arr3, size3);
+    cout << "Doubled array 3 (size 0): ";
+    for (int i = 0; i < size3; ++i) {
+        cout << arr3[i] << " ";
+    }
+    cout << endl;
+    cout << "New size 3: " << size3 << endl;
+
+    // Clean up
+    delete[] arr1;
+    delete[] arr2;
+    delete[] arr3;
+
+    return 0;
+}', 
+'"Original array 1: 1 2 3 \nDoubled array 1: 1 2 3 0 0 0 \nNew size 1: 6\nOriginal array 2: 1 2 3 4 5 \nDoubled array 2: 1 2 3 4 5 0 0 0 0 0 \nNew size 2: 10\nOriginal array 3 (size 0): No elements\nDoubled array 3 (size 0): \nNew size 3: 0\n"');
