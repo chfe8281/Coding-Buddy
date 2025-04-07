@@ -105,7 +105,7 @@ app.get('/login', (req,res)=>{
 // Method: POST
 // Route for inserting hashed password and email into users table
 app.post('/register', async (req, res) => {
-  const { username, email, name, password } = req.body;
+  const { username, email, password } = req.body;
 
   try {
       console.log('Received registration request:', { username, email });
@@ -113,23 +113,16 @@ app.post('/register', async (req, res) => {
       console.log('User exists check result:', userExists);
 
       if (userExists.length > 0) {
-        console.log('Username or Email already taken.');
-        if (req.accepts('html')) {
-            return res.status(400).render('pages/register', { 
-                message: 'Username or Email already taken. Try a different one.' 
-            });
-        }
-        return res.status(400).json({ 
-            message: 'Username or Email already taken. Try a different one.' 
-        });
+          console.log('Username or Email already taken.');
+          return res.render('pages/register', { message: 'Username or Email already taken. Try a different one.' });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       console.log('Hashed password:', hashedPassword);
 
       await db.none(
-          'INSERT INTO users (username, email, name, password) VALUES ($1, $2, $3, $4)',
-          [username, email, name, hashedPassword]
+          'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
+          [username, email, hashedPassword]
       );
 
       console.log('User registered successfully');
@@ -168,8 +161,8 @@ app.post('/login', async (req, res) => {
 
       req.session.user = user;
       req.session.save(() => {
-          console.log('User authenticated, redirecting to /discover');
-          res.redirect('/discover');
+          console.log('User authenticated, redirecting to /home');
+          res.redirect('/profile'); // temp profile page for now, will make homepage later
       });
 
   } catch (error) {
@@ -185,9 +178,7 @@ const auth = (req, res, next) => {
   }
   next();
 };
-// *****************************************************
-// <!-- Start Server -->
-// *****************************************************
+
 // Route: /profile
 // Renders the profile page (with mock data for now)
 app.get('/profile', (req, res) => {
@@ -205,25 +196,27 @@ app.get('/profile', (req, res) => {
 });
 
 let topic = "";
-app.get('/codingExercise', (req, res) => {
+app.get('/coding', (req, res) => {
   res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
 });
 
-app.post('/codingExercise', async(req, res) => {
+app.post('/coding', async(req, res) => {
   let input = req.body.code;
   let input_1 = "";
   let output_1 = "";
-  var getQuestion = `SELECT input_1, output_1 FROM coding_questions WHERE topic = '2270';`;
+  let question_id = "";
+  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE topic = '2270';`;
   try {
     let results = await db.one(getQuestion);
+    question_id = results.question_id;
     input_1 = results.input_1;
     output_1 = results.output_1;
     console.log("INPUT1", input_1);
     console.log(results);
       
   } catch (err) {
-    res.redirect('/codingExercise')
+    res.redirect('/coding')
   }
   const axios = require('axios');
   let data = JSON.stringify({
