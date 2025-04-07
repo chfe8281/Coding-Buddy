@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE IF NOT EXISTS users (
   user_id SERIAL PRIMARY KEY NOT NULL,
   username VARCHAR(50) NOT NULL,
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
   avatar_url VARCHAR(200)
 );
 
+DROP TABLE IF EXISTS decks CASCADE;
 DROP TABLE IF EXISTS decks CASCADE;
 CREATE TABLE IF NOT EXISTS decks (
   deck_id SERIAL PRIMARY KEY NOT NULL,
@@ -31,12 +33,20 @@ CREATE TABLE IF NOT EXISTS cards (
 );
 
 DROP TABLE IF EXISTS coding_questions CASCADE;
+DROP TABLE IF EXISTS coding_questions CASCADE;
 CREATE TABLE IF NOT EXISTS coding_questions (
   question_id SERIAL PRIMARY KEY NOT NULL,
   name VARCHAR(50) NOT NULL,
   -- Increase as needed
   starter_code VARCHAR(5000),
+  starter_code VARCHAR(5000),
   topic VARCHAR(20),
+  input_1 VARCHAR(5000),
+  input_2 VARCHAR(5000),
+  input_3 VARCHAR(5000),
+  output_1 VARCHAR(5000),
+  output_2 VARCHAR(5000),
+  output_3 VARCHAR(5000),
   input_1 VARCHAR(5000),
   input_2 VARCHAR(5000),
   input_3 VARCHAR(5000),
@@ -104,7 +114,6 @@ CREATE TABLE IF NOT EXISTS users_to_mc_questions (
   FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
   FOREIGN KEY (mcq_id) REFERENCES mc_questions (mcq_id) ON DELETE CASCADE
 );
-
 
 -- Create an admin user to assign default decks to
 INSERT INTO users (username, password, email)
