@@ -76,6 +76,11 @@ app.use(express.urlencoded({ extended: true })); // For parsing form data
 
 // allow access to public/images/default-event
 app.use(express.static(path.join(__dirname, 'public')));
+// Serve images from the img folder (located one level above src)
+app.use('/img', express.static(path.join(__dirname, '../img')));
+
+// Serve resources (like CSS) from the resources folder inside src
+app.use('/resources', express.static(path.join(__dirname, 'resources')));
 
 // *****************************************************
 // <!-- API Routes -->
@@ -93,6 +98,48 @@ app.get('/', (req, res) => {
 // renders the register page
 app.get('/register', (req, res) => {
     res.render('pages/register'); 
+});
+
+// Route: /home
+// Method: GET
+// renders the register page
+app.get('/home', async (req, res) => {
+  //const userId = req.session.user.user_id;
+
+  try {
+    const totalMC = await db.one('SELECT count(*) AS count FROM mc_questions');
+    const completedMC = await db.one(
+      'SELECT count(*) AS count FROM users_to_mc_questions WHERE user_id = $1',
+      [userId]
+    );
+
+    const totalCoding = await db.one('SELECT count(*) AS count FROM coding_questions');
+    const completedCoding = await db.one(
+      'SELECT count(*) AS count FROM users_to_coding_questions WHERE user_id = $1',
+      [userId]
+    );
+
+    const totalMCCount = Number(totalMC.count);
+    const completedMCCount = Number(completedMC.count);
+    const totalCodingCount = Number(totalCoding.count);
+    const completedCodingCount = Number(completedCoding.count);
+
+    const mcPercentage = totalMCCount === 0 ? 0 : Math.round((completedMCCount / totalMCCount) * 100);
+    const codingPercentage = totalCodingCount === 0 ? 0 : Math.round((completedCodingCount / totalCodingCount) * 100);
+
+    res.render('pages/homePage', {
+      mcPercentage,
+      codingPercentage,
+      user: req.session.user
+    });
+  } catch (error) {
+    console.error('Error calculating completion percentages:', error);
+    res.render('pages/homePage', {
+      mcPercentage: 0,
+      codingPercentage: 0,
+      user: req.session.user
+    });
+  }
 });
 
 // Route: /login
@@ -175,7 +222,7 @@ app.post('/login', async (req, res) => {
       req.session.user = user;
       req.session.save(() => {
           console.log('User authenticated, redirecting to /home');
-          res.redirect('/profile'); //temp redirect to profile for now
+          res.redirect('/home');
       });
 
   } catch (error) {
@@ -191,6 +238,7 @@ const auth = (req, res, next) => {
   }
   next();
 };
+
 // *****************************************************
 // <!-- Start Server -->
 // *****************************************************
