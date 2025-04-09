@@ -63,10 +63,11 @@ describe('Testing Login API', () => {
       chai
       .request(server)
       .post('/login')
+      //.set('Accept', 'application/json') // Explicitly request JSON
       .send({username: 'testuser', password: 'pwd123'})
       .end((err, res) => {
           res.should.have.status(200);
-          res.should.redirectTo(/^.*127\.0\.0\.1.*\/profile$/); // should redirect to /profile for now but home later
+          res.should.redirectTo(/^.*127\.0\.0\.1.*\/home$/); // should redirect to /home
           done();
       });
   });
