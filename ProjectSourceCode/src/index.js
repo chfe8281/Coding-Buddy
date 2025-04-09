@@ -183,7 +183,7 @@ app.get('/login', (req,res)=>{
 // Method: POST
 // Route for inserting hashed password and email into users table
 app.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, name, password } = req.body;
 
   try {
       console.log('Received registration request:', { username, email });
@@ -191,16 +191,23 @@ app.post('/register', async (req, res) => {
       console.log('User exists check result:', userExists);
 
       if (userExists.length > 0) {
-          console.log('Username or Email already taken.');
-          return res.render('pages/register', { message: 'Username or Email already taken. Try a different one.' });
+        console.log('Username or Email already taken.');
+        if (req.accepts('html')) {
+            return res.status(400).render('pages/register', { 
+                message: 'Username or Email already taken. Try a different one.' 
+            });
+        }
+        return res.status(400).json({ 
+            message: 'Username or Email already taken. Try a different one.' 
+        });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       console.log('Hashed password:', hashedPassword);
 
       await db.none(
-          'INSERT INTO users (username, email, password) VALUES ($1, $2, $3)',
-          [username, email, hashedPassword]
+          'INSERT INTO users (username, email, name, password) VALUES ($1, $2, $3, $4)',
+          [username, email, name, hashedPassword]
       );
 
       console.log('User registered successfully');
@@ -372,7 +379,6 @@ app.get('/welcome', (req, res) => {
 });
 
 app.get('/profile', auth, async (req, res) => {
-  console.log('Session data:', req.session);
   try {
     const user = req.session.user;
     if (!user) return res.redirect('/login');
