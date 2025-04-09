@@ -374,6 +374,28 @@ app.post('/coding', auth, async(req, res) => {
   });
 }); 
 
+// Route: /logout
+// Method: GET
+// Destroys the session and logs the user out
+app.get('/logout', (req, res) => {
+  // Destroy the session
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      return res.render('pages/logout', {
+        message: 'An error occurred during logout.',
+        error: true,
+      });
+    }
+
+    // Render the logout page with a success message
+    res.render('pages/logout', {
+      message: 'Logged out successfully.',
+      success: true,
+    });
+  });
+});
+
 app.get('/welcome', (req, res) => {
   res.json({status: 'success', message: 'Welcome!'});
 });
