@@ -289,14 +289,13 @@ app.get('/coding', async(req, res) => {
   //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
 });
-
 app.post('/coding', auth, async(req, res) => {
   let input = req.body.code;
   let user_id = req.session.user.user_id;
   let input_1 = "";
   let output_1 = "";
-  let question_id = "";
-  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
+  let question_id = req.body.question_id;
+  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
     let results = await db.one(getQuestion);
     question_id = results.question_id;
@@ -372,7 +371,7 @@ app.post('/coding', auth, async(req, res) => {
       error: true
     })
   });
-}); 
+});  
 
 // Route: /logout
 // Method: GET
