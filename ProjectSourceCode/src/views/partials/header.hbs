@@ -70,6 +70,19 @@
         }, 1000);
     }
 
+    document.addEventListener("DOMContentLoaded", () => {
+        const buttons = document.querySelectorAll(".type-buttons button");
+
+        buttons.forEach(button => {
+            button.addEventListener("click", () => {
+                const selectedTopic = button.textContent.trim();
+                // Redirect to the /coding route with the topic as query param
+                window.location.href = `/coding?topic=${encodeURIComponent(selectedTopic)}`;
+            });
+        });
+    });
+
+
   </script>
 </head>
 <body class="h-100 d-flex flex-column">

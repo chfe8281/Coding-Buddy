@@ -269,34 +269,93 @@ let current_user = "";
 
 const topic = "";
 const question_id = "";
-// let question_id = "";
-app.get('/coding', async(req, res) => {
-  let description = "";
-  let question_id = "";
-  var getQuestion = `SELECT question_id, description FROM coding_questions WHERE topic = '1300';`;
-  try {
-    let results = await db.one(getQuestion);
-    question_id = results.question_id;
-    description = results.description;
-    console.log("description", description);
-    console.log(results);
-    res.render('pages/codingExercise.hbs',{question_descript: description});
-      
-  } catch (err) {
-    console.log("enter error");
-    res.render('pages/codingExercise.hbs', {question_descript: ""})
+const result = "";
+app.get('/coding', async (req, res) => {
+  const topic = req.query.topic;
+
+  if (!topic) {
+    return res.render('pages/codingExercise.hbs', { question_descript: "No topic selected." });
   }
-  //this will call the /anotherRoute route in the API
+
+  const query = `SELECT question_id, description FROM coding_questions WHERE topic = $1 ORDER BY RANDOM() LIMIT 1`;
+
+  try {
+    result = await db.one(query, [topic]);
+    const { question_id, description } = result;
+    console.log("Fetched question:", result);
+    res.render('pages/codingExercise.hbs', {
+      question_descript: description,
+      question_id: question_id
+    });
+  } catch (err) {
+    console.error("Error fetching question:", err);
+    res.render('pages/codingExercise.hbs', { question_descript: "Error fetching question." });
+  }
+});
+// let question_id = "";
+/*
+app.get('/codingExercise', (req, res) => {
+  res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
 });
+//functions to fetch questions in the database and call the api route
+document.addEventListener("DOMContentLoaded", () => {
+    const buttons = document.querySelectorAll(".type-buttons button");
+    let selectedTopic = "";
+
+    buttons.forEach(button => {
+        button.addEventListener("click", () => {
+            selectedTopic = button.textContent;
+            fetchQuestion(selectedTopic);
+        });
+    });
+
+    function fetchQuestion(topic) {
+        fetch(`/get-question?topic=${encodeURIComponent(topic)}`)
+            .then(response => response.json())
+            .then(data => {
+                displayQuestion(data);
+            })
+            .catch(error => console.error("Error fetching question:", error));
+    }
+
+    function displayQuestion(question) {
+        const questionContainer = document.getElementById("question-container");
+        if (questionContainer) {
+            questionContainer.innerHTML = `<h3>${question.name}</h3><p>${question.starter_code || question.mcq_text}</p>`;
+        }
+    }
+});
+//get route fetching a random coding question by topic
+app.get("/get-question", async (req, res) => {
+  const topic = req.query.topic;
+
+  if (!topic) {
+    return res.status(400).json({ error: "Topic is required." });
+  }
+
+  try {
+    const query = `SELECT * FROM coding_questions WHERE topic = $1 ORDER BY RANDOM() LIMIT 1`;
+    const question = await db.oneOrNone(query, [topic]); // 'oneOrNone' returns a single row or null
+
+    if (question) {
+      res.json(question); // Send the question data as JSON
+    } else {
+      res.status(404).json({ error: "No questions found for this topic." });
+    }
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+});*/
 
 app.post('/coding', auth, async(req, res) => {
   let input = req.body.code;
   let user_id = req.session.user.user_id;
   let input_1 = "";
   let output_1 = "";
-  let question_id = "";
-  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
+  let question_id = req.body.question_id;
+  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
     let results = await db.one(getQuestion);
     question_id = results.question_id;
