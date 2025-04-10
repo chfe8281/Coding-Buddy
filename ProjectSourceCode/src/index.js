@@ -407,7 +407,7 @@ app.get('/profile', auth, async (req, res) => {
 
     const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [user.user_id]);
     const cqp = await calculateCompletionPercentage(userData.username);
-    
+
     res.render('pages/profile', {
       name: userData.name,
       email: userData.email,
@@ -415,7 +415,7 @@ app.get('/profile', auth, async (req, res) => {
       avatar: userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'U')}&background=random`,
       points: userData.points || 0,
       leaderboardPosition: await calculateLeaderboardPosition(userData.user_id),
-      streak: userData.streak || 0,
+      streak: await updateLoginStreak(userData.user_id) || 0,
       codingQuestionsPercent: cqp
       // Message is automatically available via res.locals
     });
@@ -630,6 +630,46 @@ async function calculateCompletionPercentage(username) {
   } catch (error) {
     console.error('Error calculating completion percentage:', error);
     return 0; // Return 0 if there's an error
+  }
+}
+
+async function updateLoginStreak(userId) {
+  try {
+    // Get user's current streak and last login date
+    const user = await db.one('SELECT last_login, streak FROM users WHERE user_id = $1', [userId]);
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to midnight
+    
+    let newStreak = 1; // Default to 1
+    
+    if (user.last_login) {
+      const lastLogin = new Date(user.last_login);
+      lastLogin.setHours(0, 0, 0, 0);
+      
+      // Calculate difference in days
+      const dayDiff = (today - lastLogin) / (1000 * 60 * 60 * 24);
+      
+      if (dayDiff === 1) {
+        newStreak = user.streak + 1;
+      } else if (dayDiff > 1) {
+        newStreak = 1;
+      } else {
+        newStreak = user.streak;
+      }
+    }
+    
+    // Update user record
+    await db.none(
+      'UPDATE users SET streak = $1, last_login = $2 WHERE user_id = $3',
+      [newStreak, today, userId]
+    );
+    
+    return newStreak;
+    
+  } catch (error) {
+    console.error('Error updating login streak:', error);
+    throw error;
   }
 }
 
