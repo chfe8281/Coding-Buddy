@@ -38,7 +38,7 @@ Negative numbers are handled as well, and the function will return the largest n
     return 0;
 }', '"The largest element in the array is: 9\nThe largest element in the second array is: -1\nThe largest element in the third array is: 20\n"'), 
 ('Array Doubling', 
-'2270','Description', 
+'2270','Array Doubling', 
 'int main() {
     // Test case 1: Initial array with size 3
     int size1 = 3;

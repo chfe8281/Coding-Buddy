@@ -265,8 +265,30 @@ app.get('/profile', (req, res) => {
 
 const topic = "";
 const question_id = "";
+app.get('/coding', async (req, res) => {
+  const topic = req.query.topic;
+
+  if (!topic) {
+    return res.render('pages/codingExercise.hbs', { question_descript: "No topic selected." });
+  }
+
+  const query = `SELECT question_id, description FROM coding_questions WHERE topic = $1 ORDER BY RANDOM() LIMIT 1`;
+
+  try {
+    const result = await db.one(query, [topic]);
+    const { question_id, description } = result;
+    console.log("Fetched question:", result);
+    res.render('pages/codingExercise.hbs', {
+      question_descript: description,
+      question_id: question_id
+    });
+  } catch (err) {
+    console.error("Error fetching question:", err);
+    res.render('pages/codingExercise.hbs', { question_descript: "Error fetching question." });
+  }
+});
 // let question_id = "";
-app.get('/coding', async(req, res) => {
+/*app.get('/coding', async(req, res) => {
   let description = "";
   let question_id = "";
   var getQuestion = `SELECT question_id, description FROM coding_questions WHERE topic = '1300';`;
@@ -286,10 +308,10 @@ app.get('/coding', async(req, res) => {
   // helpers.startCountdown();
 });
 
-/*app.get('/codingExercise', (req, res) => {
+app.get('/codingExercise', (req, res) => {
   res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
-});*/
+});
 //functions to fetch questions in the database and call the api route
 document.addEventListener("DOMContentLoaded", () => {
     const buttons = document.querySelectorAll(".type-buttons button");
@@ -339,7 +361,7 @@ app.get("/get-question", async (req, res) => {
     console.error("Database error:", error);
     res.status(500).json({ error: "Internal server error." });
   }
-});
+});*/
 
 app.post('/coding', auth, async(req, res) => {
   let input = req.body.code;
