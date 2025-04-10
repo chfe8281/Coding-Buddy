@@ -267,27 +267,28 @@ let current_user = "";
 // <!-- Start Server -->
 // *****************************************************
 
-const topic = "";
-const question_id = "";
-// let question_id = "";
-app.get('/coding', async(req, res) => {
-  let description = "";
-  let question_id = "";
-  var getQuestion = `SELECT question_id, description FROM coding_questions WHERE topic = '1300';`;
-  try {
-    let results = await db.one(getQuestion);
-    question_id = results.question_id;
-    description = results.description;
-    console.log("description", description);
-    console.log(results);
-    res.render('pages/codingExercise.hbs',{question_descript: description});
-      
-  } catch (err) {
-    console.log("enter error");
-    res.render('pages/codingExercise.hbs', {question_descript: ""})
+const result = "";
+app.get('/coding', async (req, res) => {
+  const topic = req.query.topic;
+
+  if (!topic) {
+    return res.render('pages/codingExercise.hbs', { question_descript: "No topic selected." });
   }
-  //this will call the /anotherRoute route in the API
-  // helpers.startCountdown();
+
+  const query = `SELECT question_id, description FROM coding_questions WHERE topic = $1 ORDER BY RANDOM() LIMIT 1`;
+
+  try {
+    result = await db.one(query, [topic]);
+    const { question_id, description } = result;
+    console.log("Fetched question:", result);
+    res.render('pages/codingExercise.hbs', {
+      question_descript: description,
+      question_id: question_id
+    });
+  } catch (err) {
+    console.error("Error fetching question:", err);
+    res.render('pages/codingExercise.hbs', { question_descript: "Error fetching question." });
+  }
 });
 app.post('/coding', auth, async(req, res) => {
   let input = req.body.code;
