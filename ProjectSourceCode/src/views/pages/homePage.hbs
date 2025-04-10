@@ -59,19 +59,48 @@
       <div class="row">
         <div class="text-box">
           <h2><i class="bi bi-star"></i> To-Do</h2>
-          <p>MC Test Questions Completed: {{mcPercentage}}%</p>
-          <p>Practice Problems Completed: {{codingPercentage}}%</p>
+          
+          <!-- MC Test Section -->
+          <div class="d-flex align-items-center mb-3">
+            <!-- Fixed-width container for the label -->
+            <div style="width: 300px; font-weight: bold; white-space: nowrap;">
+              MC Test Questions Completed: {{mcPercentage}}%
+            </div>
+            <!-- Progress bar container -->
+            <div class="progress ms-3" style="flex-grow: 1; height: 20px; border-radius: 10px;">
+              <div class="progress-bar bg-warning" role="progressbar" style="width: {{mcPercentage}}%;" 
+                  aria-valuenow="{{mcPercentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+          
+          <!-- Practice Problems Section -->
+          <div class="d-flex align-items-center">
+            <!-- Fixed-width container for the label -->
+            <div style="width: 300px; font-weight: bold; white-space: nowrap;">
+              Practice Problems Completed: {{codingPercentage}}%
+            </div>
+            <!-- Progress bar container -->
+            <div class="progress ms-3" style="flex-grow: 1; height: 20px; border-radius: 10px;">
+              <div class="progress-bar bg-warning" role="progressbar" style="width: {{codingPercentage}}%;" 
+                  aria-valuenow="{{codingPercentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+
         </div>
         <div class="divider"></div>
         <div class="image-box">
           <img src="/img/home/row3.jpg" alt="Row 3 Image">
         </div>
       </div>
-      <!-- Row 4 -->
+      <!-- Row 4: Leaderboard -->
       <div class="row">
         <div class="text-box">
-          <h2><i class="bi bi-lightning-charge"></i> Row 4 Title</h2>
-          <p>Undecided</p>
+          <h2><i class="bi bi-lightning-charge"></i> Leaderboard</h2>
+          <ul>
+            {{#each topUsers}}
+              <li>{{username}} ({{points}} points)</li>
+            {{/each}}
+          </ul>
         </div>
         <div class="divider"></div>
         <div class="image-box">

@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS users_to_mc_questions (
 
 -- Create an admin user to assign default decks to
 INSERT INTO users (name, username, password, email)
-  VALUES ('Admin', 'admin', '$2a$10$UDl9WT1/9C68T5xvP/cldus/rUcFC8wkXc435KBrBQmJGiuoeTcIO', 'admin42@colorado.edu');
+  VALUES ('Admin', 'admin', '$2a$10$Aa.zAO3NoYh.dXV4MFhpu.9xw7kET0LsNpvw.v76TZRE9EtRY8xjy', 'admin42@colorado.edu');
   -- hashed password is "password987"
 
 -- Default flashcard decks
