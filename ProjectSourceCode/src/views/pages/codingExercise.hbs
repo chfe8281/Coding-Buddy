@@ -1,13 +1,14 @@
-{{>nav}}
 <h1>Coding Exercises:</h1>
 
 <div class = "type-buttons">
-    <button>Introduction to CS</button>
-    <button>Data Structures</button>
-    <button>Computer Systems</button>
-    <button>Algorithms</button>
+    <button formmethod="get" formaction = "/coding">1300</button>
+    <button formmethod="get" formaction = "/coding">2270</button>
+    <button formmethod="get" formaction = "/coding">2400</button>
+    <button formmethod="get" formaction = "/coding">Algorithms</button>
+</div>
 
-    <button id = "timer" type = "submit" onclick = "startCountdown()" formmethod = "post" formaction = "/codingExercise">Start Timer</button>
+<div class = "timer-buttons">
+    <button id = "timer" type = "submit" onclick = "startCountdown()">Start Timer</button>
 </div>
 <div class = "grid-container">
     <div class = "grid-item">
@@ -17,8 +18,9 @@
     <div class = "grid-item">
         <div class = "code-textbox">
             <form method="post" action="/coding" id = "codingExercise">
+                <input type = "hidden" id = "question_id" name = "question_id" value = {{question_id}}>
                 <textarea id = "code" name = "code" cols = "75" rows = "25" placeholder = "Start Coding Here..."></textarea><br />
-                <input type="submit" id = "submit-button" name = "submit-button" value = "Submit"/>
+                <input type="submit" id = "submit-button" name = "submit-button" value = "Submit">
             </form>
         </div>
         {{>passed}}
