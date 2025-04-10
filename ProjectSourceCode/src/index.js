@@ -267,7 +267,7 @@ let current_user = "";
 // <!-- Start Server -->
 // *****************************************************
 
-const result = "";
+let result = "";
 app.get('/coding', async (req, res) => {
   const topic = req.query.topic;
 
@@ -291,18 +291,19 @@ app.get('/coding', async (req, res) => {
   }
 });
 app.post('/coding', auth, async(req, res) => {
-  let input = req.body.code;
+  let user_input = req.body.code;
   let user_id = req.session.user.user_id;
-  let input_1 = "";
-  let output_1 = "";
+  let main_input = "";
+  let expected_output = "";
   let question_id = req.body.question_id;
+  console.log("ID", question_id);
   var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
     let results = await db.one(getQuestion);
     question_id = results.question_id;
-    input_1 = results.input_1;
-    output_1 = results.output_1;
-    console.log("INPUT1", input_1);
+    main_input = results.input_1;
+    expected_output = results.output_1;
+    console.log("INPUT1", main_input);
     console.log(results);
       
   } catch (err) {
@@ -315,7 +316,7 @@ app.post('/coding', auth, async(req, res) => {
       "files": [
         {
           "name": "my_cool_code.js",
-          "content": `${input}\n${input_1}`
+          "content": `${user_input}\n${main_input}`
         }
       ],
       "stdin": "",
@@ -345,8 +346,8 @@ app.post('/coding', auth, async(req, res) => {
   .then(async (response) => {
     console.log(JSON.stringify(response.data.run.output));
     let output = JSON.stringify(response.data.run.output);
-    passed = `Incorrect\n Output:${output}\n Expected:${output_1}`;
-    if (output_1 == output)
+    passed = `Incorrect\n Output:${output}\n Expected:${expected_output}`;
+    if (expected_output == output)
     {
       passed_1 = true;
       passed = "Success!";
@@ -359,7 +360,7 @@ app.post('/coding', auth, async(req, res) => {
         // res.redirect('/coding')
       
     }
-    console.log("DBAnswer", output_1);
+    console.log("DBAnswer", expected_output);
     res.render('pages/codingExercise.hbs', {
       passed: passed,
       error: !passed_1
