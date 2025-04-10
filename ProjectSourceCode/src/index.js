@@ -265,6 +265,7 @@ app.get('/profile', (req, res) => {
 
 const topic = "";
 const question_id = "";
+const result = "";
 app.get('/coding', async (req, res) => {
   const topic = req.query.topic;
 
@@ -275,7 +276,7 @@ app.get('/coding', async (req, res) => {
   const query = `SELECT question_id, description FROM coding_questions WHERE topic = $1 ORDER BY RANDOM() LIMIT 1`;
 
   try {
-    const result = await db.one(query, [topic]);
+    result = await db.one(query, [topic]);
     const { question_id, description } = result;
     console.log("Fetched question:", result);
     res.render('pages/codingExercise.hbs', {
@@ -288,26 +289,7 @@ app.get('/coding', async (req, res) => {
   }
 });
 // let question_id = "";
-/*app.get('/coding', async(req, res) => {
-  let description = "";
-  let question_id = "";
-  var getQuestion = `SELECT question_id, description FROM coding_questions WHERE topic = '1300';`;
-  try {
-    let results = await db.one(getQuestion);
-    question_id = results.question_id;
-    description = results.description;
-    console.log("description", description);
-    console.log(results);
-    res.render('pages/codingExercise.hbs',{question_descript: description});
-      
-  } catch (err) {
-    console.log("enter error");
-    res.render('pages/codingExercise.hbs', {question_descript: ""})
-  }
-  //this will call the /anotherRoute route in the API
-  // helpers.startCountdown();
-});
-
+/*
 app.get('/codingExercise', (req, res) => {
   res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
   // helpers.startCountdown();
@@ -368,8 +350,8 @@ app.post('/coding', auth, async(req, res) => {
   let user_id = req.session.user.user_id;
   let input_1 = "";
   let output_1 = "";
-  let question_id = "";
-  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
+  let question_id = req.body.question_id;
+  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
     let results = await db.one(getQuestion);
     question_id = results.question_id;
