@@ -86,7 +86,7 @@ app.use((req, res, next) => {
 });
 
 // allow access to public/images/default-event
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'))); //add this if it doesn't work: app.use(express.static(path.join(__dirname, 'resources')));
 // Serve images from the img folder (located one level above src)
 app.use('/img', express.static(path.join(__dirname, '../img')));
 
@@ -674,5 +674,49 @@ async function updateLoginStreak(userId) {
   }
 }
 
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://emkc.org/api/v2/piston/execute',
+    headers: {
+        'Content-Type': 'application/json', 
+        'Cookie': 'engineerman.sid=s%3Akvnpn0FXmlPNrj5oQAzFdWL3_PfixMdO.6tPjcuIScWntIC6%2BYY2vnbqfu5UeM664ikYYImkm8Qc'
+    },
+    data: data
+  };
+  console.log("data1", data);
+  let passed_1 = "no";
+  axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data.run.output));
+    let output = JSON.stringify(response.data.run.output);
+    if (output_1 == output)
+    {
+      passed_1 = "yes";
+    }
+    console.log("DBAnswer", output_1);
+    res.render('pages/codingExercise.hbs', {
+      response: passed_1
+    })
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+//}); 
+
+// *****************************************************
+// <!-- Multiple Choice Question API Routes -->
+// *****************************************************
+
+
+app.get('/mcq', (req, res) => {
+    res.render('./pages/mcq'); 
+});
+
+// *****************************************************
+// <!-- End of Multiple Choice Question API Routes -->
+// *****************************************************
+
+app.listen(3000);
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
