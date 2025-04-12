@@ -674,35 +674,6 @@ async function updateLoginStreak(userId) {
   }
 }
 
-  let config = {
-    method: 'post',
-    maxBodyLength: Infinity,
-    url: 'https://emkc.org/api/v2/piston/execute',
-    headers: {
-        'Content-Type': 'application/json', 
-        'Cookie': 'engineerman.sid=s%3Akvnpn0FXmlPNrj5oQAzFdWL3_PfixMdO.6tPjcuIScWntIC6%2BYY2vnbqfu5UeM664ikYYImkm8Qc'
-    },
-    data: data
-  };
-  console.log("data1", data);
-  let passed_1 = "no";
-  axios.request(config)
-  .then((response) => {
-    console.log(JSON.stringify(response.data.run.output));
-    let output = JSON.stringify(response.data.run.output);
-    if (output_1 == output)
-    {
-      passed_1 = "yes";
-    }
-    console.log("DBAnswer", output_1);
-    res.render('pages/codingExercise.hbs', {
-      response: passed_1
-    })
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-//}); 
 
 // *****************************************************
 // <!-- Multiple Choice Question API Routes -->
