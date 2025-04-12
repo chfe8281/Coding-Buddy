@@ -53,24 +53,65 @@ db.connect()
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 
 // initialize session variables
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
-    saveUninitialized: false,
+    secret: process.env.SESSION_SECRET || 'fallback-secret',
     resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false, // Set to true if using HTTPS in production
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'strict'
+    }
   })
 );
 
+app.use((req, res, next) => {
+  res.locals.user = req.session.user; // Makes user available in all templates
+  next();
+});
 
-// allow access to 'resources' folder contents
-app.use(express.static(path.join(__dirname, 'resources')));
+
+app.use(express.json()); // For parsing application/json
+app.use(express.urlencoded({ extended: true })); // For parsing form data
+
+// Flash message middleware
+app.use((req, res, next) => {
+  res.locals.message = req.session.message;
+  delete req.session.message;
+  next();
+});
+
+// allow access to public/images/default-event
+app.use(express.static(path.join(__dirname, 'public'))); //add this if it doesn't work: app.use(express.static(path.join(__dirname, 'resources')));
+// Serve images from the img folder (located one level above src)
+app.use('/img', express.static(path.join(__dirname, '../img')));
+
+// Serve resources (like CSS) from the resources folder inside src
+app.use('/resources', express.static(path.join(__dirname, 'resources')));
+
+// Starting the server and keeping the connection open to listen for more requests
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 
 // *****************************************************
 // <!-- API Routes -->
 // *****************************************************
+
+// Authentication Middleware?
+const auth = (req, res, next) => {
+  if (!req.session.user) {
+      console.log('User not authenticated. Redirecting to login...');
+      return res.redirect('/login');
+  }
+  next();
+};
 
 // Route: /
 // Method: GET
@@ -78,21 +119,66 @@ app.use(express.static(path.join(__dirname, 'resources')));
 app.get('/', (req, res) => {
     res.redirect('/login');
   });
+
 // Route: /register
 // Method: GET
 // renders the register page
 app.get('/register', (req, res) => {
     res.render('pages/register'); 
 });
+
+// Route: /home
+// Method: GET
+// renders the register page
+app.get('/home', auth, async (req, res) => {
+
+  console.log('Session data:', req.session);
+
+  const userId = req.session.user.user_id;
+
+  try {
+    const totalMC = await db.one('SELECT count(*) AS count FROM mc_questions');
+    const completedMC = await db.one(
+      'SELECT count(*) AS count FROM users_to_mc_questions WHERE user_id = $1',
+      [userId]
+    );
+
+    const totalCoding = await db.one('SELECT count(*) AS count FROM coding_questions');
+    const completedCoding = await db.one(
+      'SELECT count(*) AS count FROM users_to_coding_questions WHERE user_id = $1',
+      [userId]
+    );
+
+    const totalMCCount = Number(totalMC.count);
+    const completedMCCount = Number(completedMC.count);
+    const totalCodingCount = Number(totalCoding.count);
+    const completedCodingCount = Number(completedCoding.count);
+
+    const mcPercentage = totalMCCount === 0 ? 0 : Math.round((completedMCCount / totalMCCount) * 100);
+    const codingPercentage = totalCodingCount === 0 ? 0 : Math.round((completedCodingCount / totalCodingCount) * 100);
+
+    res.render('pages/homePage', {
+      mcPercentage,
+      codingPercentage,
+      user: req.session.user
+    });
+  } catch (error) {
+    console.error('Error calculating completion percentages:', error);
+    res.render('pages/homePage', {
+      mcPercentage: 0,
+      codingPercentage: 0,
+      user: req.session.user
+    });
+  }
+});
+
 // Route: /login
 // Method: GET
 // renders the login page
 app.get('/login', (req,res)=>{
     res.render('pages/login')
 });
-// Route: /register
-// Method: POST
-// route for inserting hashed password into users table
+
 // Route: /register
 // Method: POST
 // Route for inserting hashed password and email into users table
@@ -105,8 +191,15 @@ app.post('/register', async (req, res) => {
       console.log('User exists check result:', userExists);
 
       if (userExists.length > 0) {
-          console.log('Username or Email already taken.');
-          return res.render('pages/register', { message: 'Username or Email already taken. Try a different one.' });
+        console.log('Username or Email already taken.');
+        if (req.accepts('html')) {
+            return res.status(400).render('pages/register', { 
+                message: 'Username or Email already taken. Try a different one.' 
+            });
+        }
+        return res.status(400).json({ 
+            message: 'Username or Email already taken. Try a different one.' 
+        });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -138,8 +231,13 @@ app.post('/login', async (req, res) => {
       console.log('Query result:', result);
 
       if (!result || result.length === 0) {
+        if (req.accepts('html')) {
           console.log('User not found in the database.');
           return res.render('pages/login', { message: 'User not found. Please register first.' });
+      }
+        return res.status(400).json({ 
+          message: 'User not found in the database.' 
+        });
       }
 
       const user = result[0]; 
@@ -153,8 +251,8 @@ app.post('/login', async (req, res) => {
 
       req.session.user = user;
       req.session.save(() => {
-          console.log('User authenticated, redirecting to /discover');
-          res.redirect('/discover');
+          console.log('User authenticated, redirecting to /home');
+          res.redirect('/home');
       });
 
   } catch (error) {
@@ -162,124 +260,54 @@ app.post('/login', async (req, res) => {
       res.status(500).send(`Internal Server Error: ${error.message}`);
   }
 });
-// Authentication Middleware?
-const auth = (req, res, next) => {
-  if (!req.session.user) {
-      console.log('User not authenticated. Redirecting to login...');
-      return res.redirect('/login');
-  }
-  next();
-};
+
+let current_user = "";
+
 // *****************************************************
 // <!-- Start Server -->
 // *****************************************************
 
-// Starting the server and keeping the connection open to listen for more requests
-app.use(
-  bodyParser.urlencoded({
-    extended: true,
-  })
-);
+let result = "";
+app.get('/coding', async (req, res) => {
+  const topic = req.query.topic;
 
-app.get('/codingExercise', (req, res) => {
-  res.render('pages/codingExercise.hbs'); //this will call the /anotherRoute route in the API
-  // helpers.startCountdown();
+  if (!topic) {
+    return res.render('pages/codingExercise.hbs', { question_descript: "No topic selected." });
+  }
+
+  const query = `SELECT question_id, description FROM coding_questions WHERE topic = $1 ORDER BY RANDOM() LIMIT 1`;
+
+  try {
+    result = await db.one(query, [topic]);
+    const { question_id, description } = result;
+    console.log("Fetched question:", result);
+    res.render('pages/codingExercise.hbs', {
+      question_descript: description,
+      question_id: question_id
+    });
+  } catch (err) {
+    console.error("Error fetching question:", err);
+    res.render('pages/codingExercise.hbs', { question_descript: "Error fetching question." });
+  }
 });
-
-/*app.post('/codingExercise', async(req, res) => {
-    let input = req.body.code;
-    let input_1 = "";
-    let output_1 = "";
-    var getQuestion = `SELECT input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
-    try {
-      let results = await db.one(getQuestion);
-      input_1 = results.input_1;
-      output_1 = results.output_1;
-      console.log("INPUT1", input_1);
-      console.log(results);
-      
-    } catch (err) {
-      res.redirect('/codingExercise')
-    }
-    const axios = require('axios');
-    let data = JSON.stringify({
-      "language": "python",
-      "version": "3.10.0",
-      "files": [
-        {
-          "name": "my_cool_code.js",
-          "content": `${input}\n${input_1}`
-        }
-      ],
-      "stdin": "",
-      "args": [
-        "1",
-        "2",
-        "3"
-      ],
-      "compile_timeout": 10000,
-      "run_timeout": 3000,
-      "compile_cpu_time": 10000,
-      "run_cpu_time": 3000,
-      "compile_memory_limit": -1,
-      "run_memory_limit": -1
-    });
-
-    console.log("Input", data);
-
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: 'https://emkc.org/api/v2/piston/execute',
-      headers: { 
-        'Content-Type': 'application/json', 
-        'Cookie': 'engineerman.sid=s%3Akvnpn0FXmlPNrj5oQAzFdWL3_PfixMdO.6tPjcuIScWntIC6%2BYY2vnbqfu5UeM664ikYYImkm8Qc'
-      },
-      data : data
-    };
-
-    axios.request(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data.run.output));
-      let output = JSON.stringify(response.data.run.output);
-      let message = "no";
-      if (output_1 == output)
-      {
-        message = "yes";
-      }
-      console.log(output);
-      res.render('pages/codingExercise.hbs', {
-        response: message
-      })
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-
-});*/
-
-/* app.post('/codingExercise', async(req, res) => {
-  let input = req.body.code;
-  let input_1 = "";
-  let input_2 = "";
-  let input_3 = "";
-  let output_1 = "";
-  let output_2 = "";
-  let output_3 = "";
-  var getQuestion = `SELECT input_1, output_1, input_2, output_2, input_3, output_3 FROM coding_questions WHERE topic = '1300';`;
+app.post('/coding', auth, async(req, res) => {
+  let user_input = req.body.code;
+  let user_id = req.session.user.user_id;
+  let main_input = "";
+  let expected_output = "";
+  let question_id = req.body.question_id;
+  console.log("ID", question_id);
+  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
     let results = await db.one(getQuestion);
-    input_1 = results.input_1;
-    input_2 = results.input_2;
-    input_3 = results.input_3;
-    output_1 = results.output_1;
-    output_2 = results.output_2;
-    output_3 = results.output_3;
-    console.log("INPUT1", input_1);
+    question_id = results.question_id;
+    main_input = results.input_1;
+    expected_output = results.output_1;
+    console.log("INPUT1", main_input);
     console.log(results);
       
   } catch (err) {
-    res.redirect('/codingExercise')
+    res.redirect('/coding')
   }
   const axios = require('axios');
   let data = JSON.stringify({
@@ -288,15 +316,11 @@ app.get('/codingExercise', (req, res) => {
       "files": [
         {
           "name": "my_cool_code.js",
-          "content": `${input}\n${input_1}`
+          "content": `${user_input}\n${main_input}`
         }
       ],
       "stdin": "",
-      "args": [
-        "1",
-        "2",
-        "3"
-      ],
+      "args": [""],
       "compile_timeout": 10000,
       "run_timeout": 3000,
       "compile_cpu_time": 10000,
@@ -315,64 +339,340 @@ app.get('/codingExercise', (req, res) => {
     },
     data: data
   };
-  console.log("data1", data);
+  // console.log("data1", data);
+  let passed_1 = false;
+  let passed = "Compile error!";
   axios.request(config)
-  .then((response) => {
+  .then(async (response) => {
     console.log(JSON.stringify(response.data.run.output));
     let output = JSON.stringify(response.data.run.output);
-    let message = "no";
-    if (output_1 == output)
+    passed = `Incorrect\n Output:${output}\n Expected:${expected_output}`;
+    if (expected_output == output)
     {
-      message = "yes";
+      passed_1 = true;
+      passed = "Success!";
+      console.log("Userid", user_id);
+      let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id) VALUES(${user_id}, ${question_id}) RETURNING user_id;`;
+      
+        console.log("inside");
+        let ret = await db.one(insertUser);
+        console.log(ret)
+        // res.redirect('/coding')
+      
     }
-    console.log(output);
+    console.log("DBAnswer", expected_output);
     res.render('pages/codingExercise.hbs', {
-      response: message
+      passed: passed,
+      error: !passed_1
     })
   })
   .catch((error) => {
     console.log(error);
+    res.render('pages/codingExercise.hbs', {
+      passed: passed,
+      error: true
+    })
   });
-}); */
+});  
 
-app.post('/codingExercise', async(req, res) => {
-  let input = req.body.code;
-  let input_1 = "";
-  let output_1 = "";
-  var getQuestion = `SELECT input_1, output_1 FROM coding_questions WHERE topic = '1300';`;
-  try {
-    let results = await db.one(getQuestion);
-    input_1 = results.input_1;
-    output_1 = results.output_1;
-    console.log("INPUT1", input_1);
-    console.log(results);
-      
-  } catch (err) {
-    res.redirect('/codingExercise')
-  }
-  const axios = require('axios');
-  let data = JSON.stringify({
-    "language": "cpp",
-      "version": "10.2.0",
-      "files": [
-        {
-          "name": "my_cool_code.js",
-          "content": `${input}\n${input_1}`
-        }
-      ],
-      "stdin": "",
-      "args": [
-        "1",
-        "2",
-        "3"
-      ],
-      "compile_timeout": 10000,
-      "run_timeout": 3000,
-      "compile_cpu_time": 10000,
-      "run_cpu_time": 3000,
-      "compile_memory_limit": -1,
-      "run_memory_limit": -1
+// Route: /logout
+// Method: GET
+// Destroys the session and logs the user out
+app.get('/logout', (req, res) => {
+  // Destroy the session
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      return res.render('pages/logout', {
+        message: 'An error occurred during logout.',
+        error: true,
+      });
+    }
+
+    // Render the logout page with a success message
+    res.render('pages/logout', {
+      message: 'Logged out successfully.',
+      success: true,
+    });
   });
+});
+
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
+app.get('/profile', auth, async (req, res) => {
+  try {
+    const user = req.session.user;
+    if (!user) return res.redirect('/login');
+
+    const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [user.user_id]);
+    const cqp = await calculateCompletionPercentage(userData.username);
+
+    res.render('pages/profile', {
+      name: userData.name,
+      email: userData.email,
+      username: userData.username,
+      avatar: userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'U')}&background=random`,
+      points: userData.points || 0,
+      leaderboardPosition: await calculateLeaderboardPosition(userData.user_id),
+      streak: await updateLoginStreak(userData.user_id) || 0,
+      codingQuestionsPercent: cqp
+      // Message is automatically available via res.locals
+    });
+  } catch (error) {
+    console.error('Profile error:', error);
+    res.status(500).send('Error loading profile');
+  }
+});
+
+async function calculateLeaderboardPosition(userId) {
+  try {
+    // 1. Get total count of users with points > 0
+    const countResult = await db.one('SELECT COUNT(*)::int FROM users WHERE points > 0');
+    const userCount = countResult.count;
+    
+    // If no users have points, return 100 (top position) instead of 0
+    if (userCount === 0) {
+      return 100;
+    }
+
+    // 2. Get current user's points (default to 0 if null)
+    const userResult = await db.one(
+      'SELECT COALESCE(points, 0) AS points FROM users WHERE user_id = $1', 
+      [userId]
+    );
+    const userPoints = userResult.points;
+
+    // 3. Count users with higher scores
+    const betterUsers = await db.one(
+      'SELECT COUNT(*)::int FROM users WHERE points > $1',
+      [userPoints]
+    );
+    const betterCount = betterUsers.count;
+
+    // 4. Calculate position (0 = best, 100 = worst)
+    const positionPercentile = Math.round((betterCount / userCount) * 100);
+    
+    // Return inverted percentile (100 - position) so higher is better
+    return 100 - positionPercentile;
+    
+  } catch (error) {
+    console.error('Error calculating leaderboard position:', error);
+    return 50; // Default middle position if errors occur
+  }
+}
+
+// Route: /profile/edit (GET) - Show edit form
+app.get('/profile/edit', auth, async (req, res) => {
+  try {
+    const user = req.session.user;
+    if (!user) {
+      return res.redirect('/login');
+    }
+
+    const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [user.user_id]);
+
+    res.render('pages/edit-profile', {
+      name: userData.name,
+      username: userData.username,
+      email: userData.email,
+      avatar: userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'U')}&background=random`
+    });
+  } catch (error) {
+    console.error('Edit profile error:', error);
+    res.status(500).send('Error loading edit profile');
+  }
+});
+
+// Route: /profile/edit (POST) - Handle form submission
+app.post('/profile/edit', auth, async (req, res) => {
+  try {
+    const { name, username, email } = req.body;
+    const userId = req.session.user.user_id;
+
+    // Check if username or email already exists (excluding current user)
+    const exists = await db.any(
+      `SELECT * FROM users 
+       WHERE (username = $1 OR email = $2) 
+       AND user_id != $3`,
+      [username, email, userId]
+    );
+
+    if (exists.length > 0) {
+      const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [userId]);
+      return res.render('pages/edit-profile', {
+        name: userData.name,
+        username: userData.username,
+        email: userData.email,
+        avatar: userData.avatar_url,
+        message: 'Username or email already taken'
+      });
+    }
+
+    // Update user in database
+    await db.none(
+      `UPDATE users 
+       SET name = $1, username = $2, email = $3 
+       WHERE user_id = $4`,
+      [name, username, email, userId]
+    );
+
+    // Update session with new data
+    req.session.user = {
+      ...req.session.user,
+      name,
+      username,
+      email
+    };
+    req.session.save();
+
+    // Set flash message and redirect
+    req.session.message = {
+      type: 'success',
+      text: 'Profile Updated Successfully'
+    };
+
+    return res.redirect('/profile');
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).send('Error updating profile');
+  }
+});
+
+// Route: /profile/change-password (GET)
+app.get('/profile/change-password', auth, async (req, res) => {
+  try {
+    res.render('pages/change-password');
+  } catch (error) {
+    console.error('Password change error:', error);
+    res.status(500).send('Error loading password change page');
+  }
+});
+
+app.post('/profile/change-password', auth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const userId = req.session.user.user_id;
+
+    // Validation
+    if (newPassword !== confirmPassword) {
+      return res.render('pages/change-password', {
+        message: { type: 'danger', text: 'New passwords do not match' }
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.render('pages/change-password', {
+        message: { type: 'danger', text: 'Password must be at least 8 characters' }
+      });
+    }
+
+    // Verify current password
+    const user = await db.one('SELECT * FROM users WHERE user_id = $1', [userId]);
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    
+    if (!isMatch) {
+      return res.render('pages/change-password', {
+        message: { type: 'danger', text: 'Current password is incorrect' }
+      });
+    }
+
+    // Update password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await db.none(
+      'UPDATE users SET password = $1 WHERE user_id = $2',
+      [hashedPassword, userId]
+    );
+
+    // Set flash message and redirect
+    req.session.message = {
+      type: 'success',
+      text: 'Password Changed Successfully'
+    };
+    return res.redirect('/profile');
+    
+  } catch (error) {
+    console.error('Password change error:', error);
+    req.session.message = {
+      type: 'danger',
+      text: 'Error changing password'
+    };
+    return res.redirect('/profile/change-password');
+  }
+});
+
+async function calculateCompletionPercentage(username) {
+  try {
+    // Get total number of coding questions
+    const totalQuestions = await db.one(
+      'SELECT COUNT(*) as count FROM coding_questions'
+    );
+    console.log(totalQuestions);
+    
+    // Get user id
+    const user = await db.one(`SELECT user_id FROM users WHERE username = $1`, [username]);
+    const userID = user.user_id; // Extract ID
+
+    // Get number of questions completed by user
+    const completedQuestions = await db.one(
+      'SELECT COUNT(*) as count FROM users_to_coding_questions WHERE user_id = $1',
+      [userID] // Now passing just the integer
+    );
+    
+    // Calculate percentage
+    if (totalQuestions.count === 0) {
+      return 0; // Avoid division by zero if no questions exist
+    }
+    
+    const percentage = (completedQuestions.count / totalQuestions.count) * 100;
+    return Math.round(percentage * 100) / 100; // Round to 2 decimal places
+    
+  } catch (error) {
+    console.error('Error calculating completion percentage:', error);
+    return 0; // Return 0 if there's an error
+  }
+}
+
+async function updateLoginStreak(userId) {
+  try {
+    // Get user's current streak and last login date
+    const user = await db.one('SELECT last_login, streak FROM users WHERE user_id = $1', [userId]);
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to midnight
+    
+    let newStreak = 1; // Default to 1
+    
+    if (user.last_login) {
+      const lastLogin = new Date(user.last_login);
+      lastLogin.setHours(0, 0, 0, 0);
+      
+      // Calculate difference in days
+      const dayDiff = (today - lastLogin) / (1000 * 60 * 60 * 24);
+      
+      if (dayDiff === 1) {
+        newStreak = user.streak + 1;
+      } else if (dayDiff > 1) {
+        newStreak = 1;
+      } else {
+        newStreak = user.streak;
+      }
+    }
+    
+    // Update user record
+    await db.none(
+      'UPDATE users SET streak = $1, last_login = $2 WHERE user_id = $3',
+      [newStreak, today, userId]
+    );
+    
+    return newStreak;
+    
+  } catch (error) {
+    console.error('Error updating login streak:', error);
+    throw error;
+  }
+}
 
   let config = {
     method: 'post',
@@ -402,7 +702,7 @@ app.post('/codingExercise', async(req, res) => {
   .catch((error) => {
     console.log(error);
   });
-}); 
+//}); 
 
 // *****************************************************
 // <!-- Multiple Choice Question API Routes -->
@@ -418,4 +718,5 @@ app.get('/mcq', (req, res) => {
 // *****************************************************
 
 app.listen(3000);
+module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');

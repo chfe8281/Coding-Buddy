@@ -1,0 +1,110 @@
+Feature 1: Login
+
+Test Data:
+- Username: example123
+- Password: Test123
+
+This information should be correctly inputted in the respective text boxes under the assumption that the username and password
+are already in the database and valid.
+
+- Username: codingbuddy
+- Password: isGreat
+
+This information should be correctly inputted in the respective text boxes under the assumption that the username and password
+are not yet in the database and invalid. 
+
+Description of Data:
+The Username and password inputted by the user should both be strings of characters.
+
+Description of Test Environment:
+The test environemnet will be localhost:3000
+
+Description of the Test Results:
+The user should succesfully login and will be promptly redirected to the home page if the username and corresponding password are correct.
+If not, an error message should be displayed prompting the user to try again and that the initial login attempt failed.
+
+Information about testers:
+The testers will be us the developers.
+
+Test Results:
+...
+
+
+
+Feature 2: Register
+
+Test Data:
+- Username: example123
+- Email: example@gmail.com
+- Name: Example
+- Password: Test123
+
+This information should be correctly inputted in the respective text boxes under the assumption that the username and password
+are not yet in the database
+
+- Username: codingbuddy
+- Email: codingbuddy@gmail.com
+- Name: Ben
+- Password: isGreat
+
+This information should be correctly inputted in the respective text boxes under the assumption that the username is already
+been inputted into the database
+
+Description of Data:
+All fields shoudl be strings and the email must have the @ symbol with character(s) that follow inputted by the user should both 
+be strings of characters.
+
+Description of Test Environment:
+The test environemnet will be localhost:3000
+
+Description of Test Results:
+If the user inputs all the data correctly, if the username isn't in the database already, then a succesfully registered message
+should be displayed with a link to the login page presented. If the username is already in the database, a 'username taken'
+message should be displayed and prompt the user to re-input username and password.
+
+Information about testers:
+The testers will be us the developers.
+
+Test Results:
+...
+
+
+
+Feature 3: Profile page
+
+Test Data: 
+- Username: example123
+- Email: testexample@gmail.com
+- Name: Example
+- Password: Test123
+
+The usernmae, email, and Name should be displayed on the profile page with tags indictaing which is which preceding each 
+string. The password SHOULD NOT be displayed on the profile page.
+
+- Username: exmaple123
+- Email: testexamaaple@gmail.com
+- Name: Examale
+- Password: Test123
+
+The usernmae, email, and Name should be displayed on the profile page with tags indictaing which is which preceding each 
+string. The password SHOULD NOT be displayed on the profile page. The user should be able to edit their information if they originally
+entered it incorrectly or want to update their information.
+
+Description of Data:
+All fields shoudl be strings and the email must have the @ symbol with character(s) that follow inputted by the user should both 
+be strings of characters.
+
+Description of Test Environment:
+The test environemnet will be localhost:3000
+
+Description of Test Results:
+If the user logs in succesfully with the information, then the profile page will display it all correctly when the user navigates
+to the profile page. If the user logs in succesfully but wants to change their information, the information will still be displayed but
+they can edit their information by clicking the edit profile button. After inputting their new information it should then be updated
+on the profile page displaying the new correct information.
+
+Information about testers:
+The testers will be us the developers.
+
+Test Results:
+...

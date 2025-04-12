@@ -53,3 +53,25 @@ Individual goals for next week:
 -Christina: - session.save to save incase a page is refreshed, only if you want to. get axios call get and post for the input and connecting codex to the coding exercise page, fix js for the timer.
 -Jack: finish connecting ER diagram, fix api routes, finish implementing the MC quiz page, create MC quiz questions.
 -Kaitlyn: create the database
+
+Week 3 Minutes (April 7, 2025)
+Main takeaways:
+-we will demonstrate the website on Thursday during lab; we need to merge everything and make sure the website works before then.
+-make sure project board is updated.
+-release notes
+
+Things done last week:
+-Wyatt: finished out js apis for login and register, flesh out the ER diagram for the database, then helped christina with buttons on the coding exercise page.
+-Calvin: finalized the home page, to do section of homepage, created functionality to track the number of coding questions a user has completed ...
+-Ben: connected the profile page to the database and have it be able to update the database, adding POST routes for profile page, ask around for help.
+-Christina: get axios call get and post for the input and connecting codex to the coding exercise page, fix js for the timer.
+-Jack: fixed api routes, progress implementing the MC quiz page, created MC quiz questions.
+-Kaitlyn: created the database, connected the flashcards route so it pulls data from the database.
+
+Individual goals for next week:
+-Wyatt: help christina with on the coding exercise page (buttons).
+-Calvin: create a leaderboard for fastest times to solve each question, help with testing for the coding exercise page.
+-Ben: work on a streak tracker to track the number of days a user has been active on the website, work on testing for profile page and flashcards page.
+-Christina: work on setting up the button functionality to generate questions from each course, add a get request for this functionality. If there is time, integrate the timer into the page.
+-Jack: continue work on the MC quiz page, go to office hours and ask teammates for help with api routes.
+-Kaitlyn: create the modals to allow users to edit the flashcards and make personalized sets.
