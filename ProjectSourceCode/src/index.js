@@ -65,8 +65,8 @@ app.use(
 );
 
 
-// allow access to public/images/default-event
-app.use(express.static(path.join(__dirname, 'public')));
+// allow access to 'resources' folder contents
+app.use(express.static(path.join(__dirname, 'resources')));
 
 // *****************************************************
 // <!-- API Routes -->
@@ -404,6 +404,18 @@ app.post('/codingExercise', async(req, res) => {
   });
 }); 
 
+// *****************************************************
+// <!-- Multiple Choice Question API Routes -->
+// *****************************************************
+
+
+app.get('/mcq', (req, res) => {
+    res.render('./pages/mcq'); 
+});
+
+// *****************************************************
+// <!-- End of Multiple Choice Question API Routes -->
+// *****************************************************
 
 app.listen(3000);
 console.log('Server is listening on port 3000');
