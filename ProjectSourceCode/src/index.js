@@ -155,7 +155,7 @@ app.get('/home', auth, async (req, res) => {
     const completedCodingCount = Number(completedCoding.count);
 
     const topUsers = await db.any('SELECT username, points FROM users ORDER BY points DESC LIMIT 3');
-
+    
     const mcPercentage = totalMCCount === 0 ? 0 : Math.round((completedMCCount / totalMCCount) * 100);
     const codingPercentage = totalCodingCount === 0 ? 0 : Math.round((completedCodingCount / totalCodingCount) * 100);
 
@@ -453,6 +453,7 @@ async function calculateLeaderboardPosition(userId) {
       [userPoints]
     );
     const betterCount = betterUsers.count;
+  
 
     // 4. Calculate position (0 = best, 100 = worst)
     const positionPercentile = Math.round((betterCount / userCount) * 100);
