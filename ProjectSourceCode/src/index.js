@@ -86,7 +86,7 @@ app.use((req, res, next) => {
 });
 
 // allow access to public/images/default-event
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'))); //add this if it doesn't work: app.use(express.static(path.join(__dirname, 'resources')));
 // Serve images from the img folder (located one level above src)
 app.use('/img', express.static(path.join(__dirname, '../img')));
 
@@ -685,5 +685,20 @@ async function calculateVisualProgress(actualStreak) {
   return Math.min(actualStreak * multiplier, maxVisual);
 }
 
+
+// *****************************************************
+// <!-- Multiple Choice Question API Routes -->
+// *****************************************************
+
+
+app.get('/mcq', (req, res) => {
+    res.render('./pages/mcq'); 
+});
+
+// *****************************************************
+// <!-- End of Multiple Choice Question API Routes -->
+// *****************************************************
+
+app.listen(3000);
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
