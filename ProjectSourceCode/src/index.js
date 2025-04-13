@@ -353,6 +353,7 @@ app.post('/coding', auth, async(req, res) => {
       passed_1 = true;
       passed = "Success!";
       console.log("Userid", user_id);
+      console.log("time: ",time_taken);
       let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id, time_taken) VALUES(${user_id}, ${question_id}, ${time_taken}) RETURNING user_id;`;
       
         console.log("inside");
@@ -362,6 +363,7 @@ app.post('/coding', auth, async(req, res) => {
       
     }
     console.log("DBAnswer", expected_output);
+    console.log("time: ",time_taken);
     res.render('pages/codingExercise.hbs', {
       passed: passed,
       error: !passed_1
