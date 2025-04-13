@@ -296,6 +296,7 @@ app.post('/coding', auth, async(req, res) => {
   let main_input = "";
   let expected_output = "";
   let question_id = req.body.question_id;
+  let time_taken=req.body.time_taken;
   console.log("ID", question_id);
   var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
@@ -352,7 +353,7 @@ app.post('/coding', auth, async(req, res) => {
       passed_1 = true;
       passed = "Success!";
       console.log("Userid", user_id);
-      let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id) VALUES(${user_id}, ${question_id}) RETURNING user_id;`;
+      let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id, time_taken) VALUES(${user_id}, ${question_id}, ${time_taken}) RETURNING user_id;`;
       
         console.log("inside");
         let ret = await db.one(insertUser);
