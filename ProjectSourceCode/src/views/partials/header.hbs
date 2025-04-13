@@ -69,6 +69,11 @@
             }
         }, 1000);
     }
+    function beforeSubmit() {
+    const totalTime = 1800;
+    const timeUsed = totalTime - countdownTime;
+    document.getElementById('time_taken').value = timeUsed;
+  }
     document.addEventListener("DOMContentLoaded", () => {
         const buttons = document.querySelectorAll(".type-buttons button");
 
