@@ -1,29 +1,56 @@
-
+console.log("JS loaded")
+//document.addEventListener('DOMContentLoaded', () => {
+//console.log("DOM loaded")
 const quizData = [
     {
         question: "What is the output of the following code? API CALL HERE",
         options: ["A) 6", "B) 5", "C) Compilation Error", "D) Undefined Behavior"],
-        correct: 2
+        correct: 1
     },
     {
         question: "What will be the output of the following statement? API TO GET IN PROPER FORMATTING: cout << 5 / 2;",
         options: ["A) 2.5", "B) 2", "C) 2.0", "D) Compilation Error"],
-        correct: 2
+        correct: 1
     },
     {
         question: "Which loop is guaranteed to execute at least once?",
         options: ["A) for loop", "B) while loop", "C) do-while loop", "D) All loops execute at least once"],
-        correct: 3
+        correct: 2
     },
     {
         question: "What is the correct way to dynamically allocate memory for an integer in C++?",
         options: ["A) int *ptr = malloc(sizeof(int));", "B) int *ptr = new int;", "C) int *ptr = (int*)malloc(sizeof(int));", "D) int ptr = new int;"],
+        correct: 1
+    },
+    {
+        question: "Which data structure follows the Last In First Out (LIFO) principle?",
+        options: ["A) Queue", "B) Array", "C) Stack", "D) Linked List"],
         correct: 2
+    },
+    {
+        question: "In a singly linked list, each node contains:",
+        options: ["A) Only data", "B) Data and a pointer to the next node", "C) A pointer to the previous node", "D) Only a pointer"],
+        correct: 1
+    },
+    {
+        question: "What is the main disadvantage of arrays?",
+        options: ["A) Fixed size at declaration", "B) Random access is not allowed", "C) Elements are not stored in order", "D) Only integers can be stored"],
+        correct: 0
+    },
+    {
+        question: "Which of the following operations is not efficient in a singly linked list?",
+        options: ["A) Inserting at the beginning", "B) Deleting from the beginning", "C) Traversing the list", "D) Accessing the last element"],
+        correct: 3
+    },
+    {
+        question: "In C++, how do you define a struct for a singly linked list node?",
+        options: ["A) struct Node { int data; Node* next; };", "B) struct Node { int data; Node next; };", "C) struct Node { data; next; };", "D) Node { int data; Node* next; };"],
+        correct: 0
     },
     {
         question: "More Questions Here",
         options: ["A", "B", "C", "D"],
-        correct: 2
+        correct: 3
     }
 ];
 
@@ -125,3 +152,4 @@ nextBtn.addEventListener('click', () => {
 
 loadQuestion();
 
+//});

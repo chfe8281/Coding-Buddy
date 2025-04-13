@@ -685,7 +685,6 @@ async function calculateVisualProgress(actualStreak) {
   return Math.min(actualStreak * multiplier, maxVisual);
 }
 
-
 // *****************************************************
 // <!-- Multiple Choice Question API Routes -->
 // *****************************************************
