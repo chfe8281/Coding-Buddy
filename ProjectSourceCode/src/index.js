@@ -272,108 +272,151 @@ app.get('/coding', async (req, res) => {
   const topic = req.query.topic;
 
   if (!topic) {
-    return res.render('pages/codingExercise.hbs', { question_descript: "No topic selected." });
+    return res.render('pages/codingExercise.hbs', { 
+      question_descript: "No topic selected." 
+    });
   }
 
-  const query = `SELECT question_id, description FROM coding_questions WHERE topic = $1 ORDER BY RANDOM() LIMIT 1`;
+  const query = `SELECT question_id, description, starter_code 
+                FROM coding_questions 
+                WHERE topic = $1 
+                ORDER BY RANDOM() 
+                LIMIT 1`;
+
+  if (!req.session || !req.session.user) {
+    return res.status(401).redirect('/login');
+  }
+
+  user_id = req.session.user.user_id;
 
   try {
-    result = await db.one(query, [topic]);
-    const { question_id, description } = result;
+    const result = await db.one(query, [topic]);
+    const savedCode = await db.oneOrNone(
+      `SELECT code FROM user_code_saves 
+       WHERE user_id = $1 AND question_id = $2`,
+      [user_id, query.question_id]
+    );
     console.log("Fetched question:", result);
+    
     res.render('pages/codingExercise.hbs', {
-      question_descript: description,
-      question_id: question_id
+      question_descript: result.description,
+      question_id: result.question_id,
+      starter_code: savedCode?.code || result.starter_code
     });
   } catch (err) {
     console.error("Error fetching question:", err);
-    res.render('pages/codingExercise.hbs', { question_descript: "Error fetching question." });
+    res.render('pages/codingExercise.hbs', { 
+      question_descript: "Error fetching question.",
+      error: err.message
+    });
   }
 });
 app.post('/coding', auth, async(req, res) => {
   let user_input = req.body.code;
   let user_id = req.session.user.user_id;
+  let question_id = req.body.question_id;
+  
+  // First, save the user's code to the database (with error handling)
+  try {
+    await db.none(
+      `INSERT INTO user_code_saves (user_id, question_id, code)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (user_id, question_id)
+       DO UPDATE SET code = $3`,
+      [user_id, question_id, user_input]
+    );
+  } catch (saveErr) {
+    console.error("Failed to save user code:", saveErr);
+    // Continue execution even if save fails
+  }
+
+  // Rest of your existing code
   let main_input = "";
   let expected_output = "";
-  let question_id = req.body.question_id;
-  console.log("ID", question_id);
-  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
+  
   try {
-    let results = await db.one(getQuestion);
+    // Use parameterized query to prevent SQL injection
+    const results = await db.one(
+      'SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = $1',
+      [question_id]
+    );
     question_id = results.question_id;
     main_input = results.input_1;
     expected_output = results.output_1;
-    console.log("INPUT1", main_input);
-    console.log(results);
-      
   } catch (err) {
-    res.redirect('/coding')
+    return res.redirect('/coding');
   }
+
   const axios = require('axios');
-  let data = JSON.stringify({
+  const data = JSON.stringify({
     "language": "cpp",
-      "version": "10.2.0",
-      "files": [
-        {
-          "name": "my_cool_code.js",
-          "content": `${user_input}\n${main_input}`
-        }
-      ],
-      "stdin": "",
-      "args": [""],
-      "compile_timeout": 10000,
-      "run_timeout": 3000,
-      "compile_cpu_time": 10000,
-      "run_cpu_time": 3000,
-      "compile_memory_limit": -1,
-      "run_memory_limit": -1
+    "version": "10.2.0",
+    "files": [{
+      "name": "my_cool_code.js",
+      "content": `${user_input}\n${main_input}`
+    }],
+    "stdin": "",
+    "args": [""],
+    "compile_timeout": 10000,
+    "run_timeout": 3000,
+    "compile_cpu_time": 10000,
+    "run_cpu_time": 3000,
+    "compile_memory_limit": -1,
+    "run_memory_limit": -1
   });
 
-  let config = {
+  // Define config here where it's accessible to all handlers
+  const config = {
     method: 'post',
     maxBodyLength: Infinity,
     url: 'https://emkc.org/api/v2/piston/execute',
     headers: {
-        'Content-Type': 'application/json', 
-        'Cookie': 'engineerman.sid=s%3Akvnpn0FXmlPNrj5oQAzFdWL3_PfixMdO.6tPjcuIScWntIC6%2BYY2vnbqfu5UeM664ikYYImkm8Qc'
+      'Content-Type': 'application/json', 
+      'Cookie': 'engineerman.sid=s%3Akvnpn0FXmlPNrj5oQAzFdWL3_PfixMdO.6tPjcuIScWntIC6%2BYY2vnbqfu5UeM664ikYYImkm8Qc'
     },
     data: data
   };
-  // console.log("data1", data);
+
   let passed_1 = false;
   let passed = "Compile error!";
-  axios.request(config)
-  .then(async (response) => {
-    console.log(JSON.stringify(response.data.run.output));
-    let output = JSON.stringify(response.data.run.output);
+  
+  try {
+    const response = await axios.request(config);
+    const output = JSON.stringify(response.data.run.output);
     passed = `Incorrect\n Output:${output}\n Expected:${expected_output}`;
-    if (expected_output == output)
-    {
+
+    const results = await db.one(
+      'SELECT question_id, input_1, output_1, description FROM coding_questions WHERE question_id = $1',
+      [question_id]
+    );
+    
+    if (expected_output == output) {
       passed_1 = true;
       passed = "Success!";
-      console.log("Userid", user_id);
-      let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id) VALUES(${user_id}, ${question_id}) RETURNING user_id;`;
-      
-        console.log("inside");
-        let ret = await db.one(insertUser);
-        console.log(ret)
-        // res.redirect('/coding')
-      
+      await db.one(
+        'INSERT INTO users_to_coding_questions(user_id, question_id) VALUES($1, $2) RETURNING user_id',
+        [user_id, question_id]
+      );
     }
-    console.log("DBAnswer", expected_output);
+
     res.render('pages/codingExercise.hbs', {
       passed: passed,
-      error: !passed_1
-    })
-  })
-  .catch((error) => {
+      error: !passed_1,
+      current_code: user_input,
+      question_id: question_id,
+      question_descript: results.description,
+    });
+  } catch (error) {
     console.log(error);
     res.render('pages/codingExercise.hbs', {
       passed: passed,
-      error: true
-    })
-  });
-});  
+      error: true,
+      current_code: user_input,
+      question_id: question_id,
+      question_descript: results.description,
+    });
+  }
+});
 
 // Route: /logout
 // Method: GET
