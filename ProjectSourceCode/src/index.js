@@ -294,7 +294,7 @@ app.get('/coding', async (req, res) => {
     const savedCode = await db.oneOrNone(
       `SELECT code FROM user_code_saves 
        WHERE user_id = $1 AND question_id = $2`,
-      [user_id, query.question_id]
+      [user_id, result.question_id]
     );
     console.log("Fetched question:", result);
     
