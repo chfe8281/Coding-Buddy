@@ -333,7 +333,7 @@ app.post('/coding', auth, async(req, res) => {
   // Rest of your existing code
   let main_input = "";
   let expected_output = "";
-  let question_id = req.body.question_id;
+  // let question_id = req.body.question_id;
   let time_taken=req.body.time_taken;
   console.log("ID", question_id);
   var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
