@@ -333,7 +333,10 @@ app.post('/coding', auth, async(req, res) => {
   // Rest of your existing code
   let main_input = "";
   let expected_output = "";
-  
+  let question_id = req.body.question_id;
+  let time_taken=req.body.time_taken;
+  console.log("ID", question_id);
+  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
     // Use parameterized query to prevent SQL injection
     const results = await db.one(
@@ -379,26 +382,26 @@ app.post('/coding', auth, async(req, res) => {
 
   let passed_1 = false;
   let passed = "Compile error!";
-  
-  try {
-    const response = await axios.request(config);
-    const output = JSON.stringify(response.data.run.output);
-    passed = `Incorrect\n Output:${output}\n Expected:${expected_output}`;
-
-    const results = await db.one(
-      'SELECT question_id, input_1, output_1, description FROM coding_questions WHERE question_id = $1',
-      [question_id]
-    );
-    
-    if (expected_output == output) {
+  axios.request(config)
+  .then(async (response) => {
+    console.log(JSON.stringify(response.data.run.output));
+    let output = JSON.stringify(response.data.run.output);
+    passed = `Incorrect Output:${output}\n Expected:${expected_output} \n Time taken: ${time_taken} seconds`;
+    if (expected_output == output)
+    {
       passed_1 = true;
-      passed = "Success!";
-      await db.one(
-        'INSERT INTO users_to_coding_questions(user_id, question_id) VALUES($1, $2) RETURNING user_id',
-        [user_id, question_id]
-      );
+      passed = `Success! \n Time taken: ${time_taken} seconds`;
+      console.log("Userid", user_id);
+      let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id, time_taken) VALUES(${user_id}, ${question_id}, ${time_taken}) RETURNING user_id;`;
+      
+        console.log("inside");
+        let ret = await db.one(insertUser);
+        console.log(ret)
+        // res.redirect('/coding')
+      
     }
 
+    console.log("DBAnswer", expected_output);
     res.render('pages/codingExercise.hbs', {
       passed: passed,
       error: !passed_1,
