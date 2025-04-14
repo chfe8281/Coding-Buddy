@@ -115,27 +115,6 @@ CREATE TABLE IF NOT EXISTS users_to_mc_questions (
   FOREIGN KEY (mcq_id) REFERENCES mc_questions (mcq_id) ON DELETE CASCADE
 );
 
--- Create an admin user to assign default decks to
-INSERT INTO users (name, username, password, email)
-  VALUES ('Admin', 'admin', '$2a$10$UDl9WT1/9C68T5xvP/cldus/rUcFC8wkXc435KBrBQmJGiuoeTcIO', 'admin42@colorado.edu');
-  -- hashed password is "password987"
-
--- Default flashcard decks
-INSERT INTO decks (name, count, creator_id)
-  VALUES ('CSCI 1300', 0, 1);
-
--- Default flashcards
-INSERT INTO cards (front, back, creator_id)
-  VALUES ('Unit testing?', 'A type of testing that checks individual segments of code works in isolation', 1);
-
--- Connect cards to decks
-INSERT INTO decks_to_cards (deck_id, card_id)
-  VALUES (1, 1);
-
--- Populate Coding Questions
-
--- Populate Multiple Choice Questions
-
 -- Check tables (comment out)
 -- SELECT * FROM users;
 -- SELECT * FROM decks;

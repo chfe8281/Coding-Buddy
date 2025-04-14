@@ -785,6 +785,58 @@ app.get('/flashcards', async (req,res) => {
   }
 });
 
+/*
+Route: /flashcards/edit-deck
+Method: POST
+Modifies deck name
+*/
+app.post('/flashcards/edit-deck', (req,res) =>{
+  db.none(`UPDATE decks
+    SET name = $2
+    WHERE deck_id = $1;`, [req.body.deck_id, req.body.name])
+  .then(data => {
+    res.redirect('/flashcards');
+  })
+  .catch(err => {
+    console.log(err);
+    res.redirect('/home');
+  });
+});
+
+/*
+Route: /flashcards/edit-card
+Method: POST
+Modify card content
+*/
+
+app.post('/flashcards/edit-card', (req, res) =>{
+  db.none(`UPDATE cards
+    SET name = $2
+    WHERE card_id = $1;`, [req.body.card_id, req.body.name])
+  .then(data => {
+    res.redirect('/flashcards');
+  })
+  .catch(err => {
+    console.log(err);
+    res.redirect('/home');
+  });
+});
+/*
+Route: /flashcards/add-cards
+Method: POAST
+Adds starter cards
+*/
+app.post('/flashcards/add-cards', async (req, res) => {
+  db.none(`INSERT INTO users_to_decks (user_id, deck_id)
+    VALUES ($1, 1), ($1, 2);`, [req.session.user.user_id])
+    .then(data => {
+      res.redirect('/flashcards');
+    })
+    .catch(err => {
+      console.log(err);
+      res.redirect('/home');
+    });
+  });
 // *****************************************************
 // <!-- End Flashcards API Routes -->
 // *****************************************************
