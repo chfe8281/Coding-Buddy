@@ -741,6 +741,53 @@ app.get('/mcq', (req, res) => {
 // <!-- End of Multiple Choice Question API Routes -->
 // *****************************************************
 
-app.listen(3000);
+// *****************************************************
+// <!-- Flashcards API Routes -->
+// *****************************************************
+app.get('/flashcards', async (req,res) => {
+  try {
+
+    // Get user decks
+    let results = await db.task (async results => {
+      deck_info = await db.any(`SELECT decks.deck_id, decks.name FROM users
+        INNER JOIN users_to_decks
+          ON users.user_id = users_to_decks.user_id
+        INNER JOIN decks
+          ON users_to_decks.deck_id = decks.deck_id
+        WHERE users.user_id = $1;`, [req.session.user.user_id]);
+
+      // Get corresponding cards
+      let decks = [];
+      for(let i = 0; i < deck_info.length; i++) {
+        // console.log(deck_info[i].name);
+        cards = await db.any(`SELECT cards.front, cards.back FROM decks
+          INNER JOIN decks_to_cards
+            ON decks_to_cards.deck_id = decks.deck_id
+          INNER JOIN cards
+            ON cards.card_id = decks_to_cards.card_id
+          WHERE decks.deck_id = $1;`, [deck_info[i].deck_id]);
+        // console.log(cards);
+          decks[i] = {
+            name: deck_info[i].name,
+            id: deck_info[i].deck_id,
+            cards
+          }
+        // console.log(decks[i]);
+      }
+      return decks;
+    });
+    res.render('pages/flashcards', {decks: results});
+  } catch (err) {
+    res.render('pages/flashcards',{
+      decks: [],
+      error: err
+    });
+  }
+});
+
+// *****************************************************
+// <!-- End Flashcards API Routes -->
+// *****************************************************
+
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
