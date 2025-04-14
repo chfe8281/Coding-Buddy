@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS coding_questions (
   name VARCHAR(50) NOT NULL,
   -- Increase as needed
   description VARCHAR(5000),
+  starter_code VARCHAR(5000),
   topic VARCHAR(20),
   input_1 VARCHAR(5000),
   input_2 VARCHAR(5000),
@@ -47,6 +48,14 @@ CREATE TABLE IF NOT EXISTS coding_questions (
   difficulty INT CONSTRAINT limited_values CHECK (difficulty > 0 AND difficulty < 6)
   -- deck_id INT,
   -- FOREIGN KEY (deck_id) REFERENCES decks (deck_id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_code_saves (
+  user_id INT REFERENCES users(user_id),
+  question_id INT REFERENCES coding_questions(question_id),
+  code TEXT NOT NULL,
+  saved_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (user_id, question_id)
 );
 
 -- DROP TABLE IF EXISTS mc_questions CASCADE;
@@ -108,8 +117,8 @@ CREATE TABLE IF NOT EXISTS users_to_mc_questions (
 );
 
 -- Create an admin user to assign default decks to
-INSERT INTO users (username, password, email)
-  VALUES ('admin', '$2a$10$UDl9WT1/9C68T5xvP/cldus/rUcFC8wkXc435KBrBQmJGiuoeTcIO', 'admin42@colorado.edu');
+INSERT INTO users (name, username, password, email)
+  VALUES ('Admin', 'admin', '$2a$10$UDl9WT1/9C68T5xvP/cldus/rUcFC8wkXc435KBrBQmJGiuoeTcIO', 'admin42@colorado.edu');
   -- hashed password is "password987"
 
 -- Default flashcard decks

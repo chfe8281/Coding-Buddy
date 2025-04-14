@@ -1,5 +1,4 @@
-INSERT INTO 
-coding_questions(name, topic, description, input_1, output_1) 
+INSERT INTO coding_questions(name, topic, description, input_1, output_1, starter_code) 
 VALUES('Largest Element', 
 '1300', 
 'Purpose:
@@ -36,11 +35,20 @@ Negative numbers are handled as well, and the function will return the largest n
     int largest2 = find_largest_element(arr2, size2);  // Call the function
     cout << "The largest element in the third array is: " << largest2 << endl;
 
-
     return 0;
-}', '"The largest element in the array is: 9\nThe largest element in the second array is: -1\nThe largest element in the third array is: 20\n"'), 
+}', 
+'"The largest element in the array is: 9\nThe largest element in the second array is: -1\nThe largest element in the third array is: 20\n"',
+'#include <iostream>
+
+using namespace std;
+
+int find_largest_element(int arr[], int size) {
+    // Begin your solution here
+}'), 
+
 ('Array Doubling', 
-'2270','Description', 
+'2270',
+'Description', 
 '// Function to print the array
 void printArray(int* arr, int size) {
     for (int i = 0; i < size; ++i) {
@@ -96,7 +104,7 @@ int main() {
 
     return 0;
 }', 
-'"Original array: 1 2 3 \nDoubled array: 1 2 3 0 0 0 \nOriginal array: 1 2 3 4 5 \nDoubled array: 1 2 3 4 5 0 0 0 0 0 \nOriginal array: \nDoubled array: \n"'),
+'"Original array: 1 2 3 \nDoubled array: 1 2 3 0 0 0 \nOriginal array: 1 2 3 4 5 \nDoubled array: 1 2 3 4 5 0 0 0 0 0 \nOriginal array: \nDoubled array: \n"','{Starter Code Here...}'),
 ('Graph Traversal - BFS', 
 '3104', 
 'Purpose:
@@ -160,7 +168,7 @@ Edge Cases:
 
     return 0;
 }', 
-'"0 1 2 3 4 5 \n0 \n\n"'), 
+'"0 1 2 3 4 5 \n0 \n\n"', ''), 
 ('Graph Traversal - DFS', 
 '3104', 
 'Purpose:
@@ -228,7 +236,7 @@ Edge Cases:
 
     return 0;
 }', 
-'"0 1 3 2 4 5 \n0 \n0 2 3 1 \n"');
+'"0 1 3 2 4 5 \n0 \n0 2 3 1 \n"', '');
 
 
 -- test for completed questions calculation

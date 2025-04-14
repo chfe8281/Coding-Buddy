@@ -30,7 +30,7 @@
       <form method="post" action="/coding" id="codingExercise">
         <input type="hidden" id="question_id" name="question_id" value="{{question_id}}">
         <input type="hidden" name="time_taken" id="time_taken" value="0">
-        <textarea id="code" name="code" class="form-control mb-3" rows="15" placeholder="Start Coding Here..."></textarea>
+        <textarea id="code" name="code" cols="75" rows="25">{{#if current_code}}{{current_code}}{{else}}{{starter_code}}{{/if}}</textarea>
         <input type="submit" id="submit-button" name="submit-button" onclick="beforeSubmit()" value="Submit" class="btn btn-primary">
       </form>
     </div>
