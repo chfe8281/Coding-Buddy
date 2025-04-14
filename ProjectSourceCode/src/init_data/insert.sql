@@ -105,7 +105,13 @@ int main() {
     return 0;
 }', 
 '"Original array: 1 2 3 \nDoubled array: 1 2 3 0 0 0 \nOriginal array: 1 2 3 4 5 \nDoubled array: 1 2 3 4 5 0 0 0 0 0 \nOriginal array: \nDoubled array: \n"',
-'{Starter Code Here...}');
+'#include <iostream>
+
+using namespace std;
+
+int* doubleArraySize(int* arr, int &size) {
+    // Begin your solution here
+}');
 
 -- test for completed questions calculation
 INSERT INTO
