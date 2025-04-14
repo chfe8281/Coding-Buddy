@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS users_to_coding_questions (
   user_id INT NOT NULL,
   question_id INT NOT NULL,
   time_taken INT NOT NULL,
+  completed BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
   FOREIGN KEY (question_id) REFERENCES coding_questions (question_id) ON DELETE CASCADE
 );
