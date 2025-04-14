@@ -116,8 +116,8 @@ INSERT INTO decks (name, count, creator_id)
   VALUES ('CSCI 1300', 0, 1);
 
 -- Default flashcards
-INSERT INTO cards (front, back, creator_id)
-  VALUES ('Unit testing?', 'A type of testing that checks individual segments of code works in isolation', 1);
+INSERT INTO cards (card_id, front, back, creator_id)
+  VALUES (1, 'Unit testing?', 'A type of testing that checks individual segments of code works in isolation', 1);
 
 -- Connect cards to decks
 INSERT INTO decks_to_cards (deck_id, card_id)
