@@ -87,6 +87,7 @@ app.use((req, res, next) => {
 
 // allow access to public/images/default-event
 app.use(express.static(path.join(__dirname, 'public'))); //add this if it doesn't work: app.use(express.static(path.join(__dirname, 'resources')));
+app.use(express.static(path.join(__dirname, 'resources')));
 // Serve images from the img folder (located one level above src)
 app.use('/img', express.static(path.join(__dirname, '../img')));
 
