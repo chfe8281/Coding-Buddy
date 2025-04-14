@@ -1,0 +1,125 @@
+body {
+    margin: 0;
+    font-family: 'Raleway', sans-serif;
+}
+/* Header with carousel */
+.carousel-header {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 25%;
+    overflow: hidden;
+}
+.carousel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.carousel img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+.carousel img.active {
+    opacity: 1;
+}
+/* Arrow buttons */
+.carousel a.prev,
+.carousel a.next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2em;
+    color: white;
+    text-decoration: none;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    z-index: 2;
+}
+.carousel a.prev {
+    left: 10px;
+}
+.carousel a.next {
+    right: 10px;
+}
+/* Header title overlay */
+.header-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    z-index: 3;
+}
+.header-content h1 {
+    margin: 0;
+    font-size: 3em;
+}
+/* Main content background under the header */
+.main-content {
+    background-color: rgb(192, 216, 192);
+    padding: 20px 0;
+}
+/* Slogan styling (now matching the container width) */
+.slogan {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    text-align: center;
+    font-size: 1.5em;
+    color: #555;
+}
+/* Main container and alternating rows */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+/* Each row has a flexible layout with alternating background colors and extra padding */
+.row {
+    display: flex;
+    align-items: center;
+    margin: 40px 0;
+    padding: 20px;
+    background-color: #fff;
+    
+}
+.row:nth-child(even) {
+    background-color: #f0f0f0;
+    flex-direction: row-reverse;
+}
+.text-box {
+    flex: 2;
+    padding: 20px;
+    border: 1px solid #110f0f;
+    border-radius: 8px;
+}
+.text-box h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.divider {
+    width: 1px;
+    background-color: #000;
+    height: 80%; /* Adjust height as needed */
+    margin: 0 20px;
+}
+.image-box {
+    flex: 1;
+    padding: 20px;
+}
+.image-box img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
