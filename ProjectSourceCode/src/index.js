@@ -86,7 +86,7 @@ app.use((req, res, next) => {
 });
 
 // allow access to public/images/default-event
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'))); //add this if it doesn't work: app.use(express.static(path.join(__dirname, 'resources')));
 // Serve images from the img folder (located one level above src)
 app.use('/img', express.static(path.join(__dirname, '../img')));
 
@@ -347,13 +347,12 @@ app.post('/coding', auth, async(req, res) => {
   .then(async (response) => {
     console.log(JSON.stringify(response.data.run.output));
     let output = JSON.stringify(response.data.run.output);
-    passed = `Incorrect\n Output:${output}\n Expected:${expected_output}`;
+    passed = `Incorrect Output:${output}\n Expected:${expected_output} \n Time taken: ${time_taken} seconds`;
     if (expected_output == output)
     {
       passed_1 = true;
-      passed = "Success!";
+      passed = `Success! \n Time taken: ${time_taken} seconds`;
       console.log("Userid", user_id);
-      console.log("time: ",time_taken);
       let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id, time_taken) VALUES(${user_id}, ${question_id}, ${time_taken}) RETURNING user_id;`;
       
         console.log("inside");
@@ -362,8 +361,8 @@ app.post('/coding', auth, async(req, res) => {
         // res.redirect('/coding')
       
     }
+
     console.log("DBAnswer", expected_output);
-    console.log("time: ",time_taken);
     res.render('pages/codingExercise.hbs', {
       passed: passed,
       error: !passed_1
@@ -411,7 +410,9 @@ app.get('/profile', auth, async (req, res) => {
 
     const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [user.user_id]);
     const cqp = await calculateCompletionPercentage(userData.username);
-    
+    const actualStreak = await updateLoginStreak(userData.user_id)
+    const visualStreak = await calculateVisualProgress(actualStreak);
+
     res.render('pages/profile', {
       name: userData.name,
       email: userData.email,
@@ -419,7 +420,9 @@ app.get('/profile', auth, async (req, res) => {
       avatar: userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'U')}&background=random`,
       points: userData.points || 0,
       leaderboardPosition: await calculateLeaderboardPosition(userData.user_id),
-      streak: userData.streak || 0,
+      totalUsers: await getTotalUsers(),
+      streak: actualStreak || 0,
+      visualStreak: visualStreak,
       codingQuestionsPercent: cqp
       // Message is automatically available via res.locals
     });
@@ -429,16 +432,20 @@ app.get('/profile', auth, async (req, res) => {
   }
 });
 
+async function getTotalUsers() {
+  try {
+    const countResult = await db.one('SELECT COUNT(*)::int FROM users');
+    const userCount = countResult.count;
+
+    return userCount;
+  } catch (error) {
+    console.error('Error calculating leaderboard position:', error);
+    return 0; // Default 0 if errors occur
+  }
+}
+
 async function calculateLeaderboardPosition(userId) {
   try {
-    // 1. Get total count of users with points > 0
-    const countResult = await db.one('SELECT COUNT(*)::int FROM users WHERE points > 0');
-    const userCount = countResult.count;
-    
-    // If no users have points, return 100 (top position) instead of 0
-    if (userCount === 0) {
-      return 100;
-    }
 
     // 2. Get current user's points (default to 0 if null)
     const userResult = await db.one(
@@ -453,12 +460,8 @@ async function calculateLeaderboardPosition(userId) {
       [userPoints]
     );
     const betterCount = betterUsers.count;
-
-    // 4. Calculate position (0 = best, 100 = worst)
-    const positionPercentile = Math.round((betterCount / userCount) * 100);
     
-    // Return inverted percentile (100 - position) so higher is better
-    return 100 - positionPercentile;
+    return betterCount + 1;
     
   } catch (error) {
     console.error('Error calculating leaderboard position:', error);
@@ -636,6 +639,114 @@ async function calculateCompletionPercentage(username) {
     return 0; // Return 0 if there's an error
   }
 }
+
+async function updateLoginStreak(userId) {
+  try {
+    // Get user's current streak and last login date
+    const user = await db.one('SELECT last_login, streak FROM users WHERE user_id = $1', [userId]);
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize to midnight
+    
+    let newStreak = 1; // Default to 1
+    
+    if (user.last_login) {
+      const lastLogin = new Date(user.last_login);
+      lastLogin.setHours(0, 0, 0, 0);
+      
+      // Calculate difference in days
+      const dayDiff = (today - lastLogin) / (1000 * 60 * 60 * 24);
+      
+      if (dayDiff === 1) {
+        newStreak = user.streak + 1;
+      } else if (dayDiff > 1) {
+        newStreak = 1;
+      } else {
+        newStreak = user.streak;
+      }
+    }
+    
+    // Update user record
+    await db.none(
+      'UPDATE users SET streak = $1, last_login = $2 WHERE user_id = $3',
+      [newStreak, today, userId]
+    );
+    
+    return newStreak;
+    
+  } catch (error) {
+    console.error('Error updating login streak:', error);
+    throw error;
+  }
+}
+
+async function calculateVisualProgress(actualStreak) {
+  const multiplier = 7;
+  const maxVisual = 100;
+  
+  return Math.min(actualStreak * multiplier, maxVisual);
+}
+
+// *****************************************************
+// <!-- Multiple Choice Question API Routes -->
+// *****************************************************
+
+
+app.get('/mcq', (req, res) => {
+    res.render('./pages/mcq'); 
+});
+
+// *****************************************************
+// <!-- End of Multiple Choice Question API Routes -->
+// *****************************************************
+
+// *****************************************************
+// <!-- Flashcards API Routes -->
+// *****************************************************
+app.get('/flashcards', async (req,res) => {
+  try {
+
+    // Get user decks
+    let results = await db.task (async results => {
+      deck_info = await db.any(`SELECT decks.deck_id, decks.name FROM users
+        INNER JOIN users_to_decks
+          ON users.user_id = users_to_decks.user_id
+        INNER JOIN decks
+          ON users_to_decks.deck_id = decks.deck_id
+        WHERE users.user_id = $1;`, [req.session.user.user_id]);
+
+      // Get corresponding cards
+      let decks = [];
+      for(let i = 0; i < deck_info.length; i++) {
+        // console.log(deck_info[i].name);
+        cards = await db.any(`SELECT cards.front, cards.back FROM decks
+          INNER JOIN decks_to_cards
+            ON decks_to_cards.deck_id = decks.deck_id
+          INNER JOIN cards
+            ON cards.card_id = decks_to_cards.card_id
+          WHERE decks.deck_id = $1;`, [deck_info[i].deck_id]);
+        // console.log(cards);
+          decks[i] = {
+            name: deck_info[i].name,
+            id: deck_info[i].deck_id,
+            cards
+          }
+        // console.log(decks[i]);
+      }
+      return decks;
+    });
+    res.render('pages/flashcards', {decks: results});
+  } catch (err) {
+    res.render('pages/flashcards',{
+      decks: [],
+      error: err
+    });
+  }
+});
+
+// *****************************************************
+// <!-- End Flashcards API Routes -->
+// *****************************************************
 
 module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
