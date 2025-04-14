@@ -44,7 +44,25 @@ using namespace std;
 
 int find_largest_element(int arr[], int size) {
     // Begin your solution here
-}'), 
+}'), ('Check Odd', '1300', 'Purpose: Check if the integer input is odd. Parameters: One integer input int num. Returning: A boolean value, true if odd, false if even.', 'int main() {
+    // Test Case 1
+    int test1 = 3;
+    std::cout << "Test 1: " << test1 << " is " << (isOdd(test1) ? "odd" : "even") << std::endl;
+
+    // Test Case 2
+    int test2 = 10;
+    std::cout << "Test 2: " << test2 << " is " << (isOdd(test2) ? "odd" : "even") << std::endl;
+
+    // Test Case 3
+    int test3 = -7;
+    std::cout << "Test 3: " << test3 << " is " << (isOdd(test3) ? "odd" : "even") << std::endl;
+
+    return 0;
+}', '"Test 1: 3 is odd\nTest 2: 10 is even\nTest 3: -7 is odd\n"', '#include <iostream>
+
+bool isOdd(int num) {
+    // Begin your solution here
+}'),
 
 ('Array Doubling', 
 '2270',
