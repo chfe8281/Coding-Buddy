@@ -382,11 +382,16 @@ app.post('/coding', auth, async(req, res) => {
 
   let passed_1 = false;
   let passed = "Compile error!";
-  axios.request(config)
-  .then(async (response) => {
-    console.log(JSON.stringify(response.data.run.output));
-    let output = JSON.stringify(response.data.run.output);
+  // axios.request(config)
+  try {
+    const response = await axios.request(config);
+    const output = JSON.stringify(response.data.run.output);
+    console.log(output);
     passed = `Incorrect Output:${output}\n Expected:${expected_output} \n Time taken: ${time_taken} seconds`;
+    const results = await db.one(
+      'SELECT question_id, input_1, output_1, description FROM coding_questions WHERE question_id = $1',
+      [question_id]
+    );
     if (expected_output == output)
     {
       passed_1 = true;
@@ -420,6 +425,44 @@ app.post('/coding', auth, async(req, res) => {
     });
   }
 });
+/*try {
+    const response = await axios.request(config);
+    const output = JSON.stringify(response.data.run.output);
+    console.log(output);
+    passed = `Incorrect\n Output:${output}\n Expected:${expected_output}`;
+
+    const results = await db.one(
+      'SELECT question_id, input_1, output_1, description FROM coding_questions WHERE question_id = $1',
+      [question_id]
+    );
+    
+    if (expected_output == output) {
+      passed_1 = true;
+      passed = "Success!";
+      await db.one(
+        'INSERT INTO users_to_coding_questions(user_id, question_id) VALUES($1, $2) RETURNING user_id',
+        [user_id, question_id]
+      );
+    }
+
+    res.render('pages/codingExercise.hbs', {
+      passed: passed,
+      error: !passed_1,
+      current_code: user_input,
+      question_id: question_id,
+      question_descript: results.description,
+    });
+  } catch (error) {
+    console.log(error);
+    res.render('pages/codingExercise.hbs', {
+      passed: passed,
+      error: true,
+      current_code: user_input,
+      question_id: question_id,
+      question_descript: results.description,
+    });
+  }
+});*/
 
 // Route: /logout
 // Method: GET
