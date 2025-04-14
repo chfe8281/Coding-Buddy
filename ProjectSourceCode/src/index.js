@@ -749,24 +749,26 @@ app.get('/flashcards', async (req,res) => {
 
     // Get user decks
     let results = await db.task (async results => {
-      deck_info = await db.any(`SELECT decks.deck_id, decks.name FROM users
+      deck_info = await db.any(`SELECT users.user_id, decks.deck_id, decks.name, decks.creator_id FROM users
         INNER JOIN users_to_decks
           ON users.user_id = users_to_decks.user_id
         INNER JOIN decks
           ON users_to_decks.deck_id = decks.deck_id
-        WHERE users.user_id = $1;`, [req.session.user.user_id]);
+        WHERE users.user_id = $1
+        ORDER BY decks.deck_id ASC;`, [req.session.user.user_id]);
 
       // Get corresponding cards
       let decks = [];
       for(let i = 0; i < deck_info.length; i++) {
         // console.log(deck_info[i].name);
-        cards = await db.any(`SELECT cards.front, cards.back FROM decks
+        cards = await db.any(`SELECT cards.card_id, cards.front, cards.back, cards.creator_id FROM decks
           INNER JOIN decks_to_cards
             ON decks_to_cards.deck_id = decks.deck_id
           INNER JOIN cards
             ON cards.card_id = decks_to_cards.card_id
-          WHERE decks.deck_id = $1;`, [deck_info[i].deck_id]);
-        // console.log(cards);
+          WHERE decks.deck_id = $1
+          ORDER BY cards.card_id ASC;`, [deck_info[i].deck_id]);
+        console.log(cards);
           decks[i] = {
             name: deck_info[i].name,
             id: deck_info[i].deck_id,
@@ -810,9 +812,11 @@ Modify card content
 */
 
 app.post('/flashcards/edit-card', (req, res) =>{
+  console.log(req.body.card_id);
   db.none(`UPDATE cards
-    SET name = $2
-    WHERE card_id = $1;`, [req.body.card_id, req.body.name])
+    SET front = $2,
+    back = $3
+    WHERE card_id = $1;`, [req.body.card_id, req.body.front, req.body.back])
   .then(data => {
     res.redirect('/flashcards');
   })
@@ -823,7 +827,7 @@ app.post('/flashcards/edit-card', (req, res) =>{
 });
 /*
 Route: /flashcards/add-cards
-Method: POAST
+Method: POST
 Adds starter cards
 */
 app.post('/flashcards/add-cards', async (req, res) => {
