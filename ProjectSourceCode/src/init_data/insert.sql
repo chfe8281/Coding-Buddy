@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-INSERT INTO 
-coding_questions(name, topic, input_1, output_1) 
-VALUES('Largest Element', 
-'1300', 
-=======
 INSERT INTO coding_questions(name, topic, description, input_1, output_1, starter_code) 
 VALUES('Largest Element', 
 '1300', 
@@ -24,7 +18,6 @@ Edge Cases:
 If the array is empty (i.e., size is zero), the function should ideally return a default value or handle this case with error handling.
 If all elements are equal, the function will return that element as the largest.
 Negative numbers are handled as well, and the function will return the largest negative number if its the greatest element in the array.',
->>>>>>> main
 'int main() {
     int arr[] = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5};  // Example array
     int size = sizeof(arr) / sizeof(arr[0]);  // Calculate the size of the array
@@ -42,12 +35,6 @@ Negative numbers are handled as well, and the function will return the largest n
     int largest2 = find_largest_element(arr2, size2);  // Call the function
     cout << "The largest element in the third array is: " << largest2 << endl;
 
-<<<<<<< HEAD
-
-    return 0;
-}', 
-'"The largest element in the array is: 9\nThe largest element in the second array is: -1\nThe largest element in the third array is: 20\n"');
-=======
     return 0;
 }', 
 '"The largest element in the array is: 9\nThe largest element in the second array is: -1\nThe largest element in the third array is: 20\n"',
@@ -125,4 +112,3 @@ INSERT INTO
 users_to_coding_questions(user_id, question_id)
 VALUES(1,1);
 
->>>>>>> main
