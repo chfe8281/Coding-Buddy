@@ -85,3 +85,41 @@ describe('Testing Login API', () => {
         });
     });
 });
+
+describe('Testing Profile API', () => {
+  it('positive : /profile', function(done) {
+    // Create an agent to maintain session
+    const agent = chai.request.agent(server);
+  
+    // First login
+    agent
+      .post('/login')
+      .send({username: 'testuser', password: 'pwd123'})
+      .then(() => {
+        // Then get profile while maintaining session
+        return agent.get('/profile');
+      })
+      .then(res => {
+        // Check for rendered HTML response
+        expect(res).to.have.status(200);
+        expect(res).to.have.header('content-type', /html/);
+        expect(res.text).to.include('testuser'); // Check username appears in HTML
+        agent.close(); // Clean up
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+  });
+
+  it('Negative : /profile. Checking invalid user', done => {
+      chai
+        .request(server)
+        .get('/profile')
+        .end((err, res) => {
+          res.should.redirectTo(/^.*127\.0\.0\.1.*\/login$/); // should redirect to /login
+          done();
+        });
+    });
+});
