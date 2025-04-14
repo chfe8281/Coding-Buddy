@@ -3,9 +3,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
 <!--Citation: https://bootstrapexamples.com/@ross-wille/interactive-quiz-application!-->
+<div class="container py-5" id="set-selector">
+  <div class="card shadow-lg rounded-4 mx-auto text-center p-4" style="max-width: 600px;">
+    <h2 class="fw-bold mb-3">Choose a Course</h2>
+    <div class="d-flex justify-content-center gap-3">
+      <button class="btn btn-outline-primary" onclick="loadSelectedSet('1300')">1300</button>
+      <button class="btn btn-outline-success" onclick="loadSelectedSet('2270')">2270</button>
+      <button class="btn btn-outline-warning" onclick="loadSelectedSet('2400')">2400</button>
+    </div>
+  </div>
+</div>
 <div class="container py-5">
   <div class="card shadow-lg rounded-4 mx-auto" style="max-width: 600px;">
-    <div class="card-body p-4" id="quiz">
+    <div class="card-body p-4" id="quiz" style="hidden">
       <h2 class="text-center mb-4 fw-bold">Interactive Quiz</h2>
       <div class="progress mb-4" style="height: 8px;">
         <div class="progress-bar bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
