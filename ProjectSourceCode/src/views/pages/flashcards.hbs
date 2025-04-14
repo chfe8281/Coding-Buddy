@@ -2,7 +2,7 @@
     <h1>Flashcards Overview</h1>
 </div>
 
-{{!-- Input json array of user's flashcards objects --}}
+{{!-- Input: json array of user's flashcards objects --}}
 {{#each decks}}
 <div class="container">
   <div class="row">
@@ -30,4 +30,45 @@
 
   </div>
 </div>
+
+<!-- Modal -->
+<div id="card_modal" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Edit Flashcard</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form id="card_form" onsubmit="editCards()">
+
+            {{!-- Send corresponding deck id --}}
+            <input type="hidden" name="course_id" value={{decks.id}}>
+
+            {{!-- Change card front --}}
+            <div class="form-group">
+                <label for="front" class="form-label">Front</label>
+                <input type="text" class="form-control" id="front" required>
+            </div>
+
+            {{!-- Change card back --}}
+            <div class="form-group">
+                <label for="back" class="form-label">Back</label>
+                <input type="text" class="form-control" id="back" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+        </div>
+        </div>
+    </div>
+    </div>
+{{else}}
+<div class="container">
+    <h2>You don't have any flashcards :(</h2>
+    <p>Interact with the <a href='/coding'>Coding Practice</a> or <a href='/quiz'>Quiz</a> to get some!</p>
+</div>
+
 {{/each}}

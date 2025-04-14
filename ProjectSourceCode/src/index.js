@@ -404,15 +404,26 @@ app.post('/codingExercise', async(req, res) => {
   });
 }); 
 
+// *****************************************************
+// <!-- Multiple Choice Question API Routes -->
+// *****************************************************
+
+
+app.get('/mcq', (req, res) => {
+    res.render('./pages/mcq'); 
+});
+
+// *****************************************************
+// <!-- End of Multiple Choice Question API Routes -->
+// *****************************************************
+
+// *****************************************************
+// <!-- Flashcards API Routes -->
+// *****************************************************
 app.get('/flashcards', async (req, res) =>{
-  // let name = "Card Group"
-  // let show_front = true
-  // let front = "This is the term"
-  // let back = "This is the explanation"
-  // res.render('pages/flashcards', {name, show_front, front, back});  
 
   try {
-
+    // Get user decks
     let results = await db.task (async results => {
       deck_info = await db.any(`SELECT decks.deck_id, decks.name FROM users
         INNER JOIN users_to_decks
@@ -420,6 +431,8 @@ app.get('/flashcards', async (req, res) =>{
         INNER JOIN decks
           ON users_to_decks.deck_id = decks.deck_id
         WHERE users.user_id = $1;`, [req.session.user.user_id]);
+      
+      // Get corresponding cards to decks
       let decks = [];
       for(let i = 0; i < deck_info.length; i++) {
         // console.log(deck_info[i].name);
@@ -440,37 +453,13 @@ app.get('/flashcards', async (req, res) =>{
       return decks;
     });
     res.render('pages/flashcards', {decks: results});
-    // res.status(200).json({
-    //   results
-    // })
+    
   } catch (err) {
     res.render('pages/flashcards',{
       decks: [],
       error: err
     });
   }
-
-  // db.any(`SELECT decks.name, cards.front, cards.back FROM users
-  //   INNER JOIN users_to_decks
-  //     ON users.user_id = users_to_decks.user_id
-  //   INNER JOIN decks
-  //     ON users_to_decks.deck_id = decks.deck_id
-  //   INNER JOIN decks_to_cards
-  //     ON decks_to_cards.deck_id = decks.deck_id
-  //   INNER JOIN cards
-  //     ON cards.card_id = decks_to_cards.card_id
-  //   WHERE users.user_id = $1;`, [req.session.user.user_id])
-  // .then(decks => {
-  //   console.log(decks)
-  //   res.render('pages/flashcards', {decks});
-  // })
-  // .catch(err => {
-  //   res.render('pages/flashcards', {
-  //     decks: [],
-  //     error: true,
-  //     message: err.message,
-  //   });
-  // });
 });
 
 
@@ -494,5 +483,5 @@ app.use(
   })
 );
 
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log('Server is listening on port 3000');
