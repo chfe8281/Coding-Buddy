@@ -48,7 +48,7 @@ int find_largest_element(int arr[], int size) {
 
 ('Array Doubling', 
 '2270',
-'Description', 
+'Purpose: The doubleArraySize function takes a dynamically allocated array and doubles it in size. The function should double the original size of the array and return the new doubled array as a pointer.Parameters: int* arr- a pointer to the original array, int &size - the original size of the array, passed by reference. Returning: A new int* which is a pointer to the new doubled array.', 
 '// Function to print the array
 void printArray(int* arr, int size) {
     for (int i = 0; i < size; ++i) {
