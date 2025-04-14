@@ -168,7 +168,16 @@ Edge Cases:
 
     return 0;
 }', 
-'"0 1 2 3 4 5 \n0 \n\n"', ''), 
+'"0 1 2 3 4 5 \n0 \n\n"', 
+'#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+vector<int> bfs_traversal(int V, vector<vector<int>>& adj, int start) {
+    // Begin your solution here
+}'), 
 ('Graph Traversal - DFS', 
 '3104', 
 'Purpose:
@@ -236,7 +245,19 @@ Edge Cases:
 
     return 0;
 }', 
-'"0 1 3 2 4 5 \n0 \n0 2 3 1 \n"', '');
+'"0 1 3 2 4 5 \n0 \n0 2 3 1 \n"', 
+'#include <iostream>
+#include <vector>
+#include <stack>
+
+using namespace std;
+
+void dfs_helper(int node, vector<vector<int>>& adj, vector<bool>& visited, vector<int>& result) {
+    // Begin your solution here
+}
+vector<int> dfs_traversal(int V, vector<vector<int>>& adj, int start) {
+    // Begin your solution here
+}');
 
 
 -- test for completed questions calculation

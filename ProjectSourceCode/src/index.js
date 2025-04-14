@@ -296,7 +296,10 @@ app.post('/coding', auth, async(req, res) => {
   let user_id = req.session.user.user_id;
   let main_input = "";
   let expected_output = "";
-  let question_id = req.body.question_id;
+
+  // let question_id = req.body.question_id;
+  let time_taken=req.body.time_taken;
+
   console.log("ID", question_id);
   var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
@@ -343,11 +346,18 @@ app.post('/coding', auth, async(req, res) => {
   // console.log("data1", data);
   let passed_1 = false;
   let passed = "Compile error!";
-  axios.request(config)
-  .then(async (response) => {
-    console.log(JSON.stringify(response.data.run.output));
-    let output = JSON.stringify(response.data.run.output);
-    passed = `Incorrect\n Output:${output}\n Expected:${expected_output}`;
+
+  // axios.request(config)
+  try {
+    const response = await axios.request(config);
+    const output = JSON.stringify(response.data.run.output);
+    console.log(output);
+    passed = `Incorrect Output:${output}\n Expected:${expected_output} \n Time taken: ${time_taken} seconds`;
+    const results = await db.one(
+      'SELECT question_id, input_1, output_1, description FROM coding_questions WHERE question_id = $1',
+      [question_id]
+    );
+
     if (expected_output == output)
     {
       passed_1 = true;
