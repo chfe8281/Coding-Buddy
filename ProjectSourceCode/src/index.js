@@ -297,6 +297,7 @@ app.get('/coding', async (req, res) => {
 
   try {
     let result = "";
+    let message = "";
     try {
       result = await db.one(query, [topic,user_id]);
     } catch(resultError)
