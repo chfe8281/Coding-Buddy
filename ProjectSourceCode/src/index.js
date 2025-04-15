@@ -308,7 +308,7 @@ app.get('/coding', async (req, res) => {
     {
       console.log("No questions remaining, regenerating from old ones");
       result = await db.one(backup_query, [topic]);
-      message = "Completed all questions from this course! Olds ones are being generated for practice.";
+      message = "Completed all questions from this course! Old ones are being generated for practice.";
     }
     const savedCode = await db.oneOrNone(
       `SELECT code FROM user_code_saves 
