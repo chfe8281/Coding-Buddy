@@ -302,19 +302,26 @@ app.get('/coding', async (req, res) => {
   try {
     let result = "";
     let message = "";
+    let savedCode = "";
     try {
       result = await db.one(query, [topic,user_id]);
+      savedCode = await db.oneOrNone(
+        `SELECT code FROM user_code_saves 
+         WHERE user_id = $1 AND question_id = $2`,
+        [user_id, result.question_id]
+      );
     } catch(resultError)
     {
       console.log("No questions remaining, regenerating from old ones");
       result = await db.one(backup_query, [topic]);
       message = "Completed all questions from this course! Old ones are being generated for practice.";
+      savedCode = result.starter_code;
     }
-    const savedCode = await db.oneOrNone(
+    /*savedCode = await db.oneOrNone(
       `SELECT code FROM user_code_saves 
        WHERE user_id = $1 AND question_id = $2`,
       [user_id, result.question_id]
-    );
+    );*/
     console.log("Fetched question:", result);
     
     res.render('pages/codingExercise.hbs', {
