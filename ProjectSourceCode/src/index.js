@@ -287,12 +287,12 @@ app.get('/coding', async (req, res) => {
                 AND question_id NOT IN (SELECT question_id FROM users_to_coding_questions WHERE user_id=$2 AND completed=TRUE) 
                 ORDER BY RANDOM() 
                 LIMIT 1`;
-    // Fallback query: fetch any question if all are completed
-  const fallbackQuery = `SELECT question_id, description, starter_code 
-    FROM coding_questions 
-    WHERE topic = $1
-    ORDER BY RANDOM() 
-    LIMIT 1`;
+  const backup_query = `SELECT question_id, description, starter_code 
+                FROM coding_questions 
+                WHERE topic = $1
+                ORDER BY RANDOM() 
+                LIMIT 1`;
+
   if (!req.session || !req.session.user) {
     return res.status(401).redirect('/login');
   }
@@ -300,7 +300,16 @@ app.get('/coding', async (req, res) => {
   user_id = req.session.user.user_id;
 
   try {
-    const result = await db.one(query, [topic,user_id]);
+    let result = "";
+    let message = "";
+    try {
+      result = await db.one(query, [topic,user_id]);
+    } catch(resultError)
+    {
+      console.log("No questions remaining, regenerating from old ones");
+      result = await db.one(backup_query, [topic]);
+      message = "Completed all questions from this course! Olds ones are being generated for practice.";
+    }
     const savedCode = await db.oneOrNone(
       `SELECT code FROM user_code_saves 
        WHERE user_id = $1 AND question_id = $2`,
@@ -311,6 +320,8 @@ app.get('/coding', async (req, res) => {
     res.render('pages/codingExercise.hbs', {
       question_descript: result.description,
       question_id: result.question_id,
+      message: message,
+      error: false,
       starter_code: savedCode?.code || result.starter_code
     });
   
