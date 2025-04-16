@@ -403,10 +403,164 @@ using namespace std;
 
 bool mysteryFunction(int n) {
     return false;
+}'),
+('Graph Traversal - BFS', 
+'3104', 
+'Purpose:
+The purpose of the bfs_traversal function is to perform a breadth-first traversal on a graph and return the order in which the nodes are visited.
+
+Declaration:
+vector<int> bfs_traversal(int V, vector<vector<int>>& adj, int start);
+
+Parameters:
+V (int): Number of vertices in the graph (0-indexed).
+adj (vector<vector<int>>): Adjacency list representation of the graph.
+start (int): Starting vertex for BFS.
+
+Returns:
+A vector containing the nodes in the order they are visited during BFS traversal.
+
+Behavior:
+The function uses a queue to traverse the graph level by level from the start node.
+Visited nodes are marked to avoid repetition.
+The order of nodes visited is stored and returned.
+
+Edge Cases:
+- If the graph has no nodes (V = 0), the function should return an empty traversal.
+- If the start node has no edges, the function should return just the start node.
+- The graph may be disconnected. Only the connected component of the start node is traversed.',
+'int main() {
+    // Test Case 1: Normal BFS Traversal
+    int V = 6;
+    vector<vector<int>> adj = {
+        {1, 2},     // Neighbors of node 0
+        {0, 3},     // 1
+        {0, 3},     // 2
+        {1, 2, 4},  // 3
+        {3, 5},     // 4
+        {4}         // 5
+    };
+
+    vector<int> result = bfs_traversal(V, adj, 0);
+    for (int node : result) {
+        cout << node << " ";
+    }
+    cout << endl;
+
+    // Test Case 2: Disconnected node
+    V = 1;
+    vector<vector<int>> adj2 = {{}};
+    result = bfs_traversal(V, adj2, 0);
+    for (int node : result) {
+        cout << node << " ";
+    }
+    cout << endl;
+
+    // Test Case 3: Edge Case 1 - Graph with no nodes (V = 0)
+    V = 0;
+    vector<vector<int>> adj3 = {};
+    result = bfs_traversal(V, adj3, 0);
+    for (int node : result) {
+        cout << node << " ";
+    }
+    cout << endl;
+
+    return 0;
+}', 
+'"0 1 2 3 4 5 \n0 \n\n"', 
+'#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+vector<int> bfs_traversal(int V, vector<vector<int>>& adj, int start) {
+    // Begin your solution here
+}'), 
+('Graph Traversal - DFS', 
+'3104', 
+'Purpose:
+The purpose of the dfs_traversal function is to perform a depth-first traversal on a graph and return the order in which the nodes are visited.
+
+Declaration:
+vector<int> dfs_traversal(int V, vector<vector<int>>& adj, int start);
+
+Parameters:
+V (int): Number of vertices in the graph (0-indexed).
+adj (vector<vector<int>>): Adjacency list representation of the graph.
+start (int): Starting vertex for DFS.
+
+Returns:
+A vector containing the nodes in the order they are visited during DFS traversal.
+
+Behavior:
+The function uses recursion to traverse the graph depth-wise from the start node.
+Visited nodes are marked to avoid cycles.
+The traversal order is stored and returned.
+
+Edge Cases:
+- If the graph has no nodes (V = 0), the function should return an empty traversal.
+- If the start node has no edges, the function should return just the start node.
+- The graph may be disconnected. Only the connected component of the start node is traversed.',
+'int main() {
+    int V = 6;
+    vector<vector<int>> adj = {
+        {1, 2},     // Neighbors of node 0
+        {0, 3},     // 1
+        {0, 3},     // 2
+        {1, 2, 4},  // 3
+        {3, 5},     // 4
+        {4}         // 5
+    };
+
+    vector<int> result = dfs_traversal(V, adj, 0);
+    for (int node : result) {
+        cout << node << " ";
+    }
+    cout << endl;
+
+    // Edge case: Disconnected node
+    V = 1;
+    vector<vector<int>> adj2 = {{}};
+    result = dfs_traversal(V, adj2, 0);
+    for (int node : result) {
+        cout << node << " ";
+    }
+    cout << endl;
+    // Test Case 3: Cyclic graph (Edge case)
+    V = 4;
+    vector<vector<int>> adj3 = {
+        {2, 1},    // 0 -> 2, 1 (Change the order here)
+        {0, 3},    // 1 -> 0, 3
+        {0, 3},    // 2 -> 0, 3
+        {1, 2}     // 3 -> 1, 2 (Cycle between 1, 2, and 3)
+    };
+    
+    result = dfs_traversal(V, adj3, 0);
+    for (int node : result) {
+        cout << node << " ";
+    }
+    cout << endl;
+
+    return 0;
+}', 
+'"0 1 3 2 4 5 \n0 \n0 2 3 1 \n"', 
+'#include <iostream>
+#include <vector>
+#include <stack>
+
+using namespace std;
+
+void dfs_helper(int node, vector<vector<int>>& adj, vector<bool>& visited, vector<int>& result) {
+    // Begin your solution here
+}
+vector<int> dfs_traversal(int V, vector<vector<int>>& adj, int start) {
+    // Begin your solution here
 }');
+
 
 -- test for completed questions calculation
 INSERT INTO
-users_to_coding_questions(user_id, question_id)
-VALUES(1,1);
+users_to_coding_questions(user_id, question_id, time_taken)
+VALUES(1,1,1);
 

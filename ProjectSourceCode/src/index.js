@@ -184,7 +184,11 @@ app.get('/login', (req,res)=>{
 // Route for inserting hashed password and email into users table
 app.post('/register', async (req, res) => {
   const { username, email, name, password } = req.body;
-
+  if (!username || !password) {
+    return res.status(400).render('pages/register', {
+      message: 'Username and password are required.'
+    });
+  }
   try {
       console.log('Received registration request:', { username, email });
       const userExists = await db.any('SELECT * FROM users WHERE username = $1 OR email = $2', [username, email]);
@@ -268,7 +272,7 @@ let current_user = "";
 // *****************************************************
 
 let result = "";
-app.get('/coding', async (req, res) => {
+app.get('/coding', auth, async (req, res) => {
   const topic = req.query.topic;
 
   if (!topic) {
@@ -279,7 +283,13 @@ app.get('/coding', async (req, res) => {
 
   const query = `SELECT question_id, description, starter_code 
                 FROM coding_questions 
-                WHERE topic = $1 
+                WHERE topic = $1
+                AND question_id NOT IN (SELECT question_id FROM users_to_coding_questions WHERE user_id=$2 AND completed=TRUE) 
+                ORDER BY RANDOM() 
+                LIMIT 1`;
+  const backup_query = `SELECT question_id, description, starter_code 
+                FROM coding_questions 
+                WHERE topic = $1
                 ORDER BY RANDOM() 
                 LIMIT 1`;
 
@@ -290,24 +300,51 @@ app.get('/coding', async (req, res) => {
   user_id = req.session.user.user_id;
 
   try {
-    const result = await db.one(query, [topic]);
-    const savedCode = await db.oneOrNone(
+    let result = "";
+    let message = "";
+    let savedCode = "";
+    try {
+      result = await db.one(query, [topic,user_id]);
+      savedCode = await db.oneOrNone(
+        `SELECT code FROM user_code_saves 
+         WHERE user_id = $1 AND question_id = $2`,
+        [user_id, result.question_id]
+      );
+    } catch(resultError)
+    {
+      console.log("No questions remaining, regenerating from old ones");
+      result = await db.one(backup_query, [topic]);
+      message = "Completed all questions from this course! Old ones are being generated for practice.";
+      savedCode = result.starter_code;
+    }
+    /*savedCode = await db.oneOrNone(
       `SELECT code FROM user_code_saves 
        WHERE user_id = $1 AND question_id = $2`,
       [user_id, result.question_id]
-    );
+    );*/
     console.log("Fetched question:", result);
     
     res.render('pages/codingExercise.hbs', {
       question_descript: result.description,
       question_id: result.question_id,
+      message: message,
+      error: false,
       starter_code: savedCode?.code || result.starter_code
     });
+  
   } catch (err) {
+    const result = await db.one(fallbackQuery, [topic]);
+    const savedCode = await db.oneOrNone(
+      `SELECT code FROM user_code_saves 
+       WHERE user_id = $1 AND question_id = $2`,
+      [user_id, result.question_id]
+    );
     console.error("Error fetching question:", err);
-    res.render('pages/codingExercise.hbs', { 
-      question_descript: "Error fetching question.",
-      error: err.message
+    res.render('pages/codingExercise.hbs', {
+      question_descript: result.description,
+      question_id: result.question_id,
+      starter_code: savedCode?.code || result.starter_code,
+      passed: 'You have already completed this exercise, would you like to practice it again?'
     });
   }
 });
@@ -334,7 +371,14 @@ app.post('/coding', auth, async(req, res) => {
   // Rest of your existing code
   let main_input = "";
   let expected_output = "";
-  
+  // let question_id = req.body.question_id;
+  let time_taken = '0';
+  if(req.body.time_taken)
+  {
+    time_taken=req.body.time_taken;
+  }
+  console.log("ID", question_id);
+  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
     // Use parameterized query to prevent SQL injection
     const results = await db.one(
@@ -381,27 +425,31 @@ app.post('/coding', auth, async(req, res) => {
 
   let passed_1 = false;
   let passed = "Compile error!";
-  
+  // axios.request(config)
   try {
     const response = await axios.request(config);
     const output = JSON.stringify(response.data.run.output);
     console.log(output);
-    passed = `Incorrect\n Output:${output}\n Expected:${expected_output}`;
-
+    passed = `Incorrect Output:${output}\n Expected:${expected_output} \n Time taken: ${time_taken} seconds`;
     const results = await db.one(
       'SELECT question_id, input_1, output_1, description FROM coding_questions WHERE question_id = $1',
       [question_id]
     );
-    
-    if (expected_output == output) {
+    if (expected_output == output)
+    {
       passed_1 = true;
-      passed = "Success!";
-      await db.one(
-        'INSERT INTO users_to_coding_questions(user_id, question_id) VALUES($1, $2) RETURNING user_id',
-        [user_id, question_id]
-      );
+      passed = `Success! \n Time taken: ${time_taken} seconds`;
+      console.log("Userid", user_id);
+      let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id, time_taken, completed) VALUES(${user_id}, ${question_id}, ${time_taken}, TRUE) RETURNING user_id;`;
+      
+        console.log("inside");
+        let ret = await db.one(insertUser);
+        console.log(ret)
+        // res.redirect('/coding')
+      
     }
 
+    console.log("DBAnswer", expected_output);
     res.render('pages/codingExercise.hbs', {
       passed: passed,
       error: !passed_1,
