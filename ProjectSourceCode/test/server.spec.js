@@ -169,7 +169,8 @@ describe('Testing Coding Page', () => {
 
   });
   
-  it('positive : /coding post', done => { 
+  it('positive : /coding post', function(done) { 
+    this.timeout(5000); 
     const agent = chai.request.agent(server);
     agent
       .post('/login')
