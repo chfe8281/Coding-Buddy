@@ -272,7 +272,7 @@ let current_user = "";
 // *****************************************************
 
 let result = "";
-app.get('/coding', async (req, res) => {
+app.get('/coding', auth, async (req, res) => {
   const topic = req.query.topic;
 
   if (!topic) {
@@ -371,7 +371,11 @@ app.post('/coding', auth, async(req, res) => {
   let main_input = "";
   let expected_output = "";
   // let question_id = req.body.question_id;
-  let time_taken=req.body.time_taken;
+  let time_taken = '0';
+  if(req.body.time_taken)
+  {
+    time_taken=req.body.time_taken;
+  }
   console.log("ID", question_id);
   var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {

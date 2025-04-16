@@ -123,3 +123,90 @@ describe('Testing Profile API', () => {
         });
     });
 });
+
+describe('Testing Coding Page', () => {
+  const testUser = {
+    username: 'testuser',
+    password: 'pwd123',
+  };
+  const testCodeInput = {
+    code: '#include <iostream>\n using namespace std;\n int find_largest_element(int arr[], int size) { \n// Begin your solution here\n if (size == 0) {\n cout << "Array is empty." << endl;\n return -1; // or throw an error depending on your use case \n }\n int largest = arr[0];\n for (int i = 1; i < size; i++) {\n if (arr[i] > largest) {\n largest = arr[i];\n }\n }\n return largest;\n }\n',
+    question_id: '1',
+  };
+  const testCodeInputIncorrect= {
+    code: 'using namespace std;\n int find_largest_element(int arr[], int size) { \n// Begin your solution here\n if (size == 0) {\n cout << "Array is empty." << endl;\n return -1; // or throw an error depending on your use case \n }\n int largest = arr[0];\n for (int i = 1; i < size; i++) {\n if (arr[i] > largest) {\n largest = arr[i];\n }\n }\n return largest;\n }\n',
+    question_id: '1',
+  };
+  it('positive : /coding', done => {
+    const agent = chai.request.agent(server);
+    agent
+      .post('/login')
+      .send(testUser)
+      .then(() => {
+        return agent.get('/coding');
+      })
+      .then(res => {
+        res.should.have.status(200);
+        expect(res.text).to.include('Description');
+        agent.close();
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+
+  });
+  it('Negative : /coding should redirect to login', done => {
+    chai
+      .request(server)
+      .get('/coding')
+      .end((err, res) => {
+        console.log(res);
+        res.should.redirectTo(/^.*127\.0\.0\.1.*\/login$/); // should redirect to /login
+        done();
+      });
+
+  });
+  
+  it('positive : /coding post', done => { 
+    const agent = chai.request.agent(server);
+    agent
+      .post('/login')
+      .send(testUser)
+      .then(() => {
+        return agent.post('/coding').send(testCodeInput);
+      })
+      .then(res => {
+        res.should.have.status(200);
+        // console.log(res);
+        expect(res.text).to.include('Success!');
+        agent.close();
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+  });
+
+  it('negative : /coding post', done => { 
+    const agent = chai.request.agent(server);
+    agent
+      .post('/login')
+      .send(testUser)
+      .then(() => {
+        return agent.post('/coding').send(testCodeInputIncorrect);
+      })
+      .then(res => {
+        res.should.have.status(200);
+        expect(res.text).to.include('Incorrect Output');
+        agent.close();
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+  });
+});
