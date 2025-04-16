@@ -352,6 +352,7 @@ app.post('/coding', auth, async(req, res) => {
   let user_input = req.body.code;
   let user_id = req.session.user.user_id;
   let question_id = req.body.question_id;
+  console.log(user_input);
   
   // First, save the user's code to the database (with error handling)
   try {
@@ -386,6 +387,7 @@ app.post('/coding', auth, async(req, res) => {
     );
     question_id = results.question_id;
     main_input = results.input_1;
+    console.log("main", main_input);
     expected_output = results.output_1;
   } catch (err) {
     return res.redirect('/coding');
