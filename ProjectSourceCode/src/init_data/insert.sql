@@ -86,7 +86,17 @@ using namespace std;
 int greatestPairSum(int arr[], int size) {
     // Begin your solution here
 }'),
-('Check Odd', '1300', 'Purpose: Check if the integer input is odd. Parameters: One integer input int num. Returning: A boolean value, true if odd, false if even.', 'int main() {
+('Check Odd', '1300', 
+'Purpose: 
+Check if the integer input is odd. 
+Declaration: 
+bool isOdd(int num);
+Parameters: 
+One integer input int num. 
+Returning: 
+A boolean value, true if odd, false if even.
+Edge Cases: 
+None.', 'int main() {
     // Test Case 1
     int test1 = 3;
     std::cout << "Test 1: " << test1 << " is " << (isOdd(test1) ? "odd" : "even") << std::endl;
@@ -105,7 +115,17 @@ int greatestPairSum(int arr[], int size) {
 bool isOdd(int num) {
     // Begin your solution here
 }'), 
-('Calculator', '1300', 'Purpose: Make a function that utilizes a switch statement to perform an operation on two integers. Parameters: int num_1, int num_2, and char operator. Returning: A float containing the result. If result is not possible return 0.', 'int main() {
+('Calculator', '1300', 
+'Purpose: 
+Make a function that utilizes a switch statement to perform an operation on two integers. 
+Declaration: 
+float calculate(int num_1, int num_2, char op);
+Parameters: 
+int num_1, int num_2, and char operator. 
+Returning: 
+A float containing the result. 
+Edge Cases: 
+If result is not possible return 0.', 'int main() {
     // Test Case 1: Addition
     string ops = "+/%";
     cout << "Test Case 1: 10 + 5 = " << calculate(10, 5, ops[0]) << endl;
@@ -126,7 +146,16 @@ float calculate(int num_1, int num_2, char op) {
 }'),
 ('Array Doubling', 
 '2270',
-'Purpose: The doubleArraySize function takes a dynamically allocated array and doubles it in size. The function should double the original size of the array and return the new doubled array as a pointer.Parameters: int* arr- a pointer to the original array, int &size - the original size of the array, passed by reference. Returning: A new int* which is a pointer to the new doubled array.', 
+'Purpose: 
+The doubleArraySize function takes a dynamically allocated array and doubles it in size. The function should double the original size of the array and return the new doubled array as a pointer.
+Declaration: 
+int* doubleArraySize(int* arr, int &size);
+Parameters: 
+int* arr- a pointer to the original array, int &size - the original size of the array, passed by reference. 
+Returning: 
+A new int* which is a pointer to the new doubled array.
+Edge Cases: 
+If the array is of size = 0 to begin with, then return an array of size = 0;', 
 '// Function to print the array
 void printArray(int* arr, int size) {
     for (int i = 0; i < size; ++i) {
@@ -190,7 +219,17 @@ using namespace std;
 int* doubleArraySize(int* arr, int &size) {
     // Begin your solution here
 }'), 
-('Reverse a Singly Linked List', '2270', 'Given a struct for a linked list node and a function to create the singly linked list, write the function reverseList to reverse the nodes in the singly linked list. Parameters: The current head of the linked list, ListNode* head. Returning: The new head of the reversed linked list.',
+('Reverse a Singly Linked List', '2270', 
+'Purpose: 
+Given a struct for a linked list node and a function to create the singly linked list, write the function reverseList to reverse the nodes in the singly linked list. 
+Declaration: 
+ListNode* reverseList(ListNode* head);
+Parameters: 
+The current head of the linked list, ListNode* head. 
+Returning: 
+The new head of the reversed linked list.
+Edge Cases:
+If linked list is empty, return an empty linked list.',
 'void printList(ListNode* head) {
     while (head != nullptr) {
         cout << head->val << " ";
@@ -254,7 +293,17 @@ ListNode* createList(const int arr[], int size) {
         current = current->next;
     }
     return head;
-}'),('Valid Parentheses', '2270', 'Purpose: Create a function that uses a stack to check if an input has valid parentheses. Valid parentheses means that the type of parentheses is opened and closed in order, so [()] is valid, [(]) is not valid. Parameters: The input string s. Returning: A boolean value, true if valid false if not.', 
+}'),('Valid Parentheses', '2270', 
+'Purpose: 
+Create a function that uses a stack to check if an input has valid parentheses. Valid parentheses means that the type of parentheses is opened and closed in order, so [()] is valid, [(]) is not valid. 
+Declaration: 
+bool isValid(string s);
+Parameters: 
+The input string s. 
+Returning: 
+A boolean value, true if valid false if not.
+Edge Cases:
+None.', 
 'int main() {
     // Test case 1
     string test1 = "()[]{}";
@@ -277,7 +326,17 @@ using namespace std;
 bool isValid(string s) {
     // Begin your solution here...
     return false;
-}'),('Computer Network Infection', '2270', 'Purpose: Given a network of computers with each computer stored in a cell of a 2x2 matrix, there is one infected computers. For each infected computer each minute it infects all of its direct neighbors. How many minutes until all of the computers are infected? Parameters: int n (size of matrix), int **edges (an array of groups of edges), int edgeCount (number of edges), int start (index of the first infected computer). Returning: int minutes, time it takes for all computers to be infected. If not all computers can be infected, return -1. ', 
+}'),('Computer Network Infection', '2270', 
+'Purpose: 
+Given a network of computers with each computer stored in a cell of a 2x2 matrix, there is one infected computers. For each infected computer each minute it infects all of its direct neighbors. How many minutes until all of the computers are infected? 
+Declaration:
+int timeToInfectAll(int n, int** edges, int edgeCount, int start);
+Parameters: 
+int n (size of matrix), int **edges (an array of groups of edges), int edgeCount (number of edges), int start (index of the first infected computer). 
+Returning: 
+int minutes, time it takes for all computers to be infected. 
+Edge Case:
+If not all computers can be infected, return -1. ', 
 'int main() {
     // Edge list for the network
     int edges1[][2] = {{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}};
@@ -317,7 +376,17 @@ int timeToInfectAll(int n, int** edges, int edgeCount, int start) {
     // Begin your solution here...
     return 0;
 }
-'),('Count Set Bits', '2400', 'Purpose: Write a function countSetBits which returns the number of set bits (1 bits) in the integer input. Parameters: integer input n. Returning: int count which is the number of set bits.', 
+'),('Count Set Bits', '2400', 
+'Purpose: 
+Write a function countSetBits which returns the number of set bits (1 bits) in the integer input. 
+Declaration:
+int countSetBits(int n);
+Parameters: 
+integer input n. 
+Returning: 
+int count which is the number of set bits.
+Edge Cases:
+None.', 
 'int main() {
     int num1 = 13;     // Binary: 1101 → Set bits: 3
     int num2 = 0;      // Binary: 0000 → Set bits: 0
@@ -335,7 +404,17 @@ using namespace std;
 int countSetBits(int n) {
     return 0;
 }'),
-('Memcpy Implementation', '2400', 'Implement a custom version of the memcpy function, which copies a specified number of bytes from a source memory block to a destination memory block.', 'int main() {
+('Memcpy Implementation', '2400', 
+'Purpose: 
+Implement a custom version of the memcpy function, which copies a specified number of bytes from a source memory block to a destination memory block.
+Declaration: 
+void* my_memcpy(void* dest, const void* src, size_t n);
+Parameters: 
+void* dest, const void* src, size_t n.
+Returning:
+Nothing, only switch the pointers.
+Edge Cases:
+If src = dest, then that should remain the same after the function call.', 'int main() {
     // Test Case 1: Copy a C-style string
     char src1[] = "Test 1";
     char dest1[10];
@@ -366,7 +445,17 @@ int countSetBits(int n) {
 void* my_memcpy(void* dest, const void* src, size_t n) {
     // Begin your solution here
 }'), 
-('IsTMax', '2400', 'Write a function to verify if the integer input is TMax. Return a boolean, true if the input is TMax, false if otherwise.', 'int main() {
+('IsTMax', '2400', 
+'Purpose: 
+Write a function to verify if the integer input is TMax. 
+Declaration:
+bool isTMax(int num);
+Parameters:
+int num (input integer).
+Returning:
+A boolean, true if the input is TMax, false if otherwise.
+Edge Cases:
+None.', 'int main() {
     // Test Case 1: Check for TMax
     int test1 = (1 << (sizeof(int) * 8 - 1)) - 1; // TMax for a 32-bit int
     std::cout << "Test 1: " << (isTMax(test1) ? "TMax" : "Not TMax") << std::endl;
@@ -384,13 +473,23 @@ void* my_memcpy(void* dest, const void* src, size_t n) {
 
 bool isTMax(int num) {
     // Begin your solution here
-}'), ('Translate x86 Assembly', '2400', 'Purpose: Looking at the assembly code below write the same function in C++. Parameters: An integer value n. Returning: a boolean value. Assembly: ".global mysteryFunctionAsm\n"
+}'), ('Translate x86 Assembly', '2400', 
+'Purpose: Looking at the assembly code below write the same function in C++.
+Declaration: 
+bool mysteryFunction(int n); 
+Parameters: 
+An integer value n. 
+Returning: a boolean value. 
+Assembly: 
+".global mysteryFunctionAsm\n"
 "mysteryFunctionAsm:\n"
 "    test %rdi, %rdi\n"
 "    test $1, %rdi\n"
 "    sete %al\n"
 "    movzx %al, %eax\n"
-"    ret\n"', 'int main() {
+"    ret\n"
+Edge Cases:
+None.', 'int main() {
     int num = 42;
     int num_two = 39;
     int num_three = 0;
