@@ -113,6 +113,7 @@ Things done last week:
 -Ben: implemented streak feature, added ability to have starter code for coding questions, saves code that users submitted for a question, added tests for the website profile page
 -Kaitlyn: made modals for flashcard editing, added ability to add flashcards
 -Christina: implemented get request for coding questions, post request checks exact question sent from the get request (instead of hard-coded question), bug fixes after MCQ merge
+-Jack: got MCQ working on server, added MCQ questions, added question sets functionality
 
 Individual goals for next week:
 -Calvin: finish carousel
@@ -120,3 +121,4 @@ Individual goals for next week:
 -Ben: defining what a streak is, help w/ flashcards+MCQ test cases
 -Kaitlyn: implement delete flashcard functionality, fix bugs w/ modals, clean up flashcard UI
 -Christina: test cases for coding exercise, add more coding questions
+-Jack: make UI consistent, work on MCQ test cases, make MCQ questions
