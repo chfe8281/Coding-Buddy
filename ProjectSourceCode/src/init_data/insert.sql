@@ -40,7 +40,52 @@ using namespace std;
 
 int find_largest_element(int arr[], int size) {
     // Begin your solution here
-}'), 
+}'), ('Greatest Pair Sum', 
+'1300', 
+'Purpose:
+The purpose of the greatestPairSum function is to identify and return the greatest sum made by any pairing out of a given array of non-negative integers.
+Declaration:
+int greatestPairSum(int* arr, int& size);
+Parameters:
+arr (int[]): A pointer to the first element of the integer array.
+size (int): The size of the array.
+Returns:
+The function returns an integer representing the largest pair sum found in the array.
+Behavior:
+The function iterates through the array from the first to the last element.
+It sums the current element with every element after it, compares and stores the greatest.
+Once the entire array is traversed, the largest pair sum is returned.
+Edge Cases:
+If the array is empty (i.e., size is zero), the function should return zero.
+Negative numbers are handled as well, and the function will return the largest negative pair sum if it is the greatest pair sum in the array.',
+'int main() {
+    int arr[] = {5, 9, 8, 2, 5, 1, 7, 4, 5};  // Example array
+    int size = sizeof(arr) / sizeof(arr[0]);  // Calculate the size of the array
+
+    int largest = greatestPairSum(arr, size);  // Call the function
+    cout << "The largest pair sum in this array is: " << largest << endl;
+
+    int arr1[] = {-2, -1, -3, -6, -2};  // Example with negative numbers
+    int size1 = sizeof(arr1) / sizeof(arr1[0]);  // Calculate the size of the array
+    int largest1 = greatestPairSum(arr1, size1);  // Call the function
+    cout << "The largest pair sum in the second array is: " << largest1 << endl;
+
+    int arr2[] = {};  // Edge Case
+    int size2 = sizeof(arr2) / sizeof(arr2[0]);  // Calculate the size of the array
+    int largest2 = greatestPairSum(arr2, size2);  // Call the function
+    cout << "The largest pair sum in the third array is: " << largest2 << endl;
+
+    return 0;
+}', 
+'"The largest pair sum in this array is: 17\nThe largest pair sum in the second array is: -3\nThe largest pair sum in the third array is: 0\n"',
+'#include <iostream>
+#include<climits>
+
+using namespace std;
+
+int greatestPairSum(int arr[], int size) {
+    // Begin your solution here
+}'),
 ('Check Odd', '1300', 'Purpose: Check if the integer input is odd. Parameters: One integer input int num. Returning: A boolean value, true if odd, false if even.', 'int main() {
     // Test Case 1
     int test1 = 3;
@@ -145,6 +190,151 @@ using namespace std;
 int* doubleArraySize(int* arr, int &size) {
     // Begin your solution here
 }'), 
+('Reverse a Singly Linked List', '2270', 'Given a struct for a linked list node and a function to create the singly linked list, write the function reverseList to reverse the nodes in the singly linked list. Parameters: The current head of the linked list, ListNode* head. Returning: The new head of the reversed linked list.',
+'void printList(ListNode* head) {
+    while (head != nullptr) {
+        cout << head->val << " ";
+        head = head->next;
+    }
+    cout << endl;
+}
+
+int main() {
+    // Test case 1
+    int arr1[] = {1, 2, 3, 4, 5};
+    ListNode* list1 = createList(arr1, 5);
+    cout << "Original List 1: ";
+    printList(list1);
+    ListNode* reversed1 = reverseList(list1);
+    cout << "Reversed List 1: ";
+    printList(reversed1);
+
+    // Test case 2
+    int arr2[] = {10, 20, 30};
+    ListNode* list2 = createList(arr2, 3);
+    cout << "Original List 2: ";
+    printList(list2);
+    ListNode* reversed2 = reverseList(list2);
+    cout << "Reversed List 2: ";
+    printList(reversed2);
+
+    // Test case 3
+    int arr3[] = {42};
+    ListNode* list3 = createList(arr3, 1);
+    cout << "Original List 3: ";
+    printList(list3);
+    ListNode* reversed3 = reverseList(list3);
+    cout << "Reversed List 3: ";
+    printList(reversed3);
+
+    return 0;
+}', '"Original List 1: 1 2 3 4 5 \nReversed List 1: 5 4 3 2 1 \nOriginal List 2: 10 20 30 \nReversed List 2: 30 20 10 \nOriginal List 3: 42 \nReversed List 3: 42 \n"', '#include <iostream>
+using namespace std;
+
+// Definition for singly-linked list.
+struct ListNode {
+    int val;
+    ListNode* next;
+    ListNode(int x) : val(x), next(NULL) {}
+};
+
+// Function to reverse a linked list
+ListNode* reverseList(ListNode* head) {
+    // Begin your solution here...
+    return nullptr;
+}
+
+// Helper to create linked list from array
+ListNode* createList(const int arr[], int size) {
+    if (size == 0) return nullptr;
+    ListNode* head = new ListNode(arr[0]);
+    ListNode* current = head;
+    for (int i = 1; i < size; i++) {
+        current->next = new ListNode(arr[i]);
+        current = current->next;
+    }
+    return head;
+}'),('Valid Parentheses', '2270', 'Purpose: Create a function that uses a stack to check if an input has valid parentheses. Valid parentheses means that the type of parentheses is opened and closed in order, so [()] is valid, [(]) is not valid. Parameters: The input string s. Returning: A boolean value, true if valid false if not.', 
+'int main() {
+    // Test case 1
+    string test1 = "()[]{}";
+    cout << "Test 1: " << test1 << " → " << (isValid(test1) ? "Valid" : "Invalid") << endl;
+
+    // Test case 2
+    string test2 = "([)]";
+    cout << "Test 2: " << test2 << " → " << (isValid(test2) ? "Valid" : "Invalid") << endl;
+
+    // Test case 3
+    string test3 = "{[()]}";
+    cout << "Test 3: " << test3 << " → " << (isValid(test3) ? "Valid" : "Invalid") << endl;
+
+    return 0;
+}', '"Test 1: ()[]{} → Valid\nTest 2: ([)] → Invalid\nTest 3: {[()]} → Valid\n"', '#include <iostream>
+#include <stack>
+#include <string>
+using namespace std;
+
+bool isValid(string s) {
+    // Begin your solution here...
+    return false;
+}'),('Computer Network Infection', '2270', 'Purpose: Given a network of computers with each computer stored in a cell of a 2x2 matrix, there is one infected computers. For each infected computer each minute it infects all of its direct neighbors. How many minutes until all of the computers are infected? Parameters: int n (size of matrix), int **edges (an array of groups of edges), int edgeCount (number of edges), int start (index of the first infected computer). Returning: int minutes, time it takes for all computers to be infected. If not all computers can be infected, return -1. ', 
+'int main() {
+    // Edge list for the network
+    int edges1[][2] = {{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}};
+    int** edgeList1 = new int*[5];
+    for (int i = 0; i < 5; i++) {
+        edgeList1[i] = edges1[i];
+    }
+    cout << "Time to infect all: " << timeToInfectAll(6, edgeList1, 5, 0) << endl; // Output: 5
+
+    // Edge list for a disconnected network
+    int edges2[][2] = {{0, 1}, {2, 3}};
+    int** edgeList2 = new int*[2];
+    for (int i = 0; i < 2; i++) {
+        edgeList2[i] = edges2[i];
+    }
+    cout << "Time to infect all: " << timeToInfectAll(4, edgeList2, 2, 0) << endl; // Output: -1 (2 and 3 are disconnected)
+
+    int edges3[][2] = {{0,1}, {0,2}, {0,3}, {0,4}};
+    int** edgeList3 = new int*[4];
+    for (int i = 0; i < 4; i++) {
+        edgeList3[i] = edges3[i];
+    }
+
+    cout << "Time to infect all: " << timeToInfectAll(5, edgeList3, 4, 2) << endl; // Output: 2
+
+    delete[] edgeList3;
+    // Clean up the dynamic edge lists
+    delete[] edgeList1;
+    delete[] edgeList2;
+
+    return 0;
+}', '"Time to infect all: 5\nTime to infect all: -1\nTime to infect all: 2\n"', '#include <iostream>
+#include <queue>
+using namespace std;
+
+int timeToInfectAll(int n, int** edges, int edgeCount, int start) {
+    // Begin your solution here...
+    return 0;
+}
+'),('Count Set Bits', '2400', 'Purpose: Write a function countSetBits which returns the number of set bits (1 bits) in the integer input. Parameters: integer input n. Returning: int count which is the number of set bits.', 
+'int main() {
+    int num1 = 13;     // Binary: 1101 → Set bits: 3
+    int num2 = 0;      // Binary: 0000 → Set bits: 0
+    int num3 = 255;    // Binary: 11111111 → Set bits: 8
+
+    cout << "Set bits in " << num1 << ": " << countSetBits(num1) << endl;
+    cout << "Set bits in " << num2 << ": " << countSetBits(num2) << endl;
+    cout << "Set bits in " << num3 << ": " << countSetBits(num3) << endl;
+
+    return 0;
+}', '"Set bits in 13: 3\nSet bits in 0: 0\nSet bits in 255: 8\n"', '#include <iostream>
+using namespace std;
+
+// Function to count set bits
+int countSetBits(int n) {
+    return 0;
+}'),
 ('Memcpy Implementation', '2400', 'Implement a custom version of the memcpy function, which copies a specified number of bytes from a source memory block to a destination memory block.', 'int main() {
     // Test Case 1: Copy a C-style string
     char src1[] = "Test 1";
@@ -194,6 +384,25 @@ void* my_memcpy(void* dest, const void* src, size_t n) {
 
 bool isTMax(int num) {
     // Begin your solution here
+}'), ('Translate x86 Assembly', '2400', 'Purpose: Looking at the assembly code below write the same function in C++. Parameters: An integer value n. Returning: a boolean value. Assembly: ".global mysteryFunctionAsm\n"
+"mysteryFunctionAsm:\n"
+"    test %rdi, %rdi\n"
+"    test $1, %rdi\n"
+"    sete %al\n"
+"    movzx %al, %eax\n"
+"    ret\n"', 'int main() {
+    int num = 42;
+    int num_two = 39;
+    int num_three = 0;
+    cout << "num_one " << (mysteryFunction(num) ? "Passes" : "Fails") << endl;
+    cout << "num_two " << (mysteryFunction(num_two) ? "Fails" : "Passes") << endl;
+    cout << "num_three " << (mysteryFunction(num_three) ? "Passes" : "Fails") << endl;
+    return 0;
+}', '"num_one Passes\nnum_two Passes\nnum_three Passes\n"', '#include <iostream>
+using namespace std;
+
+bool mysteryFunction(int n) {
+    return false;
 }');
 
 -- test for completed questions calculation
