@@ -123,3 +123,52 @@ body {
     height: auto;
     display: block;
 }
+
+/* Container for the podium; using flex to align items */
+.podium-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; /* Align boxes on the bottom */
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  /* Common styling for all podium boxes */
+  .podium-box {
+    width: 200px;
+    background-color: #f8f9fa; /* light background */
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    padding: 0.5rem;
+  }
+  
+  /* Position number styling */
+  .podium-position {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Info container for username and points */
+  .podium-info .username {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #007bff;
+  }
+  .podium-info .points {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  /* Different heights for each podium box to simulate a podium */
+  .podium-first {
+    height: 120px; /* Highest - First place */
+  }
+  .podium-second {
+    height: 100px; /* Second place is slightly lower */
+  }
+  .podium-third {
+    height: 100px; /* Third place, same as second in this example */
+  }

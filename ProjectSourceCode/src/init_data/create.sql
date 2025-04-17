@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS users_to_mc_questions (
 
 -- Create an admin user to assign default decks to
 INSERT INTO users (name, username, password, email)
-  VALUES ('Admin', 'admin', '$2a$10$UDl9WT1/9C68T5xvP/cldus/rUcFC8wkXc435KBrBQmJGiuoeTcIO', 'admin42@colorado.edu');
+  VALUES ('Admin', 'admin', '$2a$10$Aa.zAO3NoYh.dXV4MFhpu.9xw7kET0LsNpvw.v76TZRE9EtRY8xjy', 'admin42@colorado.edu');
   -- hashed password is "password987"
 
 -- Default flashcard decks
@@ -127,8 +127,8 @@ INSERT INTO decks (name, count, creator_id)
   VALUES ('CSCI 1300', 0, 1);
 
 -- Default flashcards
-INSERT INTO cards (front, back, creator_id)
-  VALUES ('Unit testing?', 'A type of testing that checks individual segments of code works in isolation', 1);
+INSERT INTO cards (card_id, front, back, creator_id)
+  VALUES (1, 'Unit testing?', 'A type of testing that checks individual segments of code works in isolation', 1);
 
 -- Connect cards to decks
 INSERT INTO decks_to_cards (deck_id, card_id)

@@ -118,7 +118,7 @@ const auth = (req, res, next) => {
 // take user to login page by default
 app.get('/', (req, res) => {
     res.redirect('/login');
-  });
+});
 
 // Route: /register
 // Method: GET
@@ -154,20 +154,24 @@ app.get('/home', auth, async (req, res) => {
     const totalCodingCount = Number(totalCoding.count);
     const completedCodingCount = Number(completedCoding.count);
 
+    const topUsers = await db.any('SELECT username, points FROM users ORDER BY points DESC LIMIT 3');
+    
     const mcPercentage = totalMCCount === 0 ? 0 : Math.round((completedMCCount / totalMCCount) * 100);
     const codingPercentage = totalCodingCount === 0 ? 0 : Math.round((completedCodingCount / totalCodingCount) * 100);
 
     res.render('pages/homePage', {
       mcPercentage,
       codingPercentage,
-      user: req.session.user
+      user: req.session.user,
+      topUsers
     });
   } catch (error) {
     console.error('Error calculating completion percentages:', error);
     res.render('pages/homePage', {
       mcPercentage: 0,
       codingPercentage: 0,
-      user: req.session.user
+      user: req.session.user,
+      topUsers
     });
   }
 });
@@ -177,6 +181,27 @@ app.get('/home', auth, async (req, res) => {
 // renders the login page
 app.get('/login', (req,res)=>{
     res.render('pages/login')
+});
+
+// Route: /flashcards
+// Method: GET
+// renders the flashcards page
+app.get('/fs', async (req, res) => {
+  try{
+    const cards = await db.any ('SELECT')
+    const check = await db.one('SELECT COUNT(*) FROM cards');
+    const count = Number(check.count);  // or use: const count = +check.count;
+    if(count > 0){
+      console.log('Working');
+      res.render('pages/fs'); 
+    } else {
+      console.log('Not Working');
+    }
+  }
+  catch{
+    console.error('Error fetching flashcards:', error);
+    res.sendStatus(500);
+  }
 });
 
 // Route: /register

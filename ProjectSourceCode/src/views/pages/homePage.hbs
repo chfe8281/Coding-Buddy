@@ -59,23 +59,88 @@
       <div class="row">
         <div class="text-box">
           <h2><i class="bi bi-star"></i> To-Do</h2>
-          <p>MC Test Questions Completed: {{mcPercentage}}%</p>
-          <p>Practice Problems Completed: {{codingPercentage}}%</p>
+          
+          <!-- MC Test Section -->
+          <div class="d-flex align-items-center mb-3">
+            <!-- Fixed-width container for the label -->
+            <div style="width: 300px; font-weight: bold; white-space: nowrap;">
+              MC Test Questions Completed: {{mcPercentage}}%
+            </div>
+            <!-- Progress bar container -->
+            <div class="progress ms-3" style="flex-grow: 1; height: 20px; border-radius: 10px;">
+              <div class="progress-bar bg-warning" role="progressbar" style="width: {{mcPercentage}}%;" 
+                  aria-valuenow="{{mcPercentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+          
+          <!-- Practice Problems Section -->
+          <div class="d-flex align-items-center">
+            <!-- Fixed-width container for the label -->
+            <div style="width: 300px; font-weight: bold; white-space: nowrap;">
+              <a href="/coding" >Practice Problems Completed</a>: {{codingPercentage}}%
+            </div>
+            <!-- Progress bar container -->
+            <div class="progress ms-3" style="flex-grow: 1; height: 20px; border-radius: 10px;">
+              <div class="progress-bar bg-warning" role="progressbar" style="width: {{codingPercentage}}%;" 
+                  aria-valuenow="{{codingPercentage}}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+
         </div>
         <div class="divider"></div>
         <div class="image-box">
-          <img src="/img/home/row3.jpg" alt="Row 3 Image">
+          <img src="../../../img/home/toDo.jpg" alt="Row 3 Image">
         </div>
       </div>
-      <!-- Row 4 -->
+      <!-- Row 4: Leaderboard -->
       <div class="row">
         <div class="text-box">
-          <h2><i class="bi bi-lightning-charge"></i> Row 4 Title</h2>
-          <p>Undecided</p>
+          <h2><i class="bi bi-lightning-charge"></i> Leaderboard</h2>
+          <div class="podium-container">
+            <!-- Second Place -->
+            <div class="podium-box podium-second">
+              <div class="podium-position">2</div>
+              <div class="podium-info">
+                {{#if topUsers.[1]}}
+                  <div class="username">{{topUsers.[1].username}}</div>
+                  <div class="points">{{topUsers.[1].points}} pts</div>
+                {{else}}
+                  <div class="username">--</div>
+                  <div class="points">0 pts</div>
+                {{/if}}
+              </div>
+            </div>
+            <!-- First Place -->
+            <div class="podium-box podium-first">
+              <div class="podium-position">1</div>
+              <div class="podium-info">
+                {{#if topUsers.[0]}}
+                  <div class="username">{{topUsers.[0].username}}</div>
+                  <div class="points">{{topUsers.[0].points}} pts</div>
+                {{else}}
+                  <div class="username">--</div>
+                  <div class="points">0 pts</div>
+                {{/if}}
+              </div>
+            </div>
+            <!-- Third Place -->
+            <div class="podium-box podium-third">
+              <div class="podium-position">3</div>
+              <div class="podium-info">
+                {{#if topUsers.[2]}}
+                  <div class="username">{{topUsers.[2].username}}</div>
+                  <div class="points">{{topUsers.[2].points}} pts</div>
+                {{else}}
+                  <div class="username">--</div>
+                  <div class="points">0 pts</div>
+                {{/if}}
+              </div>
+            </div>
+          </div>
         </div>
         <div class="divider"></div>
         <div class="image-box">
-          <img src="/images/row4.jpg" alt="Row 4 Image">
+          <img src="../../../img/home/trophy.jpg" alt="Row 4 Image">
         </div>
       </div>
     </div>
