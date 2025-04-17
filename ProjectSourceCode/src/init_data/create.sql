@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS coding_questions (
   name VARCHAR(50) NOT NULL,
   -- Increase as needed
   description VARCHAR(5000),
+  starter_code VARCHAR(5000),
   topic VARCHAR(20),
   input_1 VARCHAR(5000),
   input_2 VARCHAR(5000),
@@ -47,6 +48,14 @@ CREATE TABLE IF NOT EXISTS coding_questions (
   difficulty INT CONSTRAINT limited_values CHECK (difficulty > 0 AND difficulty < 6)
   -- deck_id INT,
   -- FOREIGN KEY (deck_id) REFERENCES decks (deck_id) ON DELETE CASCADE
+);
+
+CREATE TABLE user_code_saves (
+  user_id INT REFERENCES users(user_id),
+  question_id INT REFERENCES coding_questions(question_id),
+  code TEXT NOT NULL,
+  saved_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (user_id, question_id)
 );
 
 -- DROP TABLE IF EXISTS mc_questions CASCADE;
@@ -94,6 +103,8 @@ CREATE TABLE IF NOT EXISTS decks_to_cards (
 CREATE TABLE IF NOT EXISTS users_to_coding_questions (
   user_id INT NOT NULL,
   question_id INT NOT NULL,
+  time_taken INT NOT NULL,
+  completed BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
   FOREIGN KEY (question_id) REFERENCES coding_questions (question_id) ON DELETE CASCADE
 );

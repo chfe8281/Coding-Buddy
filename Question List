@@ -32,3 +32,73 @@ D) int ptr = new int;
 Answer: B
 
 2270 Questions:
+Which data structure follows the Last In First Out (LIFO) principle?
+A) Queue 
+B) Array
+C) Stack
+D) Linked List
+Answer: C
+
+In a singly linked list, each node contains:
+A) Only data
+B) Data and a pointer to the next node
+C) A pointer to the previos node
+D) Only a pointer
+Answer: B
+
+What is the main disadvantage of arrays?
+A) Fixed size at declaration
+B) Random access is not allowed
+C) Elements are not stored in order
+D) Only integers can be stored
+Answer: A
+
+Which of the following operations is not efficient in a singly linked list?
+A) Inserting at the beginning
+B) Deleting from the beginning
+C) Traversing the list
+D) Accessing the last element
+Answer: D
+
+In C++, how do you define a struct for a singly linked list node?
+A) struct Node { int data; Node* next; };
+B) struct Node { int data; Node next; };
+C) struct Node { data; next; };
+D) Node { int data; Node* next; };
+Answer: A
+
+2400 Questions:
+What is the main function of RAM in a computer?
+A) Store files permanently
+B) Process graphics
+C) Temporarily store data for quick access
+D) Control hardware devices
+Answer: C
+
+Which of the following stores data permanently?
+A) RAM
+B) Hard Disk Drive
+C) Cache
+D) Registers
+Answer: B
+
+What does the instruction ADD AX, BX do?
+A) Adds AX to BX and stores the result in BX
+B) Adds both and stores in memory
+C) Nothing
+D) Adds BX to AX and stores the result in AX
+Answer: D
+
+Which register is commonly used as the stack pointer in x86 assembly?
+A) %rsp
+B) %rip
+C) %rsi
+D) %rdx
+Answer: A
+
+What is 0xc5 in binary?
+A) 1100 0101
+B) 0011 0101
+C) 1101 0101
+D) 1010 0110
+Answer: A

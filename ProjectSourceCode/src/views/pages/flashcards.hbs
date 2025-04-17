@@ -1,152 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{{deckName}} - Flashcards</title>
-  <!-- Link to external CSS if needed -->
-  <link rel="stylesheet" href="/resources/css/flashcards.css">
-  <style>
-    /* Container for the deck name header */
-    header {
-      text-align: center;
-      margin-top: 1rem;
-    }
-    
-    /* Container for the carousel */
-    .flashcards-carousel {
-      position: relative;
-      width: 80%;
-      max-width: 600px;
-      margin: 2rem auto;
-      perspective: 1000px; /* Enables 3D flip effect */
-      height: 300px; /* Adjust height if needed */
-    }
+<div class="container">
+    <h1>Flashcards Overview</h1>
+</div>
 
-    /* Each flashcard (hidden by default) */
-    .flashcard {
-      display: none;
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-    /* Only the active flashcard is shown */
-    .flashcard.active {
-      display: block;
-    }
+{{!-- Input: json array of user's flashcards objects --}}
+{{#each decks}}
+<div class="container">
+  <div class="row">
+    <h2>{{name}}</h2>
 
-    /* The card container which we flip */
-    .card {
-      width: 100%;
-      height: 100%;
-      transition: transform 0.8s;
-      transform-style: preserve-3d;
-      position: relative;
-    }
-    /* Apply flip transformation */
-    .card.flipped {
-      transform: rotateY(180deg);
-    }
+    {{#each cards}}
 
-    /* Front and back sides of the card */
-    .card-face {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      backface-visibility: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      background: #fff;
-      font-size: 1.5rem;
-      padding: 1rem;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-    /* Back side (rotated 180 degrees) */
-    .card-face.card-back {
-      transform: rotateY(180deg);
-    }
-
-    /* Carousel control buttons */
-    .controls {
-      text-align: center;
-      margin-top: 1rem;
-    }
-    .controls button {
-      margin: 0 10px;
-      padding: 10px 20px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <!-- Display deck name at the top -->
-  <header>
-    <h1>{{deckName}}</h1>
-  </header>
-
-  <!-- Flashcards Carousel -->
-  <div class="flashcards-carousel" id="flashcards-carousel">
-    {{#each flashcards}}
-      <div class="flashcard {{#if @first}}active{{/if}}">
-        <div class="card">
-          <div class="card-face card-front">
-            <p>{{this.front}}</p>
-          </div>
-          <div class="card-face card-back">
-            <p>{{this.back}}</p>
-          </div>
+    <div class="container">
+        <div class="col">
+            <div class="card flashcard">
+                <div class="card-body">
+                    {{!-- Switch between card sides --}}
+                    {{#if show_back}}
+                        <h1>{{back}}</h1>
+                    {{else}}
+                        <p>{{front}}</p>
+                    {{/if}}
+                </div>
+            </div>
         </div>
-      </div>
+
+    </div>
+    
     {{/each}}
+
   </div>
+</div>
 
-  <!-- Controls: Previous, Flip, Next -->
-  <div class="controls">
-    <button id="prevCard">Previous</button>
-    <button id="flipCard">Flip</button>
-    <button id="nextCard">Next</button>
-  </div>
+<!-- Modal -->
+<div id="card_modal" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Edit Flashcard</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form id="card_form" onsubmit="editCards()">
 
-  <script>
-    // Wait for DOM to load fully
-    document.addEventListener('DOMContentLoaded', function() {
-      const flashcards = document.querySelectorAll('.flashcard');
-      let currentIndex = 0;
+            {{!-- Send corresponding deck id --}}
+            <input type="hidden" name="course_id" value={{decks.id}}>
 
-      // Function to show a specific card
-      const showCard = index => {
-        flashcards.forEach((card, i) => {
-          card.classList.toggle('active', i === index);
-        });
-      };
+            {{!-- Change card front --}}
+            <div class="form-group">
+                <label for="front" class="form-label">Front</label>
+                <input type="text" class="form-control" id="front" required>
+            </div>
 
-      // Navigate to the previous flashcard
-      document.getElementById('prevCard').addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
-        // Remove the flip state on the new active card
-        flashcards[currentIndex].querySelector('.card').classList.remove('flipped');
-        showCard(currentIndex);
-      });
+            {{!-- Change card back --}}
+            <div class="form-group">
+                <label for="back" class="form-label">Back</label>
+                <input type="text" class="form-control" id="back" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+        </div>
+        </div>
+    </div>
+    </div>
+{{else}}
+<div class="container">
+    <h2>You don't have any flashcards :(</h2>
+    <p>Interact with the <a href='/coding'>Coding Practice</a> or <a href='/quiz'>Quiz</a> to get some!</p>
+</div>
 
-      // Navigate to the next flashcard
-      document.getElementById('nextCard').addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % flashcards.length;
-        flashcards[currentIndex].querySelector('.card').classList.remove('flipped');
-        showCard(currentIndex);
-      });
-
-      // Flip the current flashcard to reveal the back side
-      document.getElementById('flipCard').addEventListener('click', () => {
-        const currentCard = flashcards[currentIndex].querySelector('.card');
-        currentCard.classList.toggle('flipped');
-      });
-    });
-  </script>
-  <script src="/js/index.js"></script>
-</body>
-</html>
+{{/each}}

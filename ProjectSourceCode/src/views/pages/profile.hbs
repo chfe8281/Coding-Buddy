@@ -34,7 +34,7 @@
           <h5 class="card-title" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">Achievements</h5>
           <p class="card-text">You have completed <strong style="color: #ffc107;">{{codingQuestionsPercent}}%</strong> of the coding problems on Coding Buddy!</p>
           <p class="card-text">You have earned <strong style="color: #28a745;">{{points}}</strong> points from coding problems!</p>
-          <p class="card-text">This puts you in the top <strong style="color: #007bff;">{{leaderboardPosition}}%</strong> of learners!</p>
+          <p class="card-text">You are rank <strong style="color: #007bff;">{{leaderboardPosition}}</strong> out of <strong style="color: #007bff;">{{totalUsers}}</strong> users on Coding Buddy!</p>
         </div>
       </div>
     </div>
@@ -45,8 +45,8 @@
         <div class="card-body" style="height:187px">
           <h5 class="card-title" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem;">Daily Streak</h5>
           <p class="card-text" style="font-size: 1.3rem;">You are on a <strong style="color: #ffc107; font-size: 1.7rem;">{{streak}}</strong> day streak!</p>
-          <div class="progress mt-3" style="height: 20px; border-radius: 10px;">
-            <div class="progress-bar bg-warning" role="progressbar" style="width: {{streak}}%;" aria-valuenow="{{streak}}" aria-valuemin="0" aria-valuemax="100"></div>
+          <div class="progress mt-3" style="height: 25px; border-radius: 10px;">
+            <div class="progress-bar bg-warning" role="progressbar" style="width: {{visualStreak}}%;" aria-valuenow="{{visualStreak}}" aria-valuemin="0" aria-valuemax="100"></div>
           </div>
         </div>
       </div>
