@@ -186,14 +186,14 @@ app.get('/login', (req,res)=>{
 // Route: /flashcards
 // Method: GET
 // renders the flashcards page
-app.get('/flashcards', async (req, res) => {
+app.get('/fs', async (req, res) => {
   try{
     const cards = await db.any ('SELECT')
     const check = await db.one('SELECT COUNT(*) FROM cards');
     const count = Number(check.count);  // or use: const count = +check.count;
     if(count > 0){
       console.log('Working');
-      res.render('pages/flashcards'); 
+      res.render('pages/fs'); 
     } else {
       console.log('Not Working');
     }
