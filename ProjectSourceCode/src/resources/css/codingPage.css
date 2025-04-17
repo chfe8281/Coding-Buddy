@@ -1,0 +1,8 @@
+body {
+    --primary: #4caf50;
+    --bg: #f0f0f0; /* light gray */
+    --text: #333;
+    --card-bg: #fff;
+    --shadow: rgba(0,0,0,0.1);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
