@@ -109,6 +109,7 @@ const progressBar = document.querySelector('.progress-bar');
 const quizContainer = document.getElementById('quiz');
 
 function loadSelectedSet(setId) {
+    console.log("entered loadselectedset");
     selectedSet = setId;
     filteredQuestions = quizData.filter(q => q.set === setId);
     currentQuestion = 0;
