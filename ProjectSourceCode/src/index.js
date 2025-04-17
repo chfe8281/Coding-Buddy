@@ -746,7 +746,9 @@ app.get('/mcq', (req, res) => {
 // *****************************************************
 app.get('/flashcards', async (req,res) => {
   try {
-
+    if (!req.session.user) {
+      res.redirect('/login');
+    }
     // Get user decks
     let results = await db.task (async results => {
       deck_info = await db.any(`SELECT users.user_id, decks.deck_id, decks.name, decks.creator_id FROM users
@@ -768,10 +770,11 @@ app.get('/flashcards', async (req,res) => {
             ON cards.card_id = decks_to_cards.card_id
           WHERE decks.deck_id = $1
           ORDER BY cards.card_id ASC;`, [deck_info[i].deck_id]);
-        console.log(cards);
+        // console.log(cards);
           decks[i] = {
             name: deck_info[i].name,
             id: deck_info[i].deck_id,
+            creator_id: deck_info[i].creator_id,
             cards
           }
         // console.log(decks[i]);
@@ -810,9 +813,8 @@ Route: /flashcards/edit-card
 Method: POST
 Modify card content
 */
-
 app.post('/flashcards/edit-card', (req, res) =>{
-  console.log(req.body.card_id);
+  // console.log(req.body.card_id);
   db.none(`UPDATE cards
     SET front = $2,
     back = $3
