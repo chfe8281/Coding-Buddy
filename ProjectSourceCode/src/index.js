@@ -133,7 +133,6 @@ app.get('/register', (req, res) => {
 app.get('/home', auth, async (req, res) => {
 
   console.log('Session data:', req.session);
-
   const userId = req.session.user.user_id;
 
   try {
