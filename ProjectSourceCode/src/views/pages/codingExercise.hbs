@@ -21,20 +21,21 @@
         {{>message}}
     <div class="row">
         <div class="col-md-6 mb-4">
-            <div class="border rounded p-3 bg-white h-100" style = "margin-left: 5%;">
+            <div class="border rounded p-3 bg-white h-100" style = "margin-left: 5%; shadow: rgba(93, 90, 90, 0.91);">
                 <h5>Description</h5>
                 <p class="text-break" style="white-space: pre-line;">{{ question_descript }}</p>
             </div>
         </div>
-    <div class="col-md-6 mb-4">
-        <div class="border rounded p-3 h-100 bg-white" style = "margin-right: 5%;">
-            <h5>Solution</h5>
-            <form method="post" action="/coding" id="codingExercise" styling = "width: 100%;" >
-                <input type="hidden" id="question_id" name="question_id" value="{{question_id}}">
-                <input type="hidden" name="time_taken" id="time_taken" value="0">
-                <textarea id="code" name="code" cols="75" rows="25">{{#if current_code}}{{current_code}}{{else}}{{starter_code}}{{/if}}</textarea>
-                <input type="submit" id="submit-button" name="submit-button" onclick="beforeSubmit()" value="Submit" class="btn btn-primary">
-            </form>
+        <div class="col-md-6 mb-4">
+            <div class="border rounded p-3 h-100 bg-white" style = "margin-right: 5%; shadow: rgba(0,0,0,0.1);">
+                <h5>Solution</h5>
+                <form method="post" action="/coding" id="codingExercise" styling = "width: 100%;" >
+                    <input type="hidden" id="question_id" name="question_id" value="{{question_id}}">
+                    <input type="hidden" name="time_taken" id="time_taken" value="0">
+                    <textarea id="code" name="code" cols="75" rows="25">{{#if current_code}}{{current_code}}{{else}}{{starter_code}}{{/if}}</textarea>
+                    <input type="submit" id="submit-button" name="submit-button" onclick="beforeSubmit()" value="Submit" class="btn btn-primary">
+                </form>
+            </div>
         </div>
     </div>
 </div>
