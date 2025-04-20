@@ -10,6 +10,7 @@
       <button class="btn btn-outline-primary" onclick="loadSelectedSet('1300')">1300</button>
       <button class="btn btn-outline-success" onclick="loadSelectedSet('2270')">2270</button>
       <button class="btn btn-outline-warning" onclick="loadSelectedSet('2400')">2400</button>
+      <button class="btn btn-outline-secondary" onclick="loadSelectedSet('3104')">3104</button>
     </div>
   </div>
 </div>
@@ -24,7 +25,10 @@
       <div class="d-grid gap-3 mb-4" id="options"></div>
       <div class="d-flex justify-content-between align-items-center">
         <div class="fw-bold" id="timer">Time: 30s</div>
-        <button class="btn btn-primary" id="next-btn">Next</button>
+        <!--button class="btn btn-primary" id="next-btn">Next</button>
+        <button class="btn btn-primary" id="check-btn">Check Answer</button-->
+        <button class="btn btn-secondary me-2" id="check-btn" style="display: none;" disabled>Check Answer</button>
+        <button class="btn btn-primary" id="next-btn" style="display: none;">Next</button>
       </div>
     </div>
   </div>
