@@ -1,112 +1,148 @@
+{{!-- views/pages/flashcards.hbs --}}
+
 <div class="container">
-    <h1>Flashcards Overview</h1>
+  <h1>Flashcards Overview</h1>
 </div>
 
-{{!-- Input: json array of user's flashcards objects --}}
 {{#each decks}}
-<div class="container">
-  <div class="row">
-    <h2>{{name}}<button type="button" class="btn btn-primary" onclick="pickDeck({{id}}, '{{name}}', {{creator_id}})" data-bs-toggle="modal" data-bs-target="#deckModal">Edit Deck</button></h2>
-    
-    {{#each cards}}
-
-    <div class="container">
-        <div class="card flashcard">
+  <div class="container">
+    <div class="row">
+      <h2>
+        <!-- Deck name now links to fs.hbs via /flashcards/{{id}} -->
+        <a href="/flashcards/{{id}}" class="text-decoration-none">
+          {{name}}
+        </a>
+        <button type="button"
+                class="btn btn-primary"
+                onclick="pickDeck({{id}}, '{{name}}', {{creator_id}})"
+                data-bs-toggle="modal"
+                data-bs-target="#deckModal">
+          Edit Deck
+        </button>
+      </h2>
+      
+      {{#each cards}}
+        <div class="container">
+          <div class="card flashcard">
             <div class="card-body" onclick="flipCard({{card_id}})">
-                <h3 id="{{card_id}}_front" style="display:block">{{front}}</h3>
-                <p id="{{card_id}}_back" style="display:none">{{back}}</p>
-                <p>card #{{card_id}} created by user #{{creator_id}}</p>
+              <h3 id="{{card_id}}_front" style="display:block">{{front}}</h3>
+              <p id="{{card_id}}_back" style="display:none">{{back}}</p>
+              <p>card #{{card_id}} created by user #{{creator_id}}</p>
             </div>
-            <button type="button" class="btn btn-primary" onclick="pickCard({{card_id}}, '{{front}}', '{{back}}', {{creator_id}})" data-bs-toggle="modal" data-bs-target="#cardModal">Edit Card</button>    
+            <button type="button"
+                    class="btn btn-primary"
+                    onclick="pickCard({{card_id}}, '{{front}}', '{{back}}', {{creator_id}})"
+                    data-bs-toggle="modal"
+                    data-bs-target="#cardModal">
+              Edit Card
+            </button>    
+          </div>
         </div>
+      {{else}}
+        <!-- No cards in this deck -->
+        <p>This deck is empty</p>
+      {{/each}}
+
     </div>
-    {{else}}
+  </div>
+{{else}}
+  <!-- No decks at all -->
+  <div class="container">
+    <h2>You don't have any flashcards :(</h2>
+    <p>
+      Interact with the <a href='/coding'>Coding Practice</a> and
+      <a href='/quiz'>Quiz</a> or click below to get some
+    </p>
+    <form id="add_cards" action="/flashcards/add-cards" method="POST">
+      <button type="submit" class="btn btn-primary">Add Cards!</button>
+    </form>
+  </div>
+{{/each}}
 
-    {{!-- No cards --}}
-    <p>This deck is empty</p>
-    
-    {{/each}}
+<!-- Edit deck modal -->
+<div id="deckModal" class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Deck</h5>
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="deck_form" action="/flashcards/edit-deck" method="POST">
+          <input type="hidden" id="edit_deck_id" name="deck_id">
+          <input type="hidden" id="edit_deck_creator_id" name="creator_id">
 
+          <div class="form-group">
+            <label for="edit_deck_name" class="form-label">Deck Name</label>
+            <input type="text"
+                   class="form-control"
+                   id="edit_deck_name"
+                   name="name"
+                   required>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal">Close</button>
+        <button type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal">Delete</button>
+        <button type="submit"
+                class="btn btn-primary">Save</button>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
-{{else}}
-
-{{!-- No decks --}}
-<div class="container">
-    <h2>You don't have any flashcards :(</h2>
-    <p>Interact with the <a href='/coding'>Coding Practice</a> and <a href='/quiz'>Quiz</a> or click below to get some</p>
-    <form id="add_cards" action="/flashcards/add-cards" method="POST">
-    <button type="submit" class="btn btn-primary">Add Cards!</button>
-    </form>
-</div>
-
-{{/each}}
-
-<!-- Edit deck -->
-<div id="deckModal" class="modal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">Edit Deck</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <form id="deck_form" action="/flashcards/edit-deck" method="POST">
-
-            {{!-- Send deck id --}}
-            <input type="hidden" id="edit_deck_id" name="deck_id">
-            <input type="hidden" id="edit_deck_creator_id" name="creator_id">
-
-            {{!-- Change name --}}
-            <div class="form-group">
-                <label for="name" class="form-label">Deck Name</label>
-                <input type="text" class="form-control" id="edit_deck_name" name="name" required>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Delete</button>
-            <button type="submit" class="btn btn-primary">Save</button>
-        </form>
-        </div>
-        </div>
-    </div>
-</div>
-
-<!-- Edit card -->
+<!-- Edit card modal -->
 <div id="cardModal" class="modal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">Edit Flashcard</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <form id="card_form" action="/flashcards/edit-card" method="POST">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Flashcard</h5>
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="card_form" action="/flashcards/edit-card" method="POST">
+          <input type="hidden" id="edit_card_id" name="card_id">
+          <input type="hidden" id="edit_card_creator_id" name="creator_id">
 
-            {{!-- Send card and creator ids--}}
-            <input type="hidden" id="edit_card_id" name="card_id">
-            <input type="hidden" id="edit_card_creator_id" name="creator_id">
+          <div class="form-group">
+            <label for="edit_card_front" class="form-label">Front</label>
+            <input type="text"
+                   class="form-control"
+                   id="edit_card_front"
+                   name="front"
+                   required>
+          </div>
 
-            {{!-- Change card front --}}
-            <div class="form-group">
-                <label for="front" class="form-label">Front</label>
-                <input type="text" class="form-control" id="edit_card_front" name="front" size="100" required>
-            </div>
-
-            {{!-- Change card back --}}
-            <div class="form-group">
-                <label for="back" class="form-label">Back</label>
-                <input type="text" class="form-control" id="edit_card_back" name="back" size="250" required>
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-secondary">Delete</button>
-            <button type="submit" class="btn btn-primary">Save</button>
+          <div class="form-group">
+            <label for="edit_card_back" class="form-label">Back</label>
+            <input type="text"
+                   class="form-control"
+                   id="edit_card_back"
+                   name="back"
+                   required>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal">Close</button>
+        <button type="button"
+                class="btn btn-secondary">Delete</button>
+        <button type="submit"
+                class="btn btn-primary">Save</button>
         </form>
-        </div>
-        </div>
+      </div>
     </div>
+  </div>
 </div>

@@ -804,14 +804,11 @@ app.get('/mcq', (req, res) => {
 // *****************************************************
 // <!-- Flashcards API Routes -->
 // *****************************************************
-app.get('/flashcards', async (req,res) => {
+app.get('/flashcards', auth, async (req,res) => {
   try {
-    if (!req.session.user) {
-      res.redirect('/login');
-    }
     // Get user decks
     let results = await db.task (async results => {
-      deck_info = await db.any(`SELECT users.user_id, decks.deck_id, decks.name, decks.creator_id FROM users
+      const deck_info = await db.any(`SELECT users.user_id, decks.deck_id, decks.name, decks.creator_id FROM users
         INNER JOIN users_to_decks
           ON users.user_id = users_to_decks.user_id
         INNER JOIN decks
@@ -823,7 +820,7 @@ app.get('/flashcards', async (req,res) => {
       let decks = [];
       for(let i = 0; i < deck_info.length; i++) {
         // console.log(deck_info[i].name);
-        cards = await db.any(`SELECT cards.card_id, cards.front, cards.back, cards.creator_id FROM decks
+        const cards = await db.any(`SELECT cards.card_id, cards.front, cards.back, cards.creator_id FROM decks
           INNER JOIN decks_to_cards
             ON decks_to_cards.deck_id = decks.deck_id
           INNER JOIN cards
@@ -904,33 +901,27 @@ app.post('/flashcards/add-cards', async (req, res) => {
     });
   });
 
-
-// Route: GET /flashcards/:deckId
+// Detail (fs.hbs)
 app.get('/flashcards/:deckId', auth, async (req, res) => {
-  const deckId = Number(req.params.deckId);
+  const deckId = +req.params.deckId;
   try {
-    const deck = await db.one(
+    const { name: deckName } = await db.one(
       'SELECT name FROM decks WHERE deck_id = $1',
       [deckId]
     );
-    const cards = await db.any(
-      `SELECT c.front, c.back
-         FROM cards c
-         JOIN decks_to_cards dc ON dc.card_id = c.card_id
-        WHERE dc.deck_id = $1
-        ORDER BY c.card_id ASC`,
-      [deckId]
-    );
-    res.render('pages/flashcardDeck', {
-      deckName: deck.name,
-      flashcards: cards
-    });
+    const flashcards = await db.any(`
+      SELECT c.front, c.back
+        FROM cards c
+        JOIN decks_to_cards dc ON dc.card_id = c.card_id
+       WHERE dc.deck_id = $1
+       ORDER BY c.card_id
+    `, [deckId]);
+    return res.render('pages/fs', { deckName, flashcards });
   } catch (err) {
-    console.error('Error loading deck:', err);
-    res.redirect('/flashcards');
+    console.error(err);
+    return res.redirect('/flashcards');
   }
 });
-
 // *****************************************************
 // <!-- End Flashcards API Routes -->
 // *****************************************************
