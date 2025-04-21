@@ -10,39 +10,13 @@
 
   <!-- TODO: Include the `title` partial here -->
   {{>title}}
-  {{!-- <link  rel = "stylesheet" href = "../../resources/css/styleTemp.css"> --}}
+  <link  rel = "stylesheet" href = "../../resources/css/codingPage.css">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <style>
-    .grid-container {
-      display: grid;
-      grid-gap: 5%;
-      grid-template-columns: 1fr 1fr;
-      justify-items: center;
-      margin-top: 5%;
-      margin-bottom: 10%;
-    }
-    .grid-item {
-      background-color: #f4f4f4;
-      padding: 3%;
-      width: 90%;
-      height: 90%;
-      border: 1px solid #ddd;
-      position: relative;
-      justify-items: center;
-      -o-object-fit:cover;
-      
-    }
-    .codingExercise{
-      position: absolute;
-    }
-    /*
-    .code-textbox{
-      margin-left:50%;
-    }*/
-    #submit-button{
-      margin-left: 89%;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link  rel = "stylesheet" href = "../../resources/css/navBar.css">
+  
   <script>
   let countdownTime = 1800;
   let timerInterval = null;
@@ -104,6 +78,36 @@
             });
         });
     });
+  document.addEventListener("DOMContentLoaded", () => {
+    // Restore checkbox state if previously saved
+    const rememberMe = localStorage.getItem("rememberMe") === "true";
+    document.getElementById("rememberMe").checked = rememberMe;
+    // Optional: auto-fill username if saved
+    if (rememberMe) {
+      const savedUsername = localStorage.getItem("savedUsername");
+      const savedPass=localStorage.getItem("savedPass");
+      if (savedUsername && savedPass) {
+        document.getElementById("username").value = savedUsername;
+        document.getElementById("password").value = savedPass;
+      }
+    }
+
+    // Save on form submission
+    document.querySelector("form").addEventListener("submit", () => {
+      const remember = document.getElementById("rememberMe").checked;
+      localStorage.setItem("rememberMe", remember);
+
+      if (remember) {
+        const password= document.getElementById("password").value;
+        const username = document.getElementById("username").value;
+        localStorage.setItem("savedUsername", username);
+        localStorage.setItem("savedPass",password);
+      } else {
+        localStorage.removeItem("savedPass");
+        localStorage.removeItem("savedUsername");
+      }
+    });
+  });
 
   </script>
 </head>

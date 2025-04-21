@@ -91,6 +91,36 @@ const quizData = [
         options: ["A", "B", "C", "D"],
         correct: 3,
         set: '1300'
+    },
+    {
+        question: "Which of the following is a searching algorithm?",
+        options: ["Bubble Sort", "Linear Search", "Selection Sort", "Insertion Sort"],
+        correct: 1,
+        set: '3104'
+    },
+    {
+        question: "What is the time complexity of binary search in the worst case?",
+        options: ["O(n)", "O(1)", "O(n log n)", "O(log n)"],
+        correct: 3,
+        set: '3104'
+    },
+    {
+        question: "Which sorting algorithm repeatedly compares and swaps adjacent elements?",
+        options: ["Insertion Sort", "Merge Sort", "Bubble Sort", "Selection Sort"],
+        correct: 2,
+        set: '3104'
+    },
+    {
+        question: "What is the best case time complexity of Bubble Sort?",
+        options: ["O(n)", "O(log n)", "O(n^2)", "O(n log n)"],
+        correct: 0,
+        set: '3104'
+    },
+    {
+        question: "Which algorithm is best suited for finding the shortest path in a graph with non-negative weights?",
+        options: ["Dijkstra's Algorithm", "Depth First Search", "Kruskal's Algorithm", "Merge Sort"],
+        correct: 0,
+        set: '3104'
     }
 ];
 
@@ -101,14 +131,17 @@ let timer;
 let timeLeft = 30;
 let selectedSet = null;
 let filteredQuestions = [];
+let answerChecked = false;
 const questionEl = document.getElementById('question');
 const optionsEl = document.getElementById('options');
 const nextBtn = document.getElementById('next-btn');
+const checkAnswerBtn = document.getElementById('check-btn');
 const timerEl = document.getElementById('timer');
 const progressBar = document.querySelector('.progress-bar');
 const quizContainer = document.getElementById('quiz');
 
 function loadSelectedSet(setId) {
+    console.log("entered loadselectedset");
     selectedSet = setId;
     filteredQuestions = quizData.filter(q => q.set === setId);
     currentQuestion = 0;
@@ -119,6 +152,8 @@ function loadSelectedSet(setId) {
 }
 
 function loadQuestion() {
+    answerChecked=false;
+
     const question = filteredQuestions[currentQuestion];
     questionEl.textContent = question.question;
     optionsEl.innerHTML = '';
@@ -130,6 +165,7 @@ function loadQuestion() {
         optionsEl.appendChild(button);
     });
     nextBtn.style.display = 'none';
+    checkAnswerBtn.style.display = 'none';
     timeLeft = 30;
     if (timer) clearInterval(timer);
     startTimer();
@@ -137,10 +173,15 @@ function loadQuestion() {
 }
 
 function selectOption(selectedButton, optionIndex) {
+    if (answerChecked) return;
+
     const buttons = optionsEl.getElementsByClassName('option');
     Array.from(buttons).forEach(button => button.classList.remove('selected'));
     selectedButton.classList.add('selected');
     nextBtn.style.display = 'block';
+    checkAnswerBtn.style.display = 'block';
+
+    checkAnswerBtn.disabled = false;
 }
 
 function startTimer() {
@@ -152,25 +193,6 @@ function startTimer() {
             checkAnswer();
         }
     }, 1000);
-}
-
-function checkAnswer() {
-    const selectedOption = document.querySelector('.option.selected');
-    if (!selectedOption) return;
-
-    const selectedAnswer = Array.from(optionsEl.children).indexOf(selectedOption);
-    const question = filteredQuestions[currentQuestion];
-
-    if (selectedAnswer === question.correct) {
-        score++;
-        selectedOption.classList.add('correct');
-    } else {
-        selectedOption.classList.add('incorrect');
-        optionsEl.children[question.correct].classList.add('correct');
-    }
-
-    Array.from(optionsEl.children).forEach(button => button.disabled = true);
-    clearInterval(timer);
 }
 
 function updateProgress() {
@@ -192,6 +214,65 @@ function showResults() {
             `;
 }
 
+function checkAnswer(timeout = false) {
+    // --- Prevent multiple checks ---
+    if (answerChecked) {
+        console.log("Answer already processed for this question.");
+        return;
+    }
+    // Mark as checked *immediately* to prevent race conditions if called again quickly
+    answerChecked = true;
+    // --- Stop timer ---
+    if (timer) clearInterval(timer);
+
+    const selectedOption = document.querySelector('.option.selected');
+
+    // --- Process Selection (or lack thereof on timeout) ---
+    if (selectedOption) {
+        const selectedAnswer = Array.from(optionsEl.children).indexOf(selectedOption);
+        const question = filteredQuestions[currentQuestion];
+
+        if (selectedAnswer === question.correct) {
+            console.log("Correct!");
+            selectedOption.style.backgroundColor = 'lightgreen';
+            score++; // Increment score ONLY ONCE here
+        } else {
+            console.log("Incorrect.");
+            selectedOption.style.backgroundColor = 'lightcoral';
+            // Highlight the correct answer as well
+            const correctOptionElement = optionsEl.children[question.correct];
+            if (correctOptionElement) {
+                correctOptionElement.style.backgroundColor = 'lightgreen';
+            }
+        }
+    } else if (timeout) {
+        console.log("Time ran out, no answer selected.");
+        // Optionally highlight the correct answer when time runs out without selection
+        const question = filteredQuestions[currentQuestion];
+         const correctOptionElement = optionsEl.children[question.correct];
+         if (correctOptionElement) {
+             correctOptionElement.style.backgroundColor = 'lightyellow'; // Gentle indication
+         }
+    } else {
+         // Should not happen if check button is disabled correctly, but good to log
+         console.log("CheckAnswer called without a selected option and not via timeout.");
+         // Re-enable check flag since nothing was processed? Or just let it proceed to disable buttons.
+         // For simplicity, we'll let the state remain checked.
+    }
+
+
+    // --- Post-check UI updates ---
+    // Disable all option buttons
+    Array.from(optionsEl.children).forEach(button => {
+        button.disabled = true;
+    });
+
+    // Disable Check Answer button
+    checkAnswerBtn.disabled = true;
+    // Show Next button
+    nextBtn.style.display = 'inline-block'; // Use inline-block for alignment
+}
+
 nextBtn.addEventListener('click', () => {
     checkAnswer();
     currentQuestion++;
@@ -202,111 +283,38 @@ nextBtn.addEventListener('click', () => {
     }
 });
 
-loadQuestion();
+checkAnswerBtn.addEventListener('click', () => {
+    //answerChecked = true;
+    checkAnswer();
+});
 
-//});
-
-
-
-
-
-
-// let currentQuestion = 0;
-// let score = 0;
-// let timer;
-// let timeLeft = 30;
-
-// const questionEl = document.getElementById('question');
-// const optionsEl = document.getElementById('options');
-// const nextBtn = document.getElementById('next-btn');
-// const timerEl = document.getElementById('timer');
-// const progressBar = document.querySelector('.progress-bar');
-// const quizContainer = document.getElementById('quiz');
-
-// function loadQuestion() {
-//     const question = quizData[currentQuestion];
-//     questionEl.textContent = question.question;
-//     optionsEl.innerHTML = '';
-//     question.options.forEach((option, index) => {
-//         const button = document.createElement('button');
-//         button.textContent = option;
-//         button.classList.add('option');
-//         button.addEventListener('click', () => selectOption(button, index));
-//         optionsEl.appendChild(button);
-//     });
-//     nextBtn.style.display = 'none';
-//     timeLeft = 30;
-//     if (timer) clearInterval(timer);
-//     startTimer();
-//     updateProgress();
-// }
-
-// function selectOption(selectedButton, optionIndex) {
-//     const buttons = optionsEl.getElementsByClassName('option');
-//     Array.from(buttons).forEach(button => button.classList.remove('selected'));
-//     selectedButton.classList.add('selected');
-//     nextBtn.style.display = 'block';
-// }
-
-// function startTimer() {
-//     timer = setInterval(() => {
-//         timeLeft--;
-//         timerEl.textContent = `Time: ${timeLeft}s`;
-//         if (timeLeft === 0) {
-//             clearInterval(timer);
-//             checkAnswer();
-//         }
-//     }, 1000);
-// }
+//loadQuestion();
 
 // function checkAnswer() {
+//     //if(answerChecked) return;
+
 //     const selectedOption = document.querySelector('.option.selected');
-//     if (!selectedOption) return;
+//     //if (!selectedOption) return;
 
 //     const selectedAnswer = Array.from(optionsEl.children).indexOf(selectedOption);
-//     const question = quizData[currentQuestion];
+//     const question = filteredQuestions[currentQuestion];
 
 //     if (selectedAnswer === question.correct) {
+//         console.log("Correct!");
+//         selectedOption.style.backgroundColor = 'lightgreen'; //#90EE90
 //         score++;
 //         selectedOption.classList.add('correct');
 //     } else {
+//         console.log("Incorrect.");
+//         selectedOption.style.backgroundColor = 'lightcoral'; //#F08080
 //         selectedOption.classList.add('incorrect');
 //         optionsEl.children[question.correct].classList.add('correct');
 //     }
 
 //     Array.from(optionsEl.children).forEach(button => button.disabled = true);
 //     clearInterval(timer);
+
+//     //answerChecked=true;
 // }
 
-// function updateProgress() {
-//     const progress = ((currentQuestion + 1) / quizData.length) * 100;
-//     progressBar.style.width = `${progress}%`;
-//     progressBar.setAttribute('aria-valuenow', progress);
-// }
-
-// function showResults() {
-//     quizContainer.innerHTML = `
-//                 <div class="results">
-//                     <div class="result-icon">
-//                         <i class="fas ${score > quizData.length / 2 ? 'fa-trophy text-success' : 'fa-times-circle text-danger'}"></i>
-//                     </div>
-//                     <div class="score">Your score: ${score}/${quizData.length}</div>
-//                     <p>${score > quizData.length / 2 ? 'Great job!' : 'Better luck next time!'}</p>
-//                     <button class="btn btn-primary" onclick="location.reload()">Restart Quiz</button>
-//                 </div>
-//             `;
-// }
-
-// nextBtn.addEventListener('click', () => {
-//     checkAnswer();
-//     currentQuestion++;
-//     if (currentQuestion < quizData.length) {
-//         loadQuestion();
-//     } else {
-//         showResults();
-//     }
-// });
-
-// loadQuestion();
-
-// //});
+//});

@@ -655,7 +655,139 @@ void dfs_helper(int node, vector<vector<int>>& adj, vector<bool>& visited, vecto
 }
 vector<int> dfs_traversal(int V, vector<vector<int>>& adj, int start) {
     // Begin your solution here
+}'), ('Divide & Conquer - Merge Sort', 
+'3104', 
+'Purpose:
+The purpose of the mergeSort function is to sort an array of integers in ascending order using the Merge Sort algorithm.
+
+Declaration:
+void mergeSort(int* arr, int left, int right);
+
+Parameters:
+arr (int[]): A pointer to the first element of the integer array.
+left (int): The starting index of the array/subarray.
+right (int): The ending index of the array/subarray.
+
+Returns:
+The function does not return anything but modifies the array in-place to sort it.
+
+Edge Cases:
+- If the array is empty (size 0), the function should handle it gracefully without performing any operations.
+- If the array contains only one element, it should remain unchanged.
+- If the array is already sorted, it should stay unchanged.
+- If the array is reverse sorted, it should be sorted correctly.',
+'int main() {
+    int arr[] = {5, 3, 8, 4, 2};  
+    int size = sizeof(arr) / sizeof(arr[0]);
+    mergeSort(arr, 0, size - 1);
+    for(int i = 0; i < size; i++) cout << arr[i] << " ";
+    cout << endl;
+
+    int arr1[] = {};  // Empty array
+    int size1 = sizeof(arr1) / sizeof(arr1[0]);
+    mergeSort(arr1, 0, size1 - 1);
+    for(int i = 0; i < size1; i++) cout << arr1[i] << " ";
+    cout << endl;
+
+    int arr2[] = {42};  // Single-element array
+    int size2 = sizeof(arr2) / sizeof(arr2[0]);
+    mergeSort(arr2, 0, size2 - 1);
+    for(int i = 0; i < size2; i++) cout << arr2[i] << " ";
+    cout << endl;
+
+    int arr3[] = {1, 2, 3, 4};  // Already sorted array
+    int size3 = sizeof(arr3) / sizeof(arr3[0]);
+    mergeSort(arr3, 0, size3 - 1);
+    for(int i = 0; i < size3; i++) cout << arr3[i] << " ";
+    cout << endl;
+
+    int arr4[] = {9, 7, 5, 3, 1};  // Reverse sorted array
+    int size4 = sizeof(arr4) / sizeof(arr4[0]);
+    mergeSort(arr4, 0, size4 - 1);
+    for(int i = 0; i < size4; i++) cout << arr4[i] << " ";
+    cout << endl;
+
+    return 0;
+}', 
+'"2 3 4 5 8 \n\n42 \n1 2 3 4 \n1 3 5 7 9 \n"',
+'#include <iostream>
+
+using namespace std;
+
+void merge(int arr[], int left, int mid, int right) {
+    // Helper function to merge two halves
+}
+
+void mergeSort(int arr[], int left, int right) {
+    // Begin your solution here
+}'),('Divide & Conquer - Quick Sort', 
+'3104', 
+'Purpose:
+The purpose of the quickSort function is to sort an array of integers in ascending order using the Quick Sort algorithm.
+
+Declaration:
+void quickSort(int* arr, int low, int high);
+
+Parameters:
+arr (int[]): A pointer to the first element of the integer array.
+low (int): The starting index of the subarray.
+high (int): The ending index of the subarray.
+
+Returns:
+The function modifies the array in-place to sort it. It does not return any value.
+
+Edge Cases:
+- An empty array should remain unchanged.
+- A single-element array is already sorted and should not be modified.
+- An array with all identical elements should remain unchanged.
+- A reverse sorted array should be sorted correctly.
+- Large arrays should be handled efficiently.',
+'int main() {
+    int arr[] = {10, 7, 8, 9, 1, 5};
+    int size = sizeof(arr)/sizeof(arr[0]);
+    quickSort(arr, 0, size - 1);
+    for(int i = 0; i < size; i++) cout << arr[i] << " ";
+    cout << endl;
+
+    int arr1[] = {}; // Empty array
+    int size1 = sizeof(arr1)/sizeof(arr1[0]);
+    quickSort(arr1, 0, size1 - 1);
+    for(int i = 0; i < size1; i++) cout << arr1[i] << " ";
+    cout << endl;
+
+    int arr2[] = {42}; // Single-element array
+    int size2 = sizeof(arr2)/sizeof(arr2[0]);
+    quickSort(arr2, 0, size2 - 1);
+    for(int i = 0; i < size2; i++) cout << arr2[i] << " ";
+    cout << endl;
+
+    int arr3[] = {5, 5, 5, 5}; // All identical elements
+    int size3 = sizeof(arr3)/sizeof(arr3[0]);
+    quickSort(arr3, 0, size3 - 1);
+    for(int i = 0; i < size3; i++) cout << arr3[i] << " ";
+    cout << endl;
+
+    int arr4[] = {9, 7, 5, 3, 1}; // Reverse sorted array
+    int size4 = sizeof(arr4)/sizeof(arr4[0]);
+    quickSort(arr4, 0, size4 - 1);
+    for(int i = 0; i < size4; i++) cout << arr4[i] << " ";
+    cout << endl;
+
+    return 0;
+}', 
+'"1 5 7 8 9 10 \n\n42 \n5 5 5 5 \n1 3 5 7 9 \n"',
+'#include <iostream>
+
+using namespace std;
+
+int partition(int arr[], int low, int high) {
+    // Helper function to partition the array
+}
+
+void quickSort(int arr[], int low, int high) {
+    // Begin your solution here
 }');
+
 
 
 -- test for completed questions calculation

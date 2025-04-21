@@ -31,7 +31,7 @@ const hbs = handlebars.create({
 
 // database configuration
 const dbConfig = {
-  host: 'db', // the database server
+  host: process.env.POSTGRES_HOST, // the database server
   port: 5432, // the database port
   database: process.env.POSTGRES_DB, // the database name
   user: process.env.POSTGRES_USER, // the user account to connect with
@@ -355,6 +355,7 @@ app.post('/coding', auth, async(req, res) => {
   let user_input = req.body.code;
   let user_id = req.session.user.user_id;
   let question_id = req.body.question_id;
+  let results = '';
   console.log(user_input);
   
   // First, save the user's code to the database (with error handling)
@@ -384,7 +385,7 @@ app.post('/coding', auth, async(req, res) => {
   var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
     // Use parameterized query to prevent SQL injection
-    const results = await db.one(
+    results = await db.one(
       'SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = $1',
       [question_id]
     );
@@ -443,10 +444,12 @@ app.post('/coding', auth, async(req, res) => {
       passed_1 = true;
       passed = `Success! \n Time taken: ${time_taken} seconds`;
       console.log("Userid", user_id);
+      await updateLoginStreak(req.session.user.user_id);
       let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id, time_taken, completed) VALUES(${user_id}, ${question_id}, ${time_taken}, TRUE) RETURNING user_id;`;
-      
+      let addPoints = `UPDATE users SET points = points + 10 WHERE user_id = ${user_id};` // temporarily add 10 points per question, we can make it add a different amount for different question difficulty later
         console.log("inside");
         let ret = await db.one(insertUser);
+        await db.none(addPoints);
         console.log(ret)
         // res.redirect('/coding')
       
@@ -505,7 +508,7 @@ app.get('/profile', auth, async (req, res) => {
 
     const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [user.user_id]);
     const cqp = await calculateCompletionPercentage(userData.username);
-    const actualStreak = await updateLoginStreak(userData.user_id)
+    const actualStreak = userData.streak;
     const visualStreak = await calculateVisualProgress(actualStreak);
 
     res.render('pages/profile', {
@@ -788,7 +791,10 @@ async function calculateVisualProgress(actualStreak) {
 
 
 app.get('/mcq', (req, res) => {
-    res.render('./pages/mcq'); 
+  const user = req.session.user;
+  if (!user) return res.redirect('/login');
+
+  res.render('./pages/mcq'); 
 });
 
 // *****************************************************
@@ -800,6 +806,9 @@ app.get('/mcq', (req, res) => {
 // *****************************************************
 app.get('/flashcards', async (req,res) => {
   try {
+    
+    const user = req.session.user;
+    if (!user) return res.redirect('/login');
 
     // Get user decks
     let results = await db.task (async results => {
