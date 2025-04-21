@@ -834,7 +834,7 @@ app.get('/flashcards', auth, async (req, res) => {
       );
       return { ...d, cards };
     }));
-    console.log(decks);
+    // console.log(decks);
     return res.render('pages/flashcards', { decks });
   } catch (err) {
     console.error('Error loading flashcards overview:', err);
@@ -880,6 +880,29 @@ app.post('/flashcards/edit-deck', auth, (req, res) => {
       console.error('Error editing deck:', err);
       res.redirect('/home');
     });
+});
+
+/*
+Route: /flashcards/create-card
+Method: POST
+Adds new card and connects to user
+*/
+app.post('/flashcards/create-card', auth, async (req,res) =>{
+
+  try {
+
+    await db.task(async t => {
+      await db.none(`INSERT INTO cards (front, back, creator_id)
+        VALUES ($1, $2, $3);`, [req.body.front, req.body.back, req.session.user.user_id])
+      
+      await db.none(`INSERT INTO decks_to_cards (deck_id, card_id)
+        VALUES ($1, (SELECT COUNT(card_id) FROM cards));`, [req.body.deck_id]);
+      });
+    res.redirect('/flashcards');
+  } catch (err) {
+    console.log(err);
+    res.redirect('/home');
+  }
 });
 
 /*
