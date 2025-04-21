@@ -37,6 +37,99 @@
             </div>
         </div>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const codeEditor = document.getElementById('code');
+    const questionId = document.getElementById('question_id').value;
+    const saveStatus = document.createElement('div');
+    
+    // Save status indicator
+    saveStatus.style.position = 'fixed';
+    saveStatus.style.bottom = '10px';
+    saveStatus.style.right = '10px';
+    saveStatus.style.padding = '5px 10px';
+    saveStatus.style.background = '#f8f9fa';
+    saveStatus.style.borderRadius = '4px';
+    saveStatus.style.display = 'none';
+    document.body.appendChild(saveStatus);
+
+    let lastSavedValue = codeEditor.value;
+    let isSaving = false;
+
+    function showStatus(message, isError = false) {
+        saveStatus.textContent = message;
+        saveStatus.style.color = isError ? 'red' : 'green';
+        saveStatus.style.display = 'block';
+        setTimeout(() => saveStatus.style.display = 'none', 2000);
+    }
+
+    async function saveDraft(autosaved) {
+        if (isSaving || codeEditor.value === lastSavedValue) return;
+        
+        isSaving = true;
+        try {
+        const response = await fetch('/save-draft', {
+            method: 'POST',
+            body: JSON.stringify({
+            code: codeEditor.value,
+            question_id: questionId
+            }),
+            headers: {'Content-Type': 'application/json'}
+        });
+
+        if (response.ok) {
+            lastSavedValue = codeEditor.value;
+            if (autosaved) {
+                showStatus('Auto-saved Successfully');
+            } else {
+                showStatus('Saved Successfully');
+            }
+        } else {
+            if (autosaved) {
+                showStatus('Auto-save Failed', true);
+            } else {
+                showStatus('Save Failed', true);
+            }
+        }
+        } catch (error) {
+            console.error('Auto-save error:', error);
+            if (autosaved) {
+                showStatus('Auto-save Error', true);
+            } else {
+                showStatus('Save Error', true);
+            }
+        } finally {
+            isSaving = false;
+        }
+    }
+
+    // Auto-save every 10 seconds
+    const autoSaveInterval = setInterval(() => saveDraft(true), 10000);
+
+    // Save immediately when leaving the page
+    window.addEventListener('beforeunload', () => {
+        if (codeEditor.value !== lastSavedValue) {
+        // Synchronous request for reliable final save
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/save-draft', false);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+            code: codeEditor.value,
+            question_id: questionId
+        }));
+        }
+        clearInterval(autoSaveInterval);
+    });
+
+    // Optional: Save on Ctrl+S or Cmd+S
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveDraft(false);
+        }
+    });
+    });
+    </script>
 </div>
 
 <script src = "../../resources/js/codingPage.js"></script>

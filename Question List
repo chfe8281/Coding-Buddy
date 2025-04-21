@@ -31,6 +31,50 @@ C) int *ptr = (int*)malloc(sizeof(int));
 D) int ptr = new int;
 Answer: B
 
+Which operator is used to access members of a class through a pointer?
+A) .
+B) ->
+C) ::
+D) *
+Answer: B
+
+Which of the following is a correct function declaration in C++?
+A) function int add(int a, int b);
+B) int add(int a, int b);
+C) int add(a, b);
+D) int add(int, int) = 0;
+Answer: B
+
+What is the default access specifier for members of a class in C++?
+A) private
+B) public
+C) protected
+D) None of the above
+Answer: A
+
+Which header file is needed to use cout and cin in C++?
+A) <stdio.h>
+B) <conio.h>
+C) <iostream>
+D) <stream>
+Answer: C
+
+Which of the following correctly creates an object in C++?
+A) Object obj();
+B) Object = new();
+C) new Object();
+D) Object obj;
+Answer: D
+
+What will this code output?
+int a = 10, b = 20;
+cout << (a > b ? a : b);
+A) 10
+B) 20
+C) a
+D) b
+Answer: B
+
 2270 Questions:
 Which data structure follows the Last In First Out (LIFO) principle?
 A) Queue 
@@ -65,6 +109,41 @@ A) struct Node { int data; Node* next; };
 B) struct Node { int data; Node next; };
 C) struct Node { data; next; };
 D) Node { int data; Node* next; };
+Answer: A
+
+Which of the following is used to implement recursion in memory?
+A) Queue
+B) Tree
+C) Stack
+D) Linked List
+Answer: C
+
+In a queue, elements are inserted at the ______ and removed from the ______.
+A) front, rear
+B) rear, rear
+C) rear, front
+D) front, front
+Answer: C
+
+What is the maximum number of children a binary tree node can have?
+A) 1
+B) 2
+C) 3
+D) Unlimited
+Answer: B
+
+Which of the following is a hierarchical data structure?
+A) Stack
+B) Array
+C) Queue
+D) Tree
+Answer: D
+
+What happens when a stack overflows?
+A) It causes a run-time error or crash
+B) The program terminates normally
+C) Elements are removed automatically
+D) It wraps around to the beginning
 Answer: A
 
 2400 Questions:
@@ -103,6 +182,41 @@ C) 1101 0101
 D) 1010 0110
 Answer: A
 
+What does “pipelining” in CPUs help with?
+A. Reducing power usage
+B. Storing more data
+C. Executing multiple instructions simultaneously
+D. Backing up files
+Answer: C
+
+Which of these contributes to better performance in multitasking environments?
+A) Single-core CPU
+B) Multi-core processor
+C) Larger cache only
+D) Removing RAM
+Answer: B
+
+What does the ls command do in a shell?
+A) Lists directory contents
+B) Shuts down the system
+C) Launches a program
+D) Logs in a user
+Answer: A
+
+What does the && operator do in shell scripts or commands?
+A) Runs two commands at the same time
+B) Runs the second command only if the first succeeds
+C) Comments out the second command
+D) Runs both commands unconditionally
+Answer: B
+
+Which shell command is used to search for text in a file?
+A) find
+B) search
+C) scan
+D) grep
+Answer: D
+
 3104 Questions:
 Which of the following is a searching algorithm?
 A) Bubble Sort
@@ -137,4 +251,39 @@ A) Dijkstra's Algorithm
 B) Depth First Search
 C) Kruskal’s Algorithm
 D) Merge Sort
+Answer: A
+
+What is the purpose of recursion in algorithms?
+A) To store multiple values
+B) To reduce the size of the program
+C) To solve a problem by calling itself with smaller inputs
+D) To sort arrays
+Answer: C
+
+What is the time complexity of linear search in the worst case?
+A) O(log n)
+B) O(1)
+C) O(n log n)
+D) O(n)
+Answer: D
+
+Which of the following is not a characteristic of a good algorithm?
+A) Correctness
+B) High memory usage
+C) Efficiency
+D) Readability
+Answer: B
+
+What is the base case in a recursive function?
+A) The last value returned
+B) The largest input
+C) The part where the function prints output
+D) The smallest input size where recursion stops
+Answer: D
+
+Which sorting algorithm is the most efficient on average for large data sets?
+A) Merge Sort
+B) Insertion Sort
+C) Bubble Sort
+D) Selection Sort
 Answer: A
