@@ -22,7 +22,8 @@ INSERT INTO decks_to_cards (deck_id, card_id)
   (2,3);
 -- Connect cards to admin
 INSERT INTO users_to_decks (user_id, deck_id)
-  VALUES (1,1);
+  VALUES (1,1),
+  (1,2);
 
 /* Begin Coding Questions */
 INSERT INTO coding_questions(name, topic, description, input_1, output_1, starter_code) 
