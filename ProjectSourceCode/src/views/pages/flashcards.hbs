@@ -12,7 +12,7 @@
   <div class="container">
     <div class="row">
       <h2>
-        <!-- Deck name now links to fs.hbs via /flashcards/{{id}} -->
+        <!-- Deck name links to fs.hbs via /flashcards/{{id}} -->
         <a href="/flashcards/{{id}}" class="text-decoration-none">
           {{name}}
         </a>
@@ -46,16 +46,17 @@
         <!-- No cards in this deck -->
         <p>This deck is empty</p>
       {{/each}}
-
     </div>
   </div>
+
 {{else}}
+
   <!-- No decks at all -->
   <div class="container">
     <h2>You don't have any flashcards :(</h2>
     <p>
       Interact with the <a href='/coding'>Coding Practice</a> and
-      <a href='/quiz'>Quiz</a> or click below to get some
+      <a href='/mcq'>Quiz</a> or click below to get some
     </p>
     <form id="add_cards" action="/flashcards/add-cards" method="POST">
       <button type="submit" class="btn btn-primary">Add Cards!</button>
