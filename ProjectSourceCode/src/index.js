@@ -182,27 +182,6 @@ app.get('/login', (req,res)=>{
     res.render('pages/login')
 });
 
-// Route: /flashcards
-// Method: GET
-// renders the flashcards page
-app.get('/fs', async (req, res) => {
-  try{
-    const cards = await db.any ('SELECT')
-    const check = await db.one('SELECT COUNT(*) FROM cards');
-    const count = Number(check.count);  // or use: const count = +check.count;
-    if(count > 0){
-      console.log('Working');
-      res.render('pages/fs'); 
-    } else {
-      console.log('Not Working');
-    }
-  }
-  catch{
-    console.error('Error fetching flashcards:', error);
-    res.sendStatus(500);
-  }
-});
-
 // Route: /register
 // Method: POST
 // Route for inserting hashed password and email into users table
@@ -825,15 +804,11 @@ app.get('/mcq', (req, res) => {
 // *****************************************************
 // <!-- Flashcards API Routes -->
 // *****************************************************
-app.get('/flashcards', async (req,res) => {
+app.get('/flashcards', auth, async (req,res) => {
   try {
-    
-    const user = req.session.user;
-    if (!user) return res.redirect('/login');
-
     // Get user decks
     let results = await db.task (async results => {
-      deck_info = await db.any(`SELECT users.user_id, decks.deck_id, decks.name, decks.creator_id FROM users
+      const deck_info = await db.any(`SELECT users.user_id, decks.deck_id, decks.name, decks.creator_id FROM users
         INNER JOIN users_to_decks
           ON users.user_id = users_to_decks.user_id
         INNER JOIN decks
@@ -845,7 +820,7 @@ app.get('/flashcards', async (req,res) => {
       let decks = [];
       for(let i = 0; i < deck_info.length; i++) {
         // console.log(deck_info[i].name);
-        cards = await db.any(`SELECT cards.card_id, cards.front, cards.back, cards.creator_id FROM decks
+        const cards = await db.any(`SELECT cards.card_id, cards.front, cards.back, cards.creator_id FROM decks
           INNER JOIN decks_to_cards
             ON decks_to_cards.deck_id = decks.deck_id
           INNER JOIN cards
@@ -925,6 +900,28 @@ app.post('/flashcards/add-cards', async (req, res) => {
       res.redirect('/home');
     });
   });
+
+// Detail (fs.hbs)
+app.get('/flashcards/:deckId', auth, async (req, res) => {
+  const deckId = +req.params.deckId;
+  try {
+    const { name: deckName } = await db.one(
+      'SELECT name FROM decks WHERE deck_id = $1',
+      [deckId]
+    );
+    const flashcards = await db.any(`
+      SELECT c.front, c.back
+        FROM cards c
+        JOIN decks_to_cards dc ON dc.card_id = c.card_id
+       WHERE dc.deck_id = $1
+       ORDER BY c.card_id
+    `, [deckId]);
+    return res.render('pages/fs', { deckName, flashcards });
+  } catch (err) {
+    console.error(err);
+    return res.redirect('/flashcards');
+  }
+});
 // *****************************************************
 // <!-- End Flashcards API Routes -->
 // *****************************************************
