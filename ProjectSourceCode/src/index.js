@@ -182,27 +182,6 @@ app.get('/login', (req,res)=>{
     res.render('pages/login')
 });
 
-// Route: /flashcards
-// Method: GET
-// renders the flashcards page
-app.get('/fs', async (req, res) => {
-  try{
-    const cards = await db.any ('SELECT')
-    const check = await db.one('SELECT COUNT(*) FROM cards');
-    const count = Number(check.count);  // or use: const count = +check.count;
-    if(count > 0){
-      console.log('Working');
-      res.render('pages/fs'); 
-    } else {
-      console.log('Not Working');
-    }
-  }
-  catch{
-    console.error('Error fetching flashcards:', error);
-    res.sendStatus(500);
-  }
-});
-
 // Route: /register
 // Method: POST
 // Route for inserting hashed password and email into users table
@@ -857,6 +836,38 @@ app.get('/flashcards', async (req,res) => {
       decks: [],
       error: err
     });
+  }
+});
+
+
+
+// Route: GET /flashcards/:deckId
+app.get('/flashcards/:deckId', auth, async (req, res) => {
+  const deckId = req.params.deckId;
+  try {
+    // Fetch deck name
+    const deck = await db.one(
+      'SELECT name FROM decks WHERE deck_id = $1',
+      [deckId]
+    );
+
+    // Fetch its cards
+    const flashcards = await db.any(
+      `SELECT c.front, c.back
+         FROM cards c
+         JOIN decks_to_cards dc ON c.card_id = dc.card_id
+        WHERE dc.deck_id = $1`,
+      [deckId]
+    );
+
+    // Render detail page
+    res.render('pages/fs', {
+      deckName: deck.name,
+      flashcards
+    });
+  } catch (err) {
+    console.error('Error loading deck:', err);
+    res.status(500).send('Could not load flashcards');
   }
 });
 
