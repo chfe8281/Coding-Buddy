@@ -21,3 +21,10 @@ Week 3 (April 7, 2025):
 -Christina: get axios call get and post for the input and connecting codex to the coding exercise page, fix js for the timer.
 -Jack: fixed api routes, progress implementing the MC quiz page, created MC quiz questions.
 -Kaitlyn: created the database, connected the flashcards route so it pulls data from the database.
+
+Week 4 (April 14, 2025)
+-Calvin: finished leaderboard feature
+-Wyatt: course buttons functionality, added pause/resume on timer, added time spent on question
+-Ben: streak feature, added ability to have starter code for coding questions, saves user code, added tests for the website profile page
+-Kaitlyn: Modals for flashcard editing, added ability to add flashcards
+-Christina: implemented get request for coding questions, post request checks exact question from the get request, bug fixes after MCQ merge

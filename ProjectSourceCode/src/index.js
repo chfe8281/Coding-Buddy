@@ -31,7 +31,7 @@ const hbs = handlebars.create({
 
 // database configuration
 const dbConfig = {
-  host: 'db', // the database server
+  host: process.env.POSTGRES_HOST, // the database server
   port: 5432, // the database port
   database: process.env.POSTGRES_DB, // the database name
   user: process.env.POSTGRES_USER, // the user account to connect with
@@ -118,7 +118,7 @@ const auth = (req, res, next) => {
 // take user to login page by default
 app.get('/', (req, res) => {
     res.redirect('/login');
-  });
+});
 
 // Route: /register
 // Method: GET
@@ -133,7 +133,6 @@ app.get('/register', (req, res) => {
 app.get('/home', auth, async (req, res) => {
 
   console.log('Session data:', req.session);
-
   const userId = req.session.user.user_id;
 
   try {
@@ -154,20 +153,24 @@ app.get('/home', auth, async (req, res) => {
     const totalCodingCount = Number(totalCoding.count);
     const completedCodingCount = Number(completedCoding.count);
 
+    const topUsers = await db.any('SELECT username, points FROM users ORDER BY points DESC LIMIT 3');
+    
     const mcPercentage = totalMCCount === 0 ? 0 : Math.round((completedMCCount / totalMCCount) * 100);
     const codingPercentage = totalCodingCount === 0 ? 0 : Math.round((completedCodingCount / totalCodingCount) * 100);
 
     res.render('pages/homePage', {
       mcPercentage,
       codingPercentage,
-      user: req.session.user
+      user: req.session.user,
+      topUsers
     });
   } catch (error) {
     console.error('Error calculating completion percentages:', error);
     res.render('pages/homePage', {
       mcPercentage: 0,
       codingPercentage: 0,
-      user: req.session.user
+      user: req.session.user,
+      topUsers
     });
   }
 });
@@ -179,12 +182,37 @@ app.get('/login', (req,res)=>{
     res.render('pages/login')
 });
 
+// Route: /flashcards
+// Method: GET
+// renders the flashcards page
+app.get('/fs', async (req, res) => {
+  try{
+    const cards = await db.any ('SELECT')
+    const check = await db.one('SELECT COUNT(*) FROM cards');
+    const count = Number(check.count);  // or use: const count = +check.count;
+    if(count > 0){
+      console.log('Working');
+      res.render('pages/fs'); 
+    } else {
+      console.log('Not Working');
+    }
+  }
+  catch{
+    console.error('Error fetching flashcards:', error);
+    res.sendStatus(500);
+  }
+});
+
 // Route: /register
 // Method: POST
 // Route for inserting hashed password and email into users table
 app.post('/register', async (req, res) => {
   const { username, email, name, password } = req.body;
-
+  if (!username || !password) {
+    return res.status(400).render('pages/register', {
+      message: 'Username and password are required.'
+    });
+  }
   try {
       console.log('Received registration request:', { username, email });
       const userExists = await db.any('SELECT * FROM users WHERE username = $1 OR email = $2', [username, email]);
@@ -268,7 +296,7 @@ let current_user = "";
 // *****************************************************
 
 let result = "";
-app.get('/coding', async (req, res) => {
+app.get('/coding', auth, async (req, res) => {
   const topic = req.query.topic;
 
   if (!topic) {
@@ -279,7 +307,13 @@ app.get('/coding', async (req, res) => {
 
   const query = `SELECT question_id, description, starter_code 
                 FROM coding_questions 
-                WHERE topic = $1 
+                WHERE topic = $1
+                AND question_id NOT IN (SELECT question_id FROM users_to_coding_questions WHERE user_id=$2 AND completed=TRUE) 
+                ORDER BY RANDOM() 
+                LIMIT 1`;
+  const backup_query = `SELECT question_id, description, starter_code 
+                FROM coding_questions 
+                WHERE topic = $1
                 ORDER BY RANDOM() 
                 LIMIT 1`;
 
@@ -290,24 +324,51 @@ app.get('/coding', async (req, res) => {
   user_id = req.session.user.user_id;
 
   try {
-    const result = await db.one(query, [topic]);
-    const savedCode = await db.oneOrNone(
+    let result = "";
+    let message = "";
+    let savedCode = "";
+    try {
+      result = await db.one(query, [topic,user_id]);
+      savedCode = await db.oneOrNone(
+        `SELECT code FROM user_code_saves 
+         WHERE user_id = $1 AND question_id = $2`,
+        [user_id, result.question_id]
+      );
+    } catch(resultError)
+    {
+      console.log("No questions remaining, regenerating from old ones");
+      result = await db.one(backup_query, [topic]);
+      message = "Completed all questions from this course! Old ones are being generated for practice.";
+      savedCode = result.starter_code;
+    }
+    /*savedCode = await db.oneOrNone(
       `SELECT code FROM user_code_saves 
        WHERE user_id = $1 AND question_id = $2`,
       [user_id, result.question_id]
-    );
+    );*/
     console.log("Fetched question:", result);
     
     res.render('pages/codingExercise.hbs', {
       question_descript: result.description,
       question_id: result.question_id,
+      message: message,
+      error: false,
       starter_code: savedCode?.code || result.starter_code
     });
+  
   } catch (err) {
+    const result = await db.one(fallbackQuery, [topic]);
+    const savedCode = await db.oneOrNone(
+      `SELECT code FROM user_code_saves 
+       WHERE user_id = $1 AND question_id = $2`,
+      [user_id, result.question_id]
+    );
     console.error("Error fetching question:", err);
-    res.render('pages/codingExercise.hbs', { 
-      question_descript: "Error fetching question.",
-      error: err.message
+    res.render('pages/codingExercise.hbs', {
+      question_descript: result.description,
+      question_id: result.question_id,
+      starter_code: savedCode?.code || result.starter_code,
+      passed: 'You have already completed this exercise, would you like to practice it again?'
     });
   }
 });
@@ -315,6 +376,8 @@ app.post('/coding', auth, async(req, res) => {
   let user_input = req.body.code;
   let user_id = req.session.user.user_id;
   let question_id = req.body.question_id;
+  let results = '';
+  console.log(user_input);
   
   // First, save the user's code to the database (with error handling)
   try {
@@ -333,15 +396,23 @@ app.post('/coding', auth, async(req, res) => {
   // Rest of your existing code
   let main_input = "";
   let expected_output = "";
-  
+  // let question_id = req.body.question_id;
+  let time_taken = '0';
+  if(req.body.time_taken)
+  {
+    time_taken=req.body.time_taken;
+  }
+  console.log("ID", question_id);
+  var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
     // Use parameterized query to prevent SQL injection
-    const results = await db.one(
+    results = await db.one(
       'SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = $1',
       [question_id]
     );
     question_id = results.question_id;
     main_input = results.input_1;
+    console.log("main", main_input);
     expected_output = results.output_1;
   } catch (err) {
     return res.redirect('/coding');
@@ -379,26 +450,33 @@ app.post('/coding', auth, async(req, res) => {
 
   let passed_1 = false;
   let passed = "Compile error!";
-  
+  // axios.request(config)
   try {
     const response = await axios.request(config);
     const output = JSON.stringify(response.data.run.output);
-    passed = `Incorrect\n Output:${output}\n Expected:${expected_output}`;
-
+    console.log(output);
+    passed = `Incorrect Output:${output}\n Expected:${expected_output} \n Time taken: ${time_taken} seconds`;
     const results = await db.one(
       'SELECT question_id, input_1, output_1, description FROM coding_questions WHERE question_id = $1',
       [question_id]
     );
-    
-    if (expected_output == output) {
+    if (expected_output == output)
+    {
       passed_1 = true;
-      passed = "Success!";
-      await db.one(
-        'INSERT INTO users_to_coding_questions(user_id, question_id) VALUES($1, $2) RETURNING user_id',
-        [user_id, question_id]
-      );
+      passed = `Success! \n Time taken: ${time_taken} seconds`;
+      console.log("Userid", user_id);
+      await updateLoginStreak(req.session.user.user_id);
+      let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id, time_taken, completed) VALUES(${user_id}, ${question_id}, ${time_taken}, TRUE) RETURNING user_id;`;
+      let addPoints = `UPDATE users SET points = points + 10 WHERE user_id = ${user_id};` // temporarily add 10 points per question, we can make it add a different amount for different question difficulty later
+        console.log("inside");
+        let ret = await db.one(insertUser);
+        await db.none(addPoints);
+        console.log(ret)
+        // res.redirect('/coding')
+      
     }
 
+    console.log("DBAnswer", expected_output);
     res.render('pages/codingExercise.hbs', {
       passed: passed,
       error: !passed_1,
@@ -451,7 +529,7 @@ app.get('/profile', auth, async (req, res) => {
 
     const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [user.user_id]);
     const cqp = await calculateCompletionPercentage(userData.username);
-    const actualStreak = await updateLoginStreak(userData.user_id)
+    const actualStreak = userData.streak;
     const visualStreak = await calculateVisualProgress(actualStreak);
 
     res.render('pages/profile', {
@@ -734,7 +812,10 @@ async function calculateVisualProgress(actualStreak) {
 
 
 app.get('/mcq', (req, res) => {
-    res.render('./pages/mcq'); 
+  const user = req.session.user;
+  if (!user) return res.redirect('/login');
+
+  res.render('./pages/mcq'); 
 });
 
 // *****************************************************
@@ -746,9 +827,10 @@ app.get('/mcq', (req, res) => {
 // *****************************************************
 app.get('/flashcards', async (req,res) => {
   try {
-    if (!req.session.user) {
-      res.redirect('/login');
-    }
+    
+    const user = req.session.user;
+    if (!user) return res.redirect('/login');
+
     // Get user decks
     let results = await db.task (async results => {
       deck_info = await db.any(`SELECT users.user_id, decks.deck_id, decks.name, decks.creator_id FROM users

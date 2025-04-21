@@ -103,6 +103,8 @@ CREATE TABLE IF NOT EXISTS decks_to_cards (
 CREATE TABLE IF NOT EXISTS users_to_coding_questions (
   user_id INT NOT NULL,
   question_id INT NOT NULL,
+  time_taken INT NOT NULL,
+  completed BOOLEAN DEFAULT FALSE,
   FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
   FOREIGN KEY (question_id) REFERENCES coding_questions (question_id) ON DELETE CASCADE
 );
@@ -114,6 +116,27 @@ CREATE TABLE IF NOT EXISTS users_to_mc_questions (
   FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
   FOREIGN KEY (mcq_id) REFERENCES mc_questions (mcq_id) ON DELETE CASCADE
 );
+
+-- Create an admin user to assign default decks to
+INSERT INTO users (name, username, password, email)
+  VALUES ('Admin', 'admin', '$2a$10$Aa.zAO3NoYh.dXV4MFhpu.9xw7kET0LsNpvw.v76TZRE9EtRY8xjy', 'admin42@colorado.edu');
+  -- hashed password is "password987"
+
+-- Default flashcard decks
+INSERT INTO decks (name, count, creator_id)
+  VALUES ('CSCI 1300', 0, 1);
+
+-- Default flashcards
+INSERT INTO cards (card_id, front, back, creator_id)
+  VALUES (1, 'Unit testing?', 'A type of testing that checks individual segments of code works in isolation', 1);
+
+-- Connect cards to decks
+INSERT INTO decks_to_cards (deck_id, card_id)
+  VALUES (1, 1);
+
+-- Populate Coding Questions
+
+-- Populate Multiple Choice Questions
 
 -- Check tables (comment out)
 -- SELECT * FROM users;

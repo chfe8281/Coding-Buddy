@@ -1,0 +1,29 @@
+body{
+    font-family: 'Raleway', sans-serif;
+    color: var(--text);
+}
+.nav-link {
+    font-weight: 500;
+    font-size: 1.05rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    color: #333;
+}
+.navbar-nav .nav-item .nav-link {
+    margin: 0 10px; /* 10px on left and right */
+}
+.nav-link:hover {
+    background-color: #e3f2fd;  /* light blue hover */
+    color: #007bff;             /* Bootstrap primary blue */
+    text-decoration: none;
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+}
+
+.navbar {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* subtle shadow */
+}

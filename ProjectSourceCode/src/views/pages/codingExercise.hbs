@@ -1,28 +1,42 @@
-<h1>Coding Exercises:</h1>
-
-<div class = "type-buttons">
-    <button formmethod="get" formaction = "/coding">1300</button>
-    <button formmethod="get" formaction = "/coding">2270</button>
-    <button formmethod="get" formaction = "/coding">2400</button>
-    <button formmethod="get" formaction = "/coding">Algorithms</button>
-</div>
-
-<div class = "timer-buttons">
-    <button id = "timer" type = "submit" onclick = "startCountdown()">Start Timer</button>
-</div>
-<div class = "grid-container">
-    <div class = "grid-item">
-        <p>Description</p>
-        {{question_descript}}
+<div id = "codingPage">
+    <div id = "welcomeMessage">
+        <h1 class="text-center">Welcome to the Coding Exercises Page!</h1>
+        <p>Please select a topic from below and an exercise related to that course will be generated. You can then press 'Start Timer' once you are ready to attempt the generated exercise. Press the submit button when you are done coding to check your answer and see the expected output.</p>
     </div>
-    <div class = "grid-item">
-        <div class = "code-textbox">
-            <form method="post" action="/coding" id = "codingExercise">
-                <input type = "hidden" id = "question_id" name = "question_id" value = {{question_id}}>
-                <textarea id="code" name="code" cols="75" rows="25">{{#if current_code}}{{current_code}}{{else}}{{starter_code}}{{/if}}</textarea>
-                <input type="submit" id = "submit-button" name = "submit-button" value = "Submit">
-            </form>
+    <div class="d-flex flex-wrap gap-3 my-4 align-items-center">
+        <div class="type-buttons-box">
+            <div class="type-buttons">
+                <button class="btn btn-primary btn-lg px-5" id = "courseButtons" formmethod="get" formaction="/coding">1300</button>
+                <button class="btn btn-primary btn-lg px-5" id = "courseButtons" formmethod="get" formaction="/coding">2270</button>
+                <button class="btn btn-primary btn-lg px-5" id = "courseButtons" formmethod="get" formaction="/coding">2400</button>
+                <button class="btn btn-primary btn-lg px-5" id = "courseButtons" formmethod="get" formaction="/coding">3104</button>
+            </div>
+            <div class = "timer-buttons">
+                <button id = "timer" class="btn btn-outline-dark btn-lg px-5 py-2" type = "submit" onclick = "startCountdown()">Start Timer</button>
+            </div>
         </div>
+    </div>
         {{>passed}}
+        {{>message}}
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="border rounded p-3 bg-white h-100" id = "description-box">
+                <h5>Description</h5>
+                <p class="text-break">{{ question_descript }}</p>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="border rounded p-3 h-100 bg-white" id = "solution-box">
+                <h5>Solution</h5>
+                <form method="post" action="/coding" id="codingExercise">
+                    <input type="hidden" id="question_id" name="question_id" value="{{question_id}}">
+                    <input type="hidden" name="time_taken" id="time_taken" value="0">
+                    <textarea id="code" name="code" cols="75" rows="25">{{#if current_code}}{{current_code}}{{else}}{{starter_code}}{{/if}}</textarea>
+                    <input type="submit" id="submit-button" name="submit-button" onclick="beforeSubmit()" value="Submit" class="btn btn-primary">
+                </form>
+            </div>
+        </div>
     </div>
 </div>
+
+<script src = "../../resources/js/codingPage.js"></script>
