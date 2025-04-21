@@ -825,6 +825,12 @@ app.get('/mcq', (req, res) => {
 // *****************************************************
 // <!-- Flashcards API Routes -->
 // *****************************************************
+
+/*
+Route: /flashcards
+Method: GET
+Show flashcards overview
+*/
 app.get('/flashcards', auth, async (req, res) => {
   try {
     // fetch decks the user has access to
@@ -849,7 +855,7 @@ app.get('/flashcards', auth, async (req, res) => {
       );
       return { ...d, cards };
     }));
-
+    // console.log(decks);
     return res.render('pages/flashcards', { decks });
   } catch (err) {
     console.error('Error loading flashcards overview:', err);
@@ -857,7 +863,35 @@ app.get('/flashcards', auth, async (req, res) => {
   }
 });
 
-// 2) EDIT DECK
+/*
+Route: /flashcards/create-deck
+Method: POST
+Adds new deck and connects to user
+*/
+app.post('/flashcards/create-deck', auth, async (req,res) =>{
+
+  try {
+
+    await db.task(async t => {
+      await db.none(`INSERT INTO decks (name, count, creator_id)
+        VALUES ($1, 0, $2);`, [req.body.name, req.session.user.user_id]);
+
+      // console.log(await db.any(`SELECT * FROM decks;`));
+      await db.none(`INSERT INTO users_to_decks (user_id, deck_id)
+        VALUES ($1, (SELECT MAX(deck_id) FROM decks));`, [req.session.user.user_id]);
+      });
+    res.redirect('/flashcards');
+  } catch (err) {
+    console.log(err);
+    res.redirect('/home');
+  }
+});
+
+/*
+Route: /flashcards/edit-deck
+Method: POST
+Edits user's existing deck
+*/
 app.post('/flashcards/edit-deck', auth, (req, res) => {
   db.none(
     'UPDATE decks SET name = $2 WHERE deck_id = $1',
@@ -870,7 +904,61 @@ app.post('/flashcards/edit-deck', auth, (req, res) => {
     });
 });
 
-// 3) EDIT CARD
+/*
+Route: /flashcards/delete-deck
+Method: DELETE
+Removes deck from user, deletes if creator
+*/
+app.post('/flashcards/delete-deck', auth, (req,res) => {
+  try {
+    db.task (async t=>{
+      // console.log(await db.any(`SELECT * FROM decks`));
+
+      // Check user is creator
+      if (req.session.user.user_id != req.body.creator_id) {
+        console.log("User doesn't own this deck");
+      } else {
+
+        // Delete deck
+        await db.none(`DELETE FROM decks
+          WHERE deck_id = $1;`, [req.body.deck_id]);
+      }
+    })
+    res.redirect('/flashcards');
+  } catch (err) {
+    console.error('Error deleting deck:', err);
+    return res.redirect('/home');
+  }
+});
+
+/*
+Route: /flashcards/create-card
+Method: POST
+Adds new card and connects to user
+*/
+app.post('/flashcards/create-card', auth, async (req,res) =>{
+
+  try {
+
+    await db.task(async t => {
+      await db.none(`INSERT INTO cards (front, back, creator_id)
+        VALUES ($1, $2, $3);`, [req.body.front, req.body.back, req.session.user.user_id])
+      
+      await db.none(`INSERT INTO decks_to_cards (deck_id, card_id)
+        VALUES ($1, (SELECT COUNT(card_id) FROM cards));`, [req.body.deck_id]);
+      });
+    res.redirect('/flashcards');
+  } catch (err) {
+    console.log(err);
+    res.redirect('/home');
+  }
+});
+
+/*
+Route: /flashcards/edit-card
+Method: POST
+Edits user's existing card
+*/
 app.post('/flashcards/edit-card', auth, (req, res) => {
   db.none(
     'UPDATE cards SET front = $2, back = $3 WHERE card_id = $1',
@@ -883,7 +971,11 @@ app.post('/flashcards/edit-card', auth, (req, res) => {
     });
 });
 
-// 4) ADD STARTER CARDS
+/*
+Route: /flashcards/add-cards
+Method: POST
+Connects user to all of admin's cards
+*/
 app.post('/flashcards/add-cards', auth, (req, res) => {
   db.none(
     'INSERT INTO users_to_decks (user_id, deck_id) VALUES ($1,1),($1,2)',
@@ -894,8 +986,35 @@ app.post('/flashcards/add-cards', auth, (req, res) => {
       console.error('Error adding cards:', err);
       res.redirect('/home');
     });
-});
+  });
 
+/*
+Route: /flashcards/delete-deck
+Method: DELETE
+Removes deck from user, deletes if creator
+*/
+app.post('/flashcards/delete-card', auth, (req,res) => {
+  try {
+    db.task (async t=>{
+      // console.log(await db.any(`SELECT * FROM decks`));
+
+      // Check user is creator
+      if (req.session.user.user_id != req.body.creator_id) {
+        console.log("User doesn't own this card");
+      } else {
+
+        // Delete deck
+        await db.none(`DELETE FROM cards
+          WHERE card_id = $1;`, [req.body.card_id]);
+      }
+    })
+    res.redirect('/flashcards');
+  } catch (err) {
+    console.error('Error deleting card:', err);
+    return res.redirect('/home');
+  }
+});
+  
 // 5) DETAIL: show one deck’s carousel (fs.hbs)
 app.get('/flashcards/:deckId', auth, async (req, res) => {
   const deckId = Number(req.params.deckId);
