@@ -1,3 +1,31 @@
+/*--------Begin Flashcard Defaults--------*/
+-- Create an admin user to assign default decks to
+INSERT INTO users (name, username, password, email)
+  VALUES ('Admin', 'admin', '$2a$10$UDl9WT1/9C68T5xvP/cldus/rUcFC8wkXc435KBrBQmJGiuoeTcIO', 'admin42@colorado.edu');
+  -- hashed password is "password987"
+
+-- Default flashcard decks
+INSERT INTO decks (name, count, creator_id)
+  VALUES ('CSCI 1300', 0, 1),
+  ('CSCI3308',3, 1);
+
+-- Default flashcards
+INSERT INTO cards (front, back, creator_id)
+  VALUES ('Unit testing', 'A type of testing that checks individual segments of code works in isolation', 1),
+  ('Regression Testing', 'A type of testing that checks new code does not break previous code', 1),
+  ('User Acceptance Testing', 'A type of testing that involves the user (usually customer) and ensures it meets their expectations', 1);
+
+-- Connect cards to decks
+INSERT INTO decks_to_cards (deck_id, card_id)
+  VALUES (2, 1),
+  (2,2),
+  (2,3);
+-- Connect cards to admin
+INSERT INTO users_to_decks (user_id, deck_id)
+  VALUES (1,1),
+  (1,2);
+
+/* Begin Coding Questions */
 INSERT INTO coding_questions(name, topic, description, input_1, output_1, starter_code) 
 VALUES('Largest Element', 
 '1300', 

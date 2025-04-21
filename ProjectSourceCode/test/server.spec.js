@@ -211,3 +211,242 @@ describe('Testing Coding Page', () => {
       });
   });
 });
+
+describe('Testing Flashcards Page', () => {
+  const testUser = {
+    username: 'testuser',
+    password: 'pwd123',
+  };
+
+  it('positive : /flashcards should return flashcards page with decks', (done) => {
+    const agent = chai.request.agent(server);
+    agent
+      .post('/login')
+      .send(testUser)
+      .then(() => {
+        return agent.get('/flashcards');
+      })
+      .then(res => {
+        res.should.have.status(200);
+        expect(res).to.have.header('content-type', /html/);
+        expect(res.text).to.include('Flashcards Overview');
+        agent.close();
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+  });
+
+  it('negative : /flashcards should redirect to login when not authenticated', (done) => {
+    chai
+      .request(server)
+      .get('/flashcards')
+      .end((err, res) => {
+        res.should.redirectTo(/^.*127\.0\.0\.1.*\/login$/);
+        done();
+      });
+  });
+
+  it('should display "no flashcards" message when user has none', (done) => {
+    // Create a test user with no flashcards
+    const newTestUser = {
+      username: 'noflashcardsuser',
+      password: 'test123',
+      email: 'noflash@test.com',
+      name: 'No Flash User'
+    };
+
+    const agent = chai.request.agent(server);
+    
+    // Register and login new user
+    agent
+      .post('/register')
+      .send(newTestUser)
+      .then(() => {
+        return agent.post('/login').send({
+          username: newTestUser.username,
+          password: newTestUser.password
+        });
+      })
+      .then(() => {
+        return agent.get('/flashcards');
+      })
+      .then(res => {
+        res.should.have.status(200);
+        expect(res.text).to.include("You don't have any flashcards");
+        expect(res.text).to.include('Interact with the');
+        return agent.get('/logout'); // Clean up session
+      })
+      .then(() => {
+        agent.close();
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+  });
+
+  it('should display flashcards when user has them', (done) => {
+    const agent = chai.request.agent(server);
+    agent
+      .post('/login')
+      .send(testUser)
+      .then(() => {
+        return agent.get('/flashcards');
+      })
+      .then(res => {
+        res.should.have.status(200);
+        expect(res.text).to.include('Flashcards Overview');
+        if (res.text.includes('You don\'t have any flashcards')) {
+          console.log('Test user has no flashcards - consider adding test data');
+        } else {
+          expect(res.text).to.match(/<div class=".*card.*">/i);
+        }
+        agent.close();
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+  });
+});
+
+describe('Testing MCQ Page', () => {
+  const testUser = {
+    username: 'testuser',
+    password: 'pwd123',
+  };
+
+  // Test the basic page rendering
+  it('should render the MCQ page with course selection', (done) => {
+    const agent = chai.request.agent(server);
+    agent
+      .post('/login')
+      .send(testUser)
+      .then(() => {
+        return agent.get('/mcq');
+      })
+      .then(res => {
+        res.should.have.status(200);
+        expect(res.text).to.include('Choose a Course');
+        expect(res.text).to.include('1300');
+        expect(res.text).to.include('2270');
+        expect(res.text).to.include('2400');
+        expect(res.text).to.include('3104');
+        expect(res.text).to.include('Interactive Quiz');
+        agent.close();
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+  });
+
+  // Test unauthenticated access
+  it('should redirect to login when not authenticated', (done) => {
+    chai
+      .request(server)
+      .get('/mcq')
+      .end((err, res) => {
+        res.should.redirectTo(/^.*127\.0\.0\.1.*\/login$/);
+        done();
+      });
+  });
+
+  // Test the quiz container visibility
+  it('should initially hide the quiz container', (done) => {
+    const agent = chai.request.agent(server);
+    agent
+      .post('/login')
+      .send(testUser)
+      .then(() => {
+        return agent.get('/mcq');
+      })
+      .then(res => {
+        res.should.have.status(200);
+        expect(res.text).to.include('id="quiz" style="display: none"');
+        agent.close();
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+  });
+
+  // Test the presence of required buttons
+  it('should have all required interactive elements', (done) => {
+    const agent = chai.request.agent(server);
+    agent
+      .post('/login')
+      .send(testUser)
+      .then(() => {
+        return agent.get('/mcq');
+      })
+      .then(res => {
+        res.should.have.status(200);
+        expect(res.text).to.include('id="next-btn"');
+        expect(res.text).to.include('id="check-btn"');
+        expect(res.text).to.include('id="timer"');
+        expect(res.text).to.include('id="question"');
+        expect(res.text).to.include('id="options"');
+        agent.close();
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+  });
+
+  // Test the initial state of buttons
+  it('should initially hide the Next and Check Answer buttons', (done) => {
+    const agent = chai.request.agent(server);
+    agent
+      .post('/login')
+      .send(testUser)
+      .then(() => {
+        return agent.get('/mcq');
+      })
+      .then(res => {
+        res.should.have.status(200);
+        expect(res.text).to.include('id="next-btn" style="display: none;"');
+        expect(res.text).to.include('id="check-btn" style="display: none;"');
+        agent.close();
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+  });
+
+  // Test the external resources are loaded
+  it('should load required external resources', (done) => {
+    const agent = chai.request.agent(server);
+    agent
+      .post('/login')
+      .send(testUser)
+      .then(() => {
+        return agent.get('/mcq');
+      })
+      .then(res => {
+        res.should.have.status(200);
+        expect(res.text).to.include('cdnjs.cloudflare.com/ajax/libs/font-awesome/');
+        expect(res.text).to.include('cdn.jsdelivr.net/npm/bootstrap@');
+        expect(res.text).to.include('fonts.googleapis.com/css');
+        expect(res.text).to.include('/resources/js/quiz.js');
+        agent.close();
+        done();
+      })
+      .catch(err => {
+        agent.close();
+        done(err);
+      });
+  });
+});

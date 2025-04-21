@@ -182,27 +182,6 @@ app.get('/login', (req,res)=>{
     res.render('pages/login')
 });
 
-// Route: /flashcards
-// Method: GET
-// renders the flashcards page
-app.get('/fs', async (req, res) => {
-  try{
-    const cards = await db.any ('SELECT')
-    const check = await db.one('SELECT COUNT(*) FROM cards');
-    const count = Number(check.count);  // or use: const count = +check.count;
-    if(count > 0){
-      console.log('Working');
-      res.render('pages/fs'); 
-    } else {
-      console.log('Not Working');
-    }
-  }
-  catch{
-    console.error('Error fetching flashcards:', error);
-    res.sendStatus(500);
-  }
-});
-
 // Route: /register
 // Method: POST
 // Route for inserting hashed password and email into users table
@@ -376,6 +355,7 @@ app.post('/coding', auth, async(req, res) => {
   let user_input = req.body.code;
   let user_id = req.session.user.user_id;
   let question_id = req.body.question_id;
+  let results = '';
   console.log(user_input);
   
   // First, save the user's code to the database (with error handling)
@@ -405,7 +385,7 @@ app.post('/coding', auth, async(req, res) => {
   var getQuestion = `SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = '${question_id}';`;
   try {
     // Use parameterized query to prevent SQL injection
-    const results = await db.one(
+    results = await db.one(
       'SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = $1',
       [question_id]
     );
@@ -464,10 +444,12 @@ app.post('/coding', auth, async(req, res) => {
       passed_1 = true;
       passed = `Success! \n Time taken: ${time_taken} seconds`;
       console.log("Userid", user_id);
+      await updateLoginStreak(req.session.user.user_id);
       let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id, time_taken, completed) VALUES(${user_id}, ${question_id}, ${time_taken}, TRUE) RETURNING user_id;`;
-      
+      let addPoints = `UPDATE users SET points = points + 10 WHERE user_id = ${user_id};` // temporarily add 10 points per question, we can make it add a different amount for different question difficulty later
         console.log("inside");
         let ret = await db.one(insertUser);
+        await db.none(addPoints);
         console.log(ret)
         // res.redirect('/coding')
       
@@ -526,7 +508,7 @@ app.get('/profile', auth, async (req, res) => {
 
     const userData = await db.one('SELECT * FROM users WHERE user_id = $1', [user.user_id]);
     const cqp = await calculateCompletionPercentage(userData.username);
-    const actualStreak = await updateLoginStreak(userData.user_id)
+    const actualStreak = userData.streak;
     const visualStreak = await calculateVisualProgress(actualStreak);
 
     res.render('pages/profile', {
@@ -809,7 +791,10 @@ async function calculateVisualProgress(actualStreak) {
 
 
 app.get('/mcq', (req, res) => {
-    res.render('./pages/mcq'); 
+  const user = req.session.user;
+  if (!user) return res.redirect('/login');
+
+  res.render('./pages/mcq'); 
 });
 
 // *****************************************************
@@ -819,47 +804,99 @@ app.get('/mcq', (req, res) => {
 // *****************************************************
 // <!-- Flashcards API Routes -->
 // *****************************************************
-app.get('/flashcards', async (req,res) => {
+app.get('/flashcards', auth, async (req, res) => {
   try {
+    // fetch decks the user has access to
+    const deckInfo = await db.any(
+      `SELECT d.deck_id AS id, d.name, d.creator_id
+         FROM decks d
+         JOIN users_to_decks ud ON ud.deck_id = d.deck_id
+        WHERE ud.user_id = $1
+        ORDER BY d.deck_id`,
+      [req.session.user.user_id]
+    );
 
-    // Get user decks
-    let results = await db.task (async results => {
-      deck_info = await db.any(`SELECT decks.deck_id, decks.name FROM users
-        INNER JOIN users_to_decks
-          ON users.user_id = users_to_decks.user_id
-        INNER JOIN decks
-          ON users_to_decks.deck_id = decks.deck_id
-        WHERE users.user_id = $1;`, [req.session.user.user_id]);
+    // for each deck, fetch its cards in parallel
+    const decks = await Promise.all(deckInfo.map(async d => {
+      const cards = await db.any(
+        `SELECT c.card_id, c.front, c.back, c.creator_id
+           FROM cards c
+           JOIN decks_to_cards dc ON dc.card_id = c.card_id
+          WHERE dc.deck_id = $1
+          ORDER BY c.card_id`,
+        [d.id]
+      );
+      return { ...d, cards };
+    }));
 
-      // Get corresponding cards
-      let decks = [];
-      for(let i = 0; i < deck_info.length; i++) {
-        // console.log(deck_info[i].name);
-        cards = await db.any(`SELECT cards.front, cards.back FROM decks
-          INNER JOIN decks_to_cards
-            ON decks_to_cards.deck_id = decks.deck_id
-          INNER JOIN cards
-            ON cards.card_id = decks_to_cards.card_id
-          WHERE decks.deck_id = $1;`, [deck_info[i].deck_id]);
-        // console.log(cards);
-          decks[i] = {
-            name: deck_info[i].name,
-            id: deck_info[i].deck_id,
-            cards
-          }
-        // console.log(decks[i]);
-      }
-      return decks;
-    });
-    res.render('pages/flashcards', {decks: results});
+    return res.render('pages/flashcards', { decks });
   } catch (err) {
-    res.render('pages/flashcards',{
-      decks: [],
-      error: err
-    });
+    console.error('Error loading flashcards overview:', err);
+    return res.render('pages/flashcards', { decks: [], error: err });
   }
 });
 
+// 2) EDIT DECK
+app.post('/flashcards/edit-deck', auth, (req, res) => {
+  db.none(
+    'UPDATE decks SET name = $2 WHERE deck_id = $1',
+    [req.body.deck_id, req.body.name]
+  )
+    .then(() => res.redirect('/flashcards'))
+    .catch(err => {
+      console.error('Error editing deck:', err);
+      res.redirect('/home');
+    });
+});
+
+// 3) EDIT CARD
+app.post('/flashcards/edit-card', auth, (req, res) => {
+  db.none(
+    'UPDATE cards SET front = $2, back = $3 WHERE card_id = $1',
+    [req.body.card_id, req.body.front, req.body.back]
+  )
+    .then(() => res.redirect('/flashcards'))
+    .catch(err => {
+      console.error('Error editing card:', err);
+      res.redirect('/home');
+    });
+});
+
+// 4) ADD STARTER CARDS
+app.post('/flashcards/add-cards', auth, (req, res) => {
+  db.none(
+    'INSERT INTO users_to_decks (user_id, deck_id) VALUES ($1,1),($1,2)',
+    [req.session.user.user_id]
+  )
+    .then(() => res.redirect('/flashcards'))
+    .catch(err => {
+      console.error('Error adding cards:', err);
+      res.redirect('/home');
+    });
+});
+
+// 5) DETAIL: show one deck’s carousel (fs.hbs)
+app.get('/flashcards/:deckId', auth, async (req, res) => {
+  const deckId = Number(req.params.deckId);
+  try {
+    const { name: deckName } = await db.one(
+      'SELECT name FROM decks WHERE deck_id = $1',
+      [deckId]
+    );
+    const flashcards = await db.any(
+      `SELECT c.front, c.back
+         FROM cards c
+         JOIN decks_to_cards dc ON dc.card_id = c.card_id
+        WHERE dc.deck_id = $1
+        ORDER BY c.card_id`,
+      [deckId]
+    );
+    return res.render('pages/fs', { deckName, flashcards });
+  } catch (err) {
+    console.error('Error loading deck detail:', err);
+    return res.redirect('/flashcards');
+  }
+});
 // *****************************************************
 // <!-- End Flashcards API Routes -->
 // *****************************************************
