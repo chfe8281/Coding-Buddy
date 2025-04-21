@@ -804,7 +804,13 @@ app.get('/mcq', (req, res) => {
 // *****************************************************
 // <!-- Flashcards API Routes -->
 // *****************************************************
-app.get('/flashcards', auth, async (req,res) => {
+
+/*
+Route: /flashcards
+Method: GET
+Shows flashcards overview
+*/
+app.get('/flashcards', async (req,res) => {
   try {
     // Get user decks
     let results = await db.task (async results => {
@@ -814,7 +820,7 @@ app.get('/flashcards', auth, async (req,res) => {
         INNER JOIN decks
           ON users_to_decks.deck_id = decks.deck_id
         WHERE users.user_id = $1
-        ORDER BY decks.deck_id ASC;`, [req.session.user.user_id]);
+        ORDER BY decks.deck_id ASC;`, [user.user_id]);
 
       // Get corresponding cards
       let decks = [];
@@ -844,6 +850,32 @@ app.get('/flashcards', auth, async (req,res) => {
       decks: [],
       error: err
     });
+  }
+});
+
+/*
+Route: /flashcards/create-deck
+Method: POST
+Modifies adds new deck and connects to user
+*/
+app.post('/flashcards/create-deck', async (req,res) =>{
+  
+  const user = req.session.user;
+  if (!user) return res.redirect('/login');
+  console.log('Creating new deck');
+  try {
+
+    await db.task(async t => {
+      await db.none(`INSERT INTO decks (name, count, creator_id)
+        VALUES ($1, 0, $2);`, [req.body.name, user.user_id])
+      
+      await db.none(`INSERT INTO users_to_decks (user_id, deck_id)
+        VALUES ($1, (SELECT COUNT(deck_id) FROM decks));`, [user.user_id]);
+      });
+    res.redirect('/flashcards');
+  } catch (err) {
+    console.log(err);
+    res.redirect('/home');
   }
 });
 
