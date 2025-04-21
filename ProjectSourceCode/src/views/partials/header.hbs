@@ -96,14 +96,13 @@
 
 // Updates editCard modal with selected card info
 function pickCard(id, front, back, creator) {
-  //console.log("Id: " + id);
-  //console.log("Front: " + front);
-  //console.log("Back: " + back);
-  //console.log("Creator: " + creator);
   document.getElementById("edit_card_id").value=id;
   document.getElementById("edit_card_front").value=front;
   document.getElementById("edit_card_back").value=back;
   document.getElementById("edit_card_creator_id").value=creator;
+
+  document.getElementById("delete_card_card_id").value=id;
+  document.getElementById("delete_card_creator_id").value=creator;
 }
 // Updates editDeck modal with selected deck info
 function pickDeck(id, name, creator) {
@@ -113,7 +112,7 @@ function pickDeck(id, name, creator) {
   document.getElementById("edit_deck_creator_id").value=creator;
 
   document.getElementById("new_card_deck_id").value=id;
-  
+
   document.getElementById("delete_deck_deck_id").value=id;
   document.getElementById("delete_deck_creator_id").value=creator;
 }

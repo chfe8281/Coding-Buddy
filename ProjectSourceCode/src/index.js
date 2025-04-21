@@ -966,6 +966,33 @@ app.post('/flashcards/add-cards', auth, (req, res) => {
       res.redirect('/home');
     });
   });
+
+/*
+Route: /flashcards/delete-deck
+Method: DELETE
+Removes deck from user, deletes if creator
+*/
+app.post('/flashcards/delete-card', auth, (req,res) => {
+  try {
+    db.task (async t=>{
+      // console.log(await db.any(`SELECT * FROM decks`));
+
+      // Check user is creator
+      if (req.session.user.user_id != req.body.creator_id) {
+        console.log("User doesn't own this card");
+      } else {
+
+        // Delete deck
+        await db.none(`DELETE FROM cards
+          WHERE card_id = $1;`, [req.body.card_id]);
+      }
+    })
+    res.redirect('/flashcards');
+  } catch (err) {
+    console.error('Error deleting card:', err);
+    return res.redirect('/home');
+  }
+});
   
 // 5) DETAIL: show one deck’s carousel (fs.hbs)
 app.get('/flashcards/:deckId', auth, async (req, res) => {
