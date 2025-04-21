@@ -26,7 +26,7 @@ INSERT INTO users_to_decks (user_id, deck_id)
   (1,2);
 
 /* Begin Coding Questions */
-INSERT INTO coding_questions(name, topic, description, input_1, output_1, starter_code) 
+INSERT INTO coding_questions(name, topic, description, input_1, output_1, starter_code, difficulty) 
 VALUES('Largest Element', 
 '1300', 
 'Purpose:
@@ -68,7 +68,7 @@ using namespace std;
 
 int find_largest_element(int arr[], int size) {
     // Begin your solution here
-}'), ('Greatest Pair Sum', 
+}',2), ('Greatest Pair Sum', 
 '1300', 
 'Purpose:
 The purpose of the greatestPairSum function is to identify and return the greatest sum made by any pairing out of a given array of non-negative integers.
@@ -113,7 +113,7 @@ using namespace std;
 
 int greatestPairSum(int arr[], int size) {
     // Begin your solution here
-}'),
+}',3),
 ('Check Odd', '1300', 
 'Purpose: 
 Check if the integer input is odd. 
@@ -142,7 +142,7 @@ None.', 'int main() {
 
 bool isOdd(int num) {
     // Begin your solution here
-}'), 
+}',1), 
 ('Calculator', '1300', 
 'Purpose: 
 Make a function that utilizes a switch statement to perform an operation on two integers. 
@@ -171,7 +171,7 @@ using namespace std;
 // Function to perform calculation using switch
 float calculate(int num_1, int num_2, char op) {
     // Begin your solution here
-}'),
+}',3),
 ('Array Doubling', 
 '2270',
 'Purpose: 
@@ -246,7 +246,7 @@ using namespace std;
 
 int* doubleArraySize(int* arr, int &size) {
     // Begin your solution here
-}'), 
+}',3), 
 ('Reverse a Singly Linked List', '2270', 
 'Purpose: 
 Given a struct for a linked list node and a function to create the singly linked list, write the function reverseList to reverse the nodes in the singly linked list. 
@@ -321,7 +321,7 @@ ListNode* createList(const int arr[], int size) {
         current = current->next;
     }
     return head;
-}'),('Valid Parentheses', '2270', 
+}',3),('Valid Parentheses', '2270', 
 'Purpose: 
 Create a function that uses a stack to check if an input has valid parentheses. Valid parentheses means that the type of parentheses is opened and closed in order, so [()] is valid, [(]) is not valid. 
 Declaration: 
@@ -354,7 +354,7 @@ using namespace std;
 bool isValid(string s) {
     // Begin your solution here...
     return false;
-}'),('Computer Network Infection', '2270', 
+}',4),('Computer Network Infection', '2270', 
 'Purpose: 
 Given a network of computers with each computer stored in a cell of a 2x2 matrix, there is one infected computers. For each infected computer each minute it infects all of its direct neighbors. How many minutes until all of the computers are infected? 
 Declaration:
@@ -404,7 +404,7 @@ int timeToInfectAll(int n, int** edges, int edgeCount, int start) {
     // Begin your solution here...
     return 0;
 }
-'),('Count Set Bits', '2400', 
+',5),('Count Set Bits', '2400', 
 'Purpose: 
 Write a function countSetBits which returns the number of set bits (1 bits) in the integer input. 
 Declaration:
@@ -431,7 +431,7 @@ using namespace std;
 // Function to count set bits
 int countSetBits(int n) {
     return 0;
-}'),
+}',3),
 ('Memcpy Implementation', '2400', 
 'Purpose: 
 Implement a custom version of the memcpy function, which copies a specified number of bytes from a source memory block to a destination memory block.
@@ -472,7 +472,7 @@ If src = dest, then that should remain the same after the function call.', 'int 
 
 void* my_memcpy(void* dest, const void* src, size_t n) {
     // Begin your solution here
-}'), 
+}',4), 
 ('IsTMax', '2400', 
 'Purpose: 
 Write a function to verify if the integer input is TMax. 
@@ -501,7 +501,7 @@ None.', 'int main() {
 
 bool isTMax(int num) {
     // Begin your solution here
-}'), ('Translate x86 Assembly', '2400', 
+}',2), ('Translate x86 Assembly', '2400', 
 'Purpose: Looking at the assembly code below write the same function in C++.
 Declaration: 
 bool mysteryFunction(int n); 
@@ -530,7 +530,7 @@ using namespace std;
 
 bool mysteryFunction(int n) {
     return false;
-}'),
+}',2),
 ('Graph Traversal - BFS', 
 '3104', 
 'Purpose:
@@ -603,7 +603,7 @@ using namespace std;
 
 vector<int> bfs_traversal(int V, vector<vector<int>>& adj, int start) {
     // Begin your solution here
-}'), 
+}',3), 
 ('Graph Traversal - DFS', 
 '3104', 
 'Purpose:
@@ -683,7 +683,7 @@ void dfs_helper(int node, vector<vector<int>>& adj, vector<bool>& visited, vecto
 }
 vector<int> dfs_traversal(int V, vector<vector<int>>& adj, int start) {
     // Begin your solution here
-}'), ('Divide & Conquer - Merge Sort', 
+}',3), ('Divide & Conquer - Merge Sort', 
 '3104', 
 'Purpose:
 The purpose of the mergeSort function is to sort an array of integers in ascending order using the Merge Sort algorithm.
@@ -748,7 +748,7 @@ void merge(int arr[], int left, int mid, int right) {
 
 void mergeSort(int arr[], int left, int right) {
     // Begin your solution here
-}'),('Divide & Conquer - Quick Sort', 
+}',3),('Divide & Conquer - Quick Sort', 
 '3104', 
 'Purpose:
 The purpose of the quickSort function is to sort an array of integers in ascending order using the Quick Sort algorithm.
@@ -814,7 +814,7 @@ int partition(int arr[], int low, int high) {
 
 void quickSort(int arr[], int low, int high) {
     // Begin your solution here
-}');
+}',3);
 
 
 

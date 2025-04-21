@@ -386,7 +386,7 @@ app.post('/coding', auth, async(req, res) => {
   try {
     // Use parameterized query to prevent SQL injection
     results = await db.one(
-      'SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = $1',
+      'SELECT question_id, input_1, output_1, difficulty FROM coding_questions WHERE question_id = $1',
       [question_id]
     );
     question_id = results.question_id;
@@ -435,8 +435,8 @@ app.post('/coding', auth, async(req, res) => {
     const output = JSON.stringify(response.data.run.output);
     console.log(output);
     passed = `Incorrect Output:${output}\n Expected:${expected_output} \n Time taken: ${time_taken} seconds`;
-    const results = await db.one(
-      'SELECT question_id, input_1, output_1, description FROM coding_questions WHERE question_id = $1',
+    results = await db.one(
+      'SELECT question_id, input_1, output_1, description, difficulty FROM coding_questions WHERE question_id = $1',
       [question_id]
     );
     if (expected_output == output)
@@ -446,7 +446,7 @@ app.post('/coding', auth, async(req, res) => {
       console.log("Userid", user_id);
       await updateLoginStreak(req.session.user.user_id);
       let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id, time_taken, completed) VALUES(${user_id}, ${question_id}, ${time_taken}, TRUE) RETURNING user_id;`;
-      let addPoints = `UPDATE users SET points = points + 10 WHERE user_id = ${user_id};` // temporarily add 10 points per question, we can make it add a different amount for different question difficulty later
+      let addPoints = `UPDATE users SET points = points + ${results.difficulty * 5} WHERE user_id = ${user_id};` // temporarily add 10 points per question, we can make it add a different amount for different question difficulty later
         console.log("inside");
         let ret = await db.one(insertUser);
         await db.none(addPoints);
