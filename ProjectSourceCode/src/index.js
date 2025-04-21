@@ -475,6 +475,27 @@ app.post('/coding', auth, async(req, res) => {
   }
 });
 
+// Auto-save route
+app.post('/save-draft', auth, async (req, res) => {
+  try {
+    const { code, question_id } = req.body;
+    const user_id = req.session.user.user_id;
+
+    await db.none(
+      `INSERT INTO user_code_saves (user_id, question_id, code)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (user_id, question_id)
+       DO UPDATE SET code = $3, saved_at = NOW()`,
+      [user_id, question_id, code]
+    );
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Draft save error:', error);
+    res.status(500).json({ success: false });
+  }
+});
+
 // Route: /logout
 // Method: GET
 // Destroys the session and logs the user out
