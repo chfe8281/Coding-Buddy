@@ -759,6 +759,17 @@ async function calculateCompletionPercentage(username) {
   }
 }
 
+app.post('/api/update-streak', auth, async (req, res) => {
+  try {
+    const userId = req.session.user.user_id;
+    const newStreak = await updateLoginStreak(userId);
+    res.json({ success: true, streak: newStreak });
+  } catch (error) {
+    console.error('Error updating streak:', error);
+    res.status(500).json({ success: false, error: 'Failed to update streak' });
+  }
+});
+
 async function updateLoginStreak(userId) {
   try {
     // Get user's current streak and last login date

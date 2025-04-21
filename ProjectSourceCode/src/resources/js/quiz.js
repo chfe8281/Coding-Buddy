@@ -279,6 +279,7 @@ nextBtn.addEventListener('click', () => {
     if (currentQuestion < filteredQuestions.length) {
         loadQuestion();
     } else {
+        updateStreak();
         showResults();
     }
 });
@@ -287,6 +288,13 @@ checkAnswerBtn.addEventListener('click', () => {
     //answerChecked = true;
     checkAnswer();
 });
+
+function updateStreak() {
+    fetch('/api/update-streak', {
+      method: 'POST',
+      credentials: 'same-origin' // Ensures session cookie is sent
+    }).catch(err => console.error('Failed to update streak:', err));
+  }
 
 //loadQuestion();
 
