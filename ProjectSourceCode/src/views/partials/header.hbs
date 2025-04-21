@@ -108,7 +108,37 @@
       }
     });
   });
+  // Flashcards functions
+  function flipCard(id) {
+    //console.log("Flip " + id);
+    if (document.getElementById(id+'_front').style.display == "block") {
+      //console.log("Show front");
+      document.getElementById(id+'_front').style.display="none";
+      document.getElementById(id+'_back').style.display="block"; 
+    } else {
+      //console.log("Show back");
+      document.getElementById(id+'_front').style.display="block";
+      document.getElementById(id+'_back').style.display="none";       
+    }
+  }
 
+// Updates editCard modal with selected card info
+function pickCard(id, front, back, creator) {
+  //console.log("Id: " + id);
+  //console.log("Front: " + front);
+  //console.log("Back: " + back);
+  //console.log("Creator: " + creator);
+  document.getElementById("edit_card_id").value=id;
+  document.getElementById("edit_card_front").value=front;
+  document.getElementById("edit_card_back").value=back;
+  document.getElementById("edit_card_creator_id").value=creator;
+}
+// Updates editDeck modal with selected deck info
+function pickDeck(id, name, creator) {
+  document.getElementById("edit_deck_id").value=id;
+  document.getElementById("edit_deck_name").value=name;
+  document.getElementById("edit_deck_creator_id").value=creator;
+}
   </script>
 </head>
 <body class="h-100 d-flex flex-column">
