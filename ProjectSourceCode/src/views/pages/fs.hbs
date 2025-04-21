@@ -1,60 +1,81 @@
-{{!-- views/pages/flashcardDeck.hbs --}}
+{{!-- views/pages/flashcards.hbs --}}
 {{#extends 'layouts/main'}}
-
+<link rel="stylesheet" href="../../resources/css/flashcards.css">
 {{#block 'body'}}
-  <div class="flashcards-container">
+  <div class="flashcards-container text-center my-5">
     <h1>{{deckName}}</h1>
 
-    <div id="flashcards-carousel">
+    <!-- Carousel area -->
+    <div id="flashcards-carousel" style="position:relative; height:250px; perspective:800px; margin:2rem auto; max-width:600px;">
       {{#each flashcards}}
-        <div class="flashcard{{#if @first}} active{{/if}}">
-          <div class="card">
-            <div class="card-face card-front">{{this.front}}</div>
-            <div class="card-face card-back">{{this.back}}</div>
+        <div class="flashcard" style="display: none; position:absolute; top:0; left:0; width:100%; height:100%;">
+          <div class="card" style="width:100%; height:100%; transform-style:preserve-3d; transition:transform 0.6s; position:relative;">
+            <div class="card-face card-front" style="
+                position:absolute; width:100%; height:100%;
+                backface-visibility:hidden; display:flex;
+                align-items:center; justify-content:center;
+                border:1px solid #ccc; border-radius:8px;
+                background:#fff; padding:1rem; box-shadow:0 2px 4px rgba(0,0,0,.1);
+                font-size:1.2rem;
+              ">
+              {{this.front}}
+            </div>
+            <div class="card-face card-back" style="
+                position:absolute; width:100%; height:100%;
+                backface-visibility:hidden; display:flex;
+                align-items:center; justify-content:center;
+                border:1px solid #ccc; border-radius:8px;
+                background:#fff; padding:1rem; box-shadow:0 2px 4px rgba(0,0,0,.1);
+                font-size:1.2rem;
+                transform:rotateY(180deg);
+              ">
+              {{this.back}}
+            </div>
           </div>
         </div>
       {{/each}}
     </div>
 
+    <!-- Controls -->
     <div class="controls">
-      <button id="prevCard">Previous</button>
-      <button id="flipCard">Flip</button>
-      <button id="nextCard">Next</button>
+      <button id="prevCard" class="btn btn-outline-primary mx-2">Previous</button>
+      <button id="flipCard" class="btn btn-outline-secondary mx-2">Flip</button>
+      <button id="nextCard" class="btn btn-outline-primary mx-2">Next</button>
     </div>
   </div>
 
-  <link rel="stylesheet" href="../../resources/css/flashcards.css">
-
+  <!-- Embedded JS -->
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const cards = Array.from(document.querySelectorAll('.flashcard'));
-      let current = 0;
+    document.addEventListener('DOMContentLoaded', () => {
+      const slides = Array.from(document.querySelectorAll('#flashcards-carousel .flashcard'));
+      let index = 0;
+      if (!slides.length) return;
 
+      // show only one card
       function show(i) {
-        cards.forEach((c, idx) => {
-          c.classList.toggle('active', idx === i);
-          // reset any flipped state
-          c.querySelector('.card').classList.remove('flipped');
+        slides.forEach((s, j) => {
+          s.style.display = j === i ? 'block' : 'none';
+          // reset flip
+          s.querySelector('.card').classList.remove('flipped');
         });
       }
 
-      document.getElementById('prevCard').addEventListener('click', () => {
-        if (!cards.length) return;
-        current = (current - 1 + cards.length) % cards.length;
-        show(current);
-      });
+      // wire buttons
+      document.getElementById('prevCard').onclick = () => {
+        index = (index - 1 + slides.length) % slides.length;
+        show(index);
+      };
+      document.getElementById('nextCard').onclick = () => {
+        index = (index + 1) % slides.length;
+        show(index);
+      };
+      document.getElementById('flipCard').onclick = () => {
+        const card = slides[index].querySelector('.card');
+        card.classList.toggle('flipped');
+      };
 
-      document.getElementById('nextCard').addEventListener('click', () => {
-        if (!cards.length) return;
-        current = (current + 1) % cards.length;
-        show(current);
-      });
-
-      document.getElementById('flipCard').addEventListener('click', () => {
-        if (!cards.length) return;
-        const cardEl = cards[current].querySelector('.card');
-        cardEl.classList.toggle('flipped');
-      });
+      // initial display
+      show(0);
     });
   </script>
 {{/block}}
