@@ -853,10 +853,11 @@ app.post('/flashcards/create-deck', auth, async (req,res) =>{
 
     await db.task(async t => {
       await db.none(`INSERT INTO decks (name, count, creator_id)
-        VALUES ($1, 0, $2);`, [req.body.name, req.session.user_id])
-      
+        VALUES ($1, 0, $2);`, [req.body.name, req.session.user.user_id]);
+
+      // console.log(await db.any(`SELECT * FROM decks;`));
       await db.none(`INSERT INTO users_to_decks (user_id, deck_id)
-        VALUES ($1, (SELECT COUNT(deck_id) FROM decks));`, [req.session.user.user_id]);
+        VALUES ($1, (SELECT MAX(deck_id) FROM decks));`, [req.session.user.user_id]);
       });
     res.redirect('/flashcards');
   } catch (err) {
@@ -880,6 +881,33 @@ app.post('/flashcards/edit-deck', auth, (req, res) => {
       console.error('Error editing deck:', err);
       res.redirect('/home');
     });
+});
+
+/*
+Route: /flashcards/delete-deck
+Method: DELETE
+Removes deck from user, deletes if creator
+*/
+app.post('/flashcards/delete-deck', auth, (req,res) => {
+  try {
+    db.task (async t=>{
+      // console.log(await db.any(`SELECT * FROM decks`));
+
+      // Check user is creator
+      if (req.session.user.user_id != req.body.creator_id) {
+        console.log("User doesn't own this deck");
+      } else {
+
+        // Delete deck
+        await db.none(`DELETE FROM decks
+          WHERE deck_id = $1;`, [req.body.deck_id]);
+      }
+    })
+    res.redirect('/flashcards');
+  } catch (err) {
+    console.error('Error deleting deck:', err);
+    return res.redirect('/home');
+  }
 });
 
 /*

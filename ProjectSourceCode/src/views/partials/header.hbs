@@ -107,10 +107,15 @@ function pickCard(id, front, back, creator) {
 }
 // Updates editDeck modal with selected deck info
 function pickDeck(id, name, creator) {
+  console.log("Select deck");
   document.getElementById("edit_deck_id").value=id;
   document.getElementById("edit_deck_name").value=name;
   document.getElementById("edit_deck_creator_id").value=creator;
+
   document.getElementById("new_card_deck_id").value=id;
+  
+  document.getElementById("delete_deck_deck_id").value=id;
+  document.getElementById("delete_deck_creator_id").value=creator;
 }
   </script>
 </head>
