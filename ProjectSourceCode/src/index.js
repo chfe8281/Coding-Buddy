@@ -804,50 +804,146 @@ app.get('/mcq', (req, res) => {
 // *****************************************************
 // <!-- Flashcards API Routes -->
 // *****************************************************
-app.get('/flashcards', async (req,res) => {
+app.get('/flashcards', async (req, res) => {
   try {
-    
-    const user = req.session.user;
-    if (!user) return res.redirect('/login');
+    if (!req.session.user) {
+      // stop execution once we redirect
+      return res.redirect('/login');
+    }
 
-    // Get user decks
-    let results = await db.task (async results => {
-      deck_info = await db.any(`SELECT users.user_id, decks.deck_id, decks.name, decks.creator_id FROM users
-        INNER JOIN users_to_decks
-          ON users.user_id = users_to_decks.user_id
-        INNER JOIN decks
-          ON users_to_decks.deck_id = decks.deck_id
-        WHERE users.user_id = $1
-        ORDER BY decks.deck_id ASC;`, [req.session.user.user_id]);
+    // 1) Fetch all decks this user belongs to
+    const deckInfo = await db.any(`
+      SELECT u.user_id,
+             d.deck_id,
+             d.name,
+             d.creator_id
+        FROM users u
+   INNER JOIN users_to_decks utd
+           ON u.user_id = utd.user_id
+   INNER JOIN decks d
+           ON utd.deck_id = d.deck_id
+       WHERE u.user_id = $1
+       ORDER BY d.deck_id ASC;
+    `, [req.session.user.user_id]);
 
-      // Get corresponding cards
-      let decks = [];
-      for(let i = 0; i < deck_info.length; i++) {
-        // console.log(deck_info[i].name);
-        cards = await db.any(`SELECT cards.card_id, cards.front, cards.back, cards.creator_id FROM decks
-          INNER JOIN decks_to_cards
-            ON decks_to_cards.deck_id = decks.deck_id
-          INNER JOIN cards
-            ON cards.card_id = decks_to_cards.card_id
-          WHERE decks.deck_id = $1
-          ORDER BY cards.card_id ASC;`, [deck_info[i].deck_id]);
-        // console.log(cards);
-          decks[i] = {
-            name: deck_info[i].name,
-            id: deck_info[i].deck_id,
-            creator_id: deck_info[i].creator_id,
-            cards
-          }
-        // console.log(decks[i]);
-      }
-      return decks;
-    });
-    res.render('pages/flashcards', {decks: results});
+    // 2) For each deck, fetch its cards
+    const decks = await Promise.all(deckInfo.map(async info => {
+      const cards = await db.any(`
+        SELECT c.card_id,
+               c.front,
+               c.back,
+               c.creator_id
+          FROM decks d
+     INNER JOIN decks_to_cards dtc
+             ON d.deck_id = dtc.deck_id
+     INNER JOIN cards c
+             ON c.card_id = dtc.card_id
+         WHERE d.deck_id = $1
+         ORDER BY c.card_id ASC;
+      `, [info.deck_id]);
+
+      return {
+        id:          info.deck_id,
+        name:        info.name,
+        creator_id:  info.creator_id,
+        cards
+      };
+    }));
+
+    // 3) Render
+    res.render('pages/flashcards', { decks });
+
   } catch (err) {
-    res.render('pages/flashcards',{
+    console.error('Error loading flashcards:', err);
+    res.render('pages/flashcards', {
       decks: [],
       error: err
     });
+  }
+});
+
+/*
+ Route: POST /flashcards/edit-deck
+ Modifies deck name
+*/
+app.post('/flashcards/edit-deck', (req, res) => {
+  db.none(`
+    UPDATE decks
+       SET name = $2
+     WHERE deck_id = $1;
+  `, [req.body.deck_id, req.body.name])
+    .then(() => res.redirect('/flashcards'))
+    .catch(err => {
+      console.error('Error editing deck:', err);
+      res.redirect('/home');
+    });
+});
+
+/*
+ Route: POST /flashcards/edit-card
+ Modify card content
+*/
+app.post('/flashcards/edit-card', (req, res) => {
+  db.none(`
+    UPDATE cards
+       SET front = $2,
+           back  = $3
+     WHERE card_id = $1;
+  `, [req.body.card_id, req.body.front, req.body.back])
+    .then(() => res.redirect('/flashcards'))
+    .catch(err => {
+      console.error('Error editing card:', err);
+      res.redirect('/home');
+    });
+});
+
+/*
+ Route: POST /flashcards/add-cards
+ Adds starter cards
+*/
+app.post('/flashcards/add-cards', (req, res) => {
+  db.none(`
+    INSERT INTO users_to_decks (user_id, deck_id)
+         VALUES ($1, 1),
+                ($1, 2);
+  `, [req.session.user.user_id])
+    .then(() => res.redirect('/flashcards'))
+    .catch(err => {
+      console.error('Error adding starter cards:', err);
+      res.redirect('/home');
+    });
+});
+
+/*
+ Route: GET /flashcards/:deckId
+ Show a single deck
+*/
+app.get('/flashcards/:deckId', auth, async (req, res) => {
+  const deckId = Number(req.params.deckId);
+  try {
+    const deck = await db.one(
+      `SELECT name
+         FROM decks
+        WHERE deck_id = $1;`,
+      [deckId]
+    );
+    const cards = await db.any(`
+      SELECT c.front,
+             c.back
+        FROM cards c
+   INNER JOIN decks_to_cards dc
+           ON dc.card_id = c.card_id
+       WHERE dc.deck_id = $1
+       ORDER BY c.card_id ASC;
+    `, [deckId]);
+
+    res.render('pages/flashcardDeck', {
+      deckName:   deck.name,
+      flashcards: cards
+    });
+  } catch (err) {
+    console.error('Error loading deck:', err);
+    res.redirect('/flashcards');
   }
 });
 
