@@ -1,0 +1,56 @@
+.flashcards-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    text-align: center;
+    font-family: sans-serif;
+  }
+  
+  #flashcards-carousel {
+    position: relative;
+    height: 250px;
+    perspective: 800px;
+    margin-bottom: 1rem;
+  }
+  
+  .flashcard {
+    display: none;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  
+  .flashcard.active {
+    display: block;
+  }
+  
+  .card {
+    width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    position: relative;
+  }
+  
+  .card.flipped {
+    transform: rotateY(180deg);
+  }
+  
+  .card-face {
+    position: absolute;
+    backface-visibility: hidden;
+    width: 100%; height: 100%;
+    display: flex; justify-content: center; align-items: center;
+    border: 1px solid #ccc; border-radius: 8px;
+    background: #fff; padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    font-size: 1.2rem; text-align: center;
+  }
+  
+  .card-face.card-back {
+    transform: rotateY(180deg);
+  }
+  
+  .controls button {
+    margin: 0 .5rem;
+    padding: .5rem 1rem;
+    cursor: pointer;
+  }
