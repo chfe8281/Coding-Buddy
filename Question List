@@ -102,3 +102,39 @@ B) 0011 0101
 C) 1101 0101
 D) 1010 0110
 Answer: A
+
+3104 Questions:
+Which of the following is a searching algorithm?
+A) Bubble Sort
+B) Linear Search
+C) Selection Sort
+D) Insertion Sort
+Answer: B
+
+What is the time complexity of binary search in the worst case?
+A) O(n)
+B) O(1)
+C) O(n log n)
+D) O(log n)
+Answer: D
+
+Which sorting algorithm repeatedly compares and swaps adjacent elements?
+A) Insertion Sort
+B) Merge Sort
+C) Bubble Sort
+D) Selection Sort
+Answer: C
+
+What is the best case time complexity of Bubble Sort?
+A) O(n)
+B) O(log n)
+C) O(n^2)
+D) O(n log n)
+Answer: A
+
+Which algorithm is best suited for finding the shortest path in a graph with non-negative weights?
+A) Dijkstra's Algorithm
+B) Depth First Search
+C) Kruskal’s Algorithm
+D) Merge Sort
+Answer: A
