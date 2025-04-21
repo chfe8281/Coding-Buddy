@@ -804,74 +804,44 @@ app.get('/mcq', (req, res) => {
 // *****************************************************
 // <!-- Flashcards API Routes -->
 // *****************************************************
-app.get('/flashcards', async (req, res) => {
+app.get('/flashcards', auth, async (req, res) => {
   try {
-    if (!req.session.user) {
-      // stop execution once we redirect
-      return res.redirect('/login');
-    }
+    // fetch decks the user has access to
+    const deckInfo = await db.any(
+      `SELECT d.deck_id AS id, d.name, d.creator_id
+         FROM decks d
+         JOIN users_to_decks ud ON ud.deck_id = d.deck_id
+        WHERE ud.user_id = $1
+        ORDER BY d.deck_id`,
+      [req.session.user.user_id]
+    );
 
-    // 1) Fetch all decks this user belongs to
-    const deckInfo = await db.any(`
-      SELECT u.user_id,
-             d.deck_id,
-             d.name,
-             d.creator_id
-        FROM users u
-   INNER JOIN users_to_decks utd
-           ON u.user_id = utd.user_id
-   INNER JOIN decks d
-           ON utd.deck_id = d.deck_id
-       WHERE u.user_id = $1
-       ORDER BY d.deck_id ASC;
-    `, [req.session.user.user_id]);
-
-    // 2) For each deck, fetch its cards
-    const decks = await Promise.all(deckInfo.map(async info => {
-      const cards = await db.any(`
-        SELECT c.card_id,
-               c.front,
-               c.back,
-               c.creator_id
-          FROM decks d
-     INNER JOIN decks_to_cards dtc
-             ON d.deck_id = dtc.deck_id
-     INNER JOIN cards c
-             ON c.card_id = dtc.card_id
-         WHERE d.deck_id = $1
-         ORDER BY c.card_id ASC;
-      `, [info.deck_id]);
-
-      return {
-        id:          info.deck_id,
-        name:        info.name,
-        creator_id:  info.creator_id,
-        cards
-      };
+    // for each deck, fetch its cards in parallel
+    const decks = await Promise.all(deckInfo.map(async d => {
+      const cards = await db.any(
+        `SELECT c.card_id, c.front, c.back, c.creator_id
+           FROM cards c
+           JOIN decks_to_cards dc ON dc.card_id = c.card_id
+          WHERE dc.deck_id = $1
+          ORDER BY c.card_id`,
+        [d.id]
+      );
+      return { ...d, cards };
     }));
 
-    // 3) Render
-    res.render('pages/flashcards', { decks });
-
+    return res.render('pages/flashcards', { decks });
   } catch (err) {
-    console.error('Error loading flashcards:', err);
-    res.render('pages/flashcards', {
-      decks: [],
-      error: err
-    });
+    console.error('Error loading flashcards overview:', err);
+    return res.render('pages/flashcards', { decks: [], error: err });
   }
 });
 
-/*
- Route: POST /flashcards/edit-deck
- Modifies deck name
-*/
-app.post('/flashcards/edit-deck', (req, res) => {
-  db.none(`
-    UPDATE decks
-       SET name = $2
-     WHERE deck_id = $1;
-  `, [req.body.deck_id, req.body.name])
+// 2) EDIT DECK
+app.post('/flashcards/edit-deck', auth, (req, res) => {
+  db.none(
+    'UPDATE decks SET name = $2 WHERE deck_id = $1',
+    [req.body.deck_id, req.body.name]
+  )
     .then(() => res.redirect('/flashcards'))
     .catch(err => {
       console.error('Error editing deck:', err);
@@ -879,17 +849,12 @@ app.post('/flashcards/edit-deck', (req, res) => {
     });
 });
 
-/*
- Route: POST /flashcards/edit-card
- Modify card content
-*/
-app.post('/flashcards/edit-card', (req, res) => {
-  db.none(`
-    UPDATE cards
-       SET front = $2,
-           back  = $3
-     WHERE card_id = $1;
-  `, [req.body.card_id, req.body.front, req.body.back])
+// 3) EDIT CARD
+app.post('/flashcards/edit-card', auth, (req, res) => {
+  db.none(
+    'UPDATE cards SET front = $2, back = $3 WHERE card_id = $1',
+    [req.body.card_id, req.body.front, req.body.back]
+  )
     .then(() => res.redirect('/flashcards'))
     .catch(err => {
       console.error('Error editing card:', err);
@@ -897,56 +862,41 @@ app.post('/flashcards/edit-card', (req, res) => {
     });
 });
 
-/*
- Route: POST /flashcards/add-cards
- Adds starter cards
-*/
-app.post('/flashcards/add-cards', (req, res) => {
-  db.none(`
-    INSERT INTO users_to_decks (user_id, deck_id)
-         VALUES ($1, 1),
-                ($1, 2);
-  `, [req.session.user.user_id])
+// 4) ADD STARTER CARDS
+app.post('/flashcards/add-cards', auth, (req, res) => {
+  db.none(
+    'INSERT INTO users_to_decks (user_id, deck_id) VALUES ($1,1),($1,2)',
+    [req.session.user.user_id]
+  )
     .then(() => res.redirect('/flashcards'))
     .catch(err => {
-      console.error('Error adding starter cards:', err);
+      console.error('Error adding cards:', err);
       res.redirect('/home');
     });
 });
 
-/*
- Route: GET /flashcards/:deckId
- Show a single deck
-*/
+// 5) DETAIL: show one deck’s carousel (fs.hbs)
 app.get('/flashcards/:deckId', auth, async (req, res) => {
   const deckId = Number(req.params.deckId);
   try {
-    const deck = await db.one(
-      `SELECT name
-         FROM decks
-        WHERE deck_id = $1;`,
+    const { name: deckName } = await db.one(
+      'SELECT name FROM decks WHERE deck_id = $1',
       [deckId]
     );
-    const cards = await db.any(`
-      SELECT c.front,
-             c.back
-        FROM cards c
-   INNER JOIN decks_to_cards dc
-           ON dc.card_id = c.card_id
-       WHERE dc.deck_id = $1
-       ORDER BY c.card_id ASC;
-    `, [deckId]);
-
-    res.render('pages/flashcardDeck', {
-      deckName:   deck.name,
-      flashcards: cards
-    });
+    const flashcards = await db.any(
+      `SELECT c.front, c.back
+         FROM cards c
+         JOIN decks_to_cards dc ON dc.card_id = c.card_id
+        WHERE dc.deck_id = $1
+        ORDER BY c.card_id`,
+      [deckId]
+    );
+    return res.render('pages/fs', { deckName, flashcards });
   } catch (err) {
-    console.error('Error loading deck:', err);
-    res.redirect('/flashcards');
+    console.error('Error loading deck detail:', err);
+    return res.redirect('/flashcards');
   }
 });
-
 // *****************************************************
 // <!-- End Flashcards API Routes -->
 // *****************************************************
