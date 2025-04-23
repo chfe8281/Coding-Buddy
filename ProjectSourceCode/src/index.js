@@ -187,9 +187,9 @@ app.get('/login', (req,res)=>{
 // Route for inserting hashed password and email into users table
 app.post('/register', async (req, res) => {
   const { username, email, name, password } = req.body;
-  if (!username || !password) {
+  if (!username || !password || !email) {
     return res.status(400).render('pages/register', {
-      message: 'Username and password are required.'
+      message: 'Username, email, and password are required.'
     });
   }
   try {
@@ -386,7 +386,7 @@ app.post('/coding', auth, async(req, res) => {
   try {
     // Use parameterized query to prevent SQL injection
     results = await db.one(
-      'SELECT question_id, input_1, output_1 FROM coding_questions WHERE question_id = $1',
+      'SELECT question_id, input_1, output_1, difficulty FROM coding_questions WHERE question_id = $1',
       [question_id]
     );
     question_id = results.question_id;
@@ -435,8 +435,8 @@ app.post('/coding', auth, async(req, res) => {
     const output = JSON.stringify(response.data.run.output);
     console.log(output);
     passed = `Incorrect Output:${output}\n Expected:${expected_output} \n Time taken: ${time_taken} seconds`;
-    const results = await db.one(
-      'SELECT question_id, input_1, output_1, description FROM coding_questions WHERE question_id = $1',
+    results = await db.one(
+      'SELECT question_id, input_1, output_1, description, difficulty FROM coding_questions WHERE question_id = $1',
       [question_id]
     );
     if (expected_output == output)
@@ -446,7 +446,7 @@ app.post('/coding', auth, async(req, res) => {
       console.log("Userid", user_id);
       await updateLoginStreak(req.session.user.user_id);
       let insertUser = `INSERT INTO users_to_coding_questions(user_id, question_id, time_taken, completed) VALUES(${user_id}, ${question_id}, ${time_taken}, TRUE) RETURNING user_id;`;
-      let addPoints = `UPDATE users SET points = points + 10 WHERE user_id = ${user_id};` // temporarily add 10 points per question, we can make it add a different amount for different question difficulty later
+      let addPoints = `UPDATE users SET points = points + ${results.difficulty * 5} WHERE user_id = ${user_id};` // temporarily add 10 points per question, we can make it add a different amount for different question difficulty later
         console.log("inside");
         let ret = await db.one(insertUser);
         await db.none(addPoints);
@@ -759,6 +759,17 @@ async function calculateCompletionPercentage(username) {
   }
 }
 
+app.post('/api/update-streak', auth, async (req, res) => {
+  try {
+    const userId = req.session.user.user_id;
+    const newStreak = await updateLoginStreak(userId);
+    res.json({ success: true, streak: newStreak });
+  } catch (error) {
+    console.error('Error updating streak:', error);
+    res.status(500).json({ success: false, error: 'Failed to update streak' });
+  }
+});
+
 async function updateLoginStreak(userId) {
   try {
     // Get user's current streak and last login date
@@ -809,7 +820,33 @@ async function calculateVisualProgress(actualStreak) {
 // *****************************************************
 // <!-- Multiple Choice Question API Routes -->
 // *****************************************************
+app.post('/api/add-points', auth, async (req, res) => { // Use 'auth' middleware to ensure user is logged in
+  // The 'auth' middleware already checks req.session.user
+  const userId = req.session.user.user_id;
+  const pointsToAdd = 1; // Define how many points a correct answer gives
 
+  console.log(`Attempting to add ${pointsToAdd} point(s) to user ID: ${userId}`);
+
+  try {
+      const updateQuery = 'UPDATE users SET points = points + $1 WHERE user_id = $2';
+      // Use db.none since we don't need any data returned from this query
+      await db.none(updateQuery, [pointsToAdd, userId]);
+
+      console.log(`Successfully added ${pointsToAdd} point(s) for user ID: ${userId}.`);
+
+      // Optionally, update the points in the session if you display it frequently from there
+      // req.session.user.points = (req.session.user.points || 0) + pointsToAdd;
+      // req.session.save(); // Make sure to save session if you modify it
+
+      // Send a success response back to the client
+      res.status(200).json({ success: true, message: 'Points updated successfully' });
+
+  } catch (error) {
+      console.error(`Error updating points for user ID ${userId}:`, error);
+      // Send an error response back to the client
+      res.status(500).json({ success: false, message: 'Internal server error while updating points' });
+  }
+});
 
 app.get('/mcq', (req, res) => {
   const user = req.session.user;
