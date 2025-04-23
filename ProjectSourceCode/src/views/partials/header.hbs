@@ -17,42 +17,6 @@
   <link  rel = "stylesheet" href = "../../resources/css/navBar.css">
   
   <script>
-    let countdownTime = 1800;
-    function startCountdown() {
-        const timerElement = document.getElementById('timer');
-        timerElement.style.backgroundColor = 'rgb(214, 246, 214)';
-        const interval = setInterval(() => {
-                    // Calculate minutes and seconds
-            const minutes = Math.floor(countdownTime / 60);
-            const seconds = countdownTime % 60;
-
-                        // Format the time as MM:SS
-            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-            // Decrease the countdown time by 1 second
-            countdownTime--;
-
-            // Check if the countdown is over
-            if (countdownTime < 600){
-                timerElement.style.backgroundColor = 'rgb(242, 190, 185)';
-            }
-            if (countdownTime < 0) {
-                clearInterval(interval);
-                timerElement.textContent = "Time's up!";
-            }
-        }, 1000);
-    }
-    document.addEventListener("DOMContentLoaded", () => {
-        const buttons = document.querySelectorAll(".type-buttons button");
-
-        buttons.forEach(button => {
-            button.addEventListener("click", () => {
-                const selectedTopic = button.textContent.trim();
-                // Redirect to the /coding route with the topic as query param
-                window.location.href = `/coding?topic=${encodeURIComponent(selectedTopic)}`;
-            });
-        });
-    });
   // Flashcards functions
   function flipCard(id) {
     //console.log("Flip " + id);
