@@ -187,6 +187,7 @@ app.get('/login', (req,res)=>{
 // Route for inserting hashed password and email into users table
 app.post('/register', async (req, res) => {
   const { username, email, name, password } = req.body;
+
   if (!username || !password||!email) {
     return res.status(400).render('pages/register', {
       message: 'Username, email, and password are required.'
@@ -820,7 +821,33 @@ async function calculateVisualProgress(actualStreak) {
 // *****************************************************
 // <!-- Multiple Choice Question API Routes -->
 // *****************************************************
+app.post('/api/add-points', auth, async (req, res) => { // Use 'auth' middleware to ensure user is logged in
+  // The 'auth' middleware already checks req.session.user
+  const userId = req.session.user.user_id;
+  const pointsToAdd = 1; // Define how many points a correct answer gives
 
+  console.log(`Attempting to add ${pointsToAdd} point(s) to user ID: ${userId}`);
+
+  try {
+      const updateQuery = 'UPDATE users SET points = points + $1 WHERE user_id = $2';
+      // Use db.none since we don't need any data returned from this query
+      await db.none(updateQuery, [pointsToAdd, userId]);
+
+      console.log(`Successfully added ${pointsToAdd} point(s) for user ID: ${userId}.`);
+
+      // Optionally, update the points in the session if you display it frequently from there
+      // req.session.user.points = (req.session.user.points || 0) + pointsToAdd;
+      // req.session.save(); // Make sure to save session if you modify it
+
+      // Send a success response back to the client
+      res.status(200).json({ success: true, message: 'Points updated successfully' });
+
+  } catch (error) {
+      console.error(`Error updating points for user ID ${userId}:`, error);
+      // Send an error response back to the client
+      res.status(500).json({ success: false, message: 'Internal server error while updating points' });
+  }
+});
 
 app.get('/mcq', (req, res) => {
   const user = req.session.user;

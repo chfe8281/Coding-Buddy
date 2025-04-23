@@ -9,7 +9,7 @@ const quizData = [
         set: '1300'
     },
     {
-        question: "What will be the output of the following statement? API TO GET IN PROPER FORMATTING: cout << 5 / 2;",
+        question: "What will be the output of the following statement? cout << 5 / 2;",
         options: ["A) 2.5", "B) 2", "C) 2.0", "D) Compilation Error"],
         correct: 1,
         set: '1300'
@@ -87,9 +87,9 @@ const quizData = [
         set: '2400'
     },
     {
-        question: "More Questions Here",
-        options: ["A", "B", "C", "D"],
-        correct: 3,
+        question: "What is the default access specifier for members of a class in C++?",
+        options: ["Private", "Public", "Protected", "None of the above"],
+        correct: 0,
         set: '1300'
     },
     {
@@ -142,6 +142,7 @@ const quizContainer = document.getElementById('quiz');
 
 function loadSelectedSet(setId) {
     console.log("entered loadselectedset");
+    document.getElementById('quiz-title').textContent = `${setId} Quiz`;
     selectedSet = setId;
     filteredQuestions = quizData.filter(q => q.set === setId);
     currentQuestion = 0;
@@ -161,7 +162,10 @@ function loadQuestion() {
         const button = document.createElement('button');
         button.textContent = option;
         button.classList.add('option');
-        button.addEventListener('click', () => selectOption(button, index));
+        button.addEventListener('click', () => {
+            selectOption(button, index);
+            //button.style.backgroundColor='#b5adab';
+        });
         optionsEl.appendChild(button);
     });
     nextBtn.style.display = 'none';
@@ -176,8 +180,12 @@ function selectOption(selectedButton, optionIndex) {
     if (answerChecked) return;
 
     const buttons = optionsEl.getElementsByClassName('option');
-    Array.from(buttons).forEach(button => button.classList.remove('selected'));
+    Array.from(buttons).forEach(button => {
+        button.classList.remove('selected');
+        button.style.backgroundColor = ''; //set all btns to default color
+    });
     selectedButton.classList.add('selected');
+    selectedButton.style.backgroundColor = '#b5adab'; //change selected btn's bg color
     nextBtn.style.display = 'block';
     checkAnswerBtn.style.display = 'block';
 
@@ -209,25 +217,21 @@ function showResults() {
                     </div>
                     <div class="score">Your score: ${score}/${filteredQuestions.length}</div>
                     <p>${score > filteredQuestions.length / 2 ? 'Great job!' : 'Better luck next time!'}</p>
-                    <button class="btn btn-primary" onclick="location.reload()">Restart Quiz</button>
+                    <button class="btn btn-primary" onclick="location.reload()">Take Another Quiz</button>
                 </div>
             `;
 }
 
 function checkAnswer(timeout = false) {
-    // --- Prevent multiple checks ---
     if (answerChecked) {
         console.log("Answer already processed for this question.");
         return;
     }
-    // Mark as checked *immediately* to prevent race conditions if called again quickly
     answerChecked = true;
-    // --- Stop timer ---
-    if (timer) clearInterval(timer);
+    if (timer) clearInterval(timer); //stop timer
 
     const selectedOption = document.querySelector('.option.selected');
 
-    // --- Process Selection (or lack thereof on timeout) ---
     if (selectedOption) {
         const selectedAnswer = Array.from(optionsEl.children).indexOf(selectedOption);
         const question = filteredQuestions[currentQuestion];
@@ -235,7 +239,34 @@ function checkAnswer(timeout = false) {
         if (selectedAnswer === question.correct) {
             console.log("Correct!");
             selectedOption.style.backgroundColor = 'lightgreen';
-            score++; // Increment score ONLY ONCE here
+            score++;
+            //points++;
+            fetch('/api/add-points', { // Endpoint name
+                method: 'POST',       // Use POST for actions that modify data
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Add CSRF token header if your setup requires it
+                },
+                credentials: 'same-origin' // Send cookies with the request
+                // No body needed if the server just increments by 1 upon receiving the request
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Server failed to update points:', response.statusText);
+                    // Handle error appropriately, maybe log it without alerting the user
+                }
+                return response.json(); // Expect a JSON response back
+            })
+            .then(data => {
+                if (data.success) {
+                    console.log('Points updated on server.');
+                } else {
+                    console.warn('Server responded but points update failed:', data.message);
+                }
+            })
+            .catch(err => {
+                console.error('Network error during point update:', err);
+            });
         } else {
             console.log("Incorrect.");
             selectedOption.style.backgroundColor = 'lightcoral';
@@ -296,33 +327,3 @@ function updateStreak() {
     }).catch(err => console.error('Failed to update streak:', err));
   }
 
-//loadQuestion();
-
-// function checkAnswer() {
-//     //if(answerChecked) return;
-
-//     const selectedOption = document.querySelector('.option.selected');
-//     //if (!selectedOption) return;
-
-//     const selectedAnswer = Array.from(optionsEl.children).indexOf(selectedOption);
-//     const question = filteredQuestions[currentQuestion];
-
-//     if (selectedAnswer === question.correct) {
-//         console.log("Correct!");
-//         selectedOption.style.backgroundColor = 'lightgreen'; //#90EE90
-//         score++;
-//         selectedOption.classList.add('correct');
-//     } else {
-//         console.log("Incorrect.");
-//         selectedOption.style.backgroundColor = 'lightcoral'; //#F08080
-//         selectedOption.classList.add('incorrect');
-//         optionsEl.children[question.correct].classList.add('correct');
-//     }
-
-//     Array.from(optionsEl.children).forEach(button => button.disabled = true);
-//     clearInterval(timer);
-
-//     //answerChecked=true;
-// }
-
-//});
