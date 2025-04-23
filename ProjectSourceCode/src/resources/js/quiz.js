@@ -326,3 +326,4 @@ function updateStreak() {
       credentials: 'same-origin' // Ensures session cookie is sent
     }).catch(err => console.error('Failed to update streak:', err));
   }
+

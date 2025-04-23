@@ -187,7 +187,8 @@ app.get('/login', (req,res)=>{
 // Route for inserting hashed password and email into users table
 app.post('/register', async (req, res) => {
   const { username, email, name, password } = req.body;
-  if (!username || !password || !email) {
+
+  if (!username || !password||!email) {
     return res.status(400).render('pages/register', {
       message: 'Username, email, and password are required.'
     });
