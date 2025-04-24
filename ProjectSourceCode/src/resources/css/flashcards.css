@@ -54,3 +54,14 @@
     padding: .5rem 1rem;
     cursor: pointer;
   }
+
+/* Flashcards overview styling */
+.deck {
+  background-color: #aac9fa; 
+  padding: 20px; 
+  border-radius: 8px; 
+  margin: 20px 40px; 
+  color:#555555;
+  box-shadow: 5% 5% #555555;
+  font-size: large;
+}
