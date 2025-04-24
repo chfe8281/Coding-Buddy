@@ -1,21 +1,24 @@
-{{#if message}}
-    <div class="alert alert-danger">{{message}}</div>
-{{/if}}
 <div class="container">
-  <h1>Flashcards Overview</h1>
+  {{#if message}}
+      <div class="alert alert-{{message.type}}">{{message.text}}</div>
+  {{/if}}
 </div>
-<div>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newDeckModal">Create New Deck</button>
+<div class="container mt-5">
+  <h1>Flashcards Overview</h1>
+  <p>Welcome! Here you'll find all your flashcards. Click on a card to flip it. Click on the deck name to practice.</p>
+  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newDeckModal">Create New Deck</button>
+
 </div>
 {{!-- Input: json array of user's flashcards objects --}}
 {{#each decks}}
-  <div class="container">
-    <div class="row">
-      <h2>
+  <div class="container" style="background-color:white">
+    <h2>
         <!-- Deck name links to fs.hbs via /flashcards/{{id}} -->
         <a href="/flashcards/{{id}}" class="text-decoration-none">
           {{name}}
         </a>
+      </h2>
+        <p>deck #{{id}} created by user #{{creator_id}}</p>
         <button type="button"
                 class="btn btn-primary"
                 onclick="pickDeck({{id}}, '{{name}}', {{creator_id}})"
@@ -26,16 +29,16 @@
         <button type="button" class="btn btn-primary" onclick="pickDeck({{id}}, '{{name}}', {{creator_id}})" data-bs-toggle="modal" data-bs-target="#deleteDeckModal">Delete Deck</button>
         <button type="button" class="btn btn-primary" onclick="pickDeck({{id}}, '{{name}}', {{creator_id}})" data-bs-toggle="modal" data-bs-target="#newCardModal">Add Card</button>
 
-      </h2>
       
+      <div class="row">
       {{#each cards}}
-        <div class="container">
-          <div class="card flashcard">
-            <div class="card-body" onclick="flipCard({{card_id}})">
-              <h3 id="{{card_id}}_front" style="display:block">{{front}}</h3>
-              <p id="{{card_id}}_back" style="display:none">{{back}}</p>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <h3 id="{{card_id}}_front" style="display:block" onclick="flipCard({{card_id}})">{{front}}</h3>
+              <p id="{{card_id}}_back" style="display:none" onclick="flipCard({{card_id}})">{{back}}</p>
+              
               <p>card #{{card_id}} created by user #{{creator_id}}</p>
-            </div>
             <button type="button"
                     class="btn btn-primary"
                     onclick="pickCard({{card_id}}, '{{front}}', '{{back}}', {{creator_id}})"
@@ -45,12 +48,13 @@
             </button>
             <button type="button" class="btn btn-primary" onclick="pickCard({{card_id}}, '{{front}}', '{{back}}', {{creator_id}})" data-bs-toggle="modal" data-bs-target="#deleteCardModal">Delete Card</button>
           </div>
+          </div>
         </div>
       {{else}}
         <!-- No cards in this deck -->
         <p>This deck is empty</p>
       {{/each}}
-    </div>
+      </div>
   </div>
 
 {{else}}
@@ -59,12 +63,10 @@
   <div class="container">
     <h2>You don't have any flashcards :(</h2>
     <p>
-      Interact with the <a href='/coding'>Coding Practice</a> and
-      <a href='/mcq'>Quiz</a> or click below to get some
-      <a href='/mcq'>Quiz</a> or click below to get some
+      Create your own or click on the button below to get some presets.
     </p>
     <form id="add_cards" action="/flashcards/add-cards" method="POST">
-      <button type="submit" class="btn btn-primary">Add Cards!</button>
+      <button type="submit" class="btn btn-primary">Get Flashcards!</button>
     </form>
   </div>
 {{/each}}
@@ -83,7 +85,8 @@
             {{!-- Deck name --}}
             <div class="form-group">
                 <label for="new_deck_name" class="form-label">Deck Name</label>
-                <input type="text" class="form-control" id="new_deck_name" name="name" required>
+                <p>Deck names cannot begin or end on special characters.</p>
+                <input type="text" class="form-control" id="new_deck_name" name="name" pattern="^[\w].*[\w]$" required>
             </div>
         </div>
         <div class="modal-footer">
@@ -105,7 +108,7 @@
         </div>
         <div class="modal-body">
             <form id="deck_form" action="/flashcards/edit-deck" method="POST">
-
+            <p>You can only edit cards you created.</p>
             {{!-- Send deck and creator ids --}}
             <input type="hidden" id="edit_deck_id" name="deck_id">
             <input type="hidden" id="edit_deck_creator_id" name="creator_id">
@@ -113,7 +116,8 @@
             {{!-- Change name --}}
             <div class="form-group">
                 <label for="edit_deck_name" class="form-label">Deck Name</label>
-                <input type="text" class="form-control" id="edit_deck_name" name="name" required>
+                <p>Deck names cannot begin or end on special characters.</p>
+                <input type="text" class="form-control" id="edit_deck_name" name="name" pattern="^[\w].*[\w]$" required>
             </div>
         </div>
         <div class="modal-footer">
@@ -135,8 +139,7 @@
         </div>
         <div class="modal-body">
             <form id="delete_deck_form" action="/flashcards/delete-deck" method="POST">
-            <h2>Are you sure you want to delete this deck?</h2>
-            <p>You can only delete decks that you created.</p>
+            <p>Are you sure you want to delete this deck? You can only delete decks that you created.</p>
             {{!-- Send deck and creator ids --}}
 
             <input type="hidden" id="delete_deck_deck_id" name="deck_id">
@@ -161,8 +164,8 @@
         </div>
         <div class="modal-body">
             <form id="deck_form" action="/flashcards/create-card" method="POST">
-
-        {{!-- Send deck and creator ids --}}
+            <p>You can only create cards for decks you created.</p>
+        {{!-- Send deck id --}}
         <input type="hidden" id="new_card_deck_id" name="deck_id">        
         {{!-- Front --}}
           <div class="form-group">
@@ -252,8 +255,7 @@
         </div>
         <div class="modal-body">
             <form id="delete_card_form" action="/flashcards/delete-card" method="POST">
-            <h2>Are you sure you want to delete this card?</h2>
-            <p>You can only delete cards that you created.</p>
+            <p>Are you sure you want to delete this card? You can only delete cards that you created.</p>
             {{!-- Send card and creator ids --}}
 
             <input type="hidden" id="delete_card_card_id" name="card_id">
