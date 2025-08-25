@@ -308,12 +308,15 @@ app.get('/coding', auth, async (req, res) => {
     let message = "";
     let savedCode = "";
     try {
-      result = await db.one(query, [topic,user_id]);
+      result = await db.oneOrNone(query, [topic,user_id]);
       savedCode = await db.oneOrNone(
         `SELECT code FROM user_code_saves 
          WHERE user_id = $1 AND question_id = $2`,
         [user_id, result.question_id]
       );
+      if (!result){
+        result = await db.one(backup_query, [topic]);
+      }
     } catch(resultError)
     {
       console.log("No questions remaining, regenerating from old ones");
