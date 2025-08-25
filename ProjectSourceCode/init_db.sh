@@ -7,6 +7,8 @@
 PG_URI=${DATABASE_URL}
 echo "Running create.sql..."
 psql "$PG_URI" -f src/init_data/create.sql
+
+psql "$PG_URI" -f src/init_data/insert.sql
 # Execute each .sql file in the directory
 for file in src/init_data/*.sql; do
     echo "Executing $file..."
