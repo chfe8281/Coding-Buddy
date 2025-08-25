@@ -337,7 +337,7 @@ app.get('/coding', auth, async (req, res) => {
     });
   
   } catch (err) {
-    const result = await db.one(fallbackQuery, [topic]);
+    const result = await db.one(backupQuery, [topic]);
     const savedCode = await db.oneOrNone(
       `SELECT code FROM user_code_saves 
        WHERE user_id = $1 AND question_id = $2`,
