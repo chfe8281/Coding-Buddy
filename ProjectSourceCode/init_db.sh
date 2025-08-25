@@ -4,7 +4,7 @@
 # This file contains sensitive information and should be kept private
 
 # TODO: Set your PostgreSQL URI - Use the External Database URL from the Render dashboard
-PG_URI="postgresql://users_db_eu7f_user:94dg2bpsKncEDpH3kr9mRFZyxHgnIP1x@dpg-d00m0f8dl3ps73e55sug-a.oregon-postgres.render.com/users_db_eu7f"
+PG_URI="postgresql://coding_buddy_db_user:RrcXMHbbkW0juSthSDAw6exIiCvmZLcM@dpg-d2man6q4d50c73alaslg-a.oregon-postgres.render.com/coding_buddy_db"
 
 # Execute each .sql file in the directory
 for file in src/init_data/*.sql; do
